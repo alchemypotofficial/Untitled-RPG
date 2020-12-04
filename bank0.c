@@ -34,67 +34,67 @@
 /*--------------------------------------------*/
 
 /*  Game Variables:  */
-UBYTE Playing, Joy, Seed;
+UBYTE Playing = 0, Joy = 0, Seed = 0;
 
-UBYTE current_bank, held_bank;
+UBYTE current_bank = 2, held_bank = 0;
 
-UBYTE CurrentMap, CurrentMapBank, Tileset, Collision;
+UBYTE CurrentMap = 0, CurrentMapBank = 0, Tileset = 0, Collision = 0;
 
-UBYTE confirm_x, confirm_y;
+UBYTE confirm_x = 0, confirm_y = 0;
 
-UBYTE CurrentCombat, CurrentTroop, combat_main_y, combat_selection_y, CurrentTurn, turn_number, CurrentTarget, total_actors, selected_enemy, enemy_selection[4], action_selection[4], target_selection[7], skill_selection[7], action_order[7], enemy_x, actor_action[4], enemy_action[3], message_x, message_y;
+UBYTE CurrentCombat = 0, CurrentTroop = 0, combat_main_y = 0, combat_selection_y = 0, CurrentTurn = 0, turn_number = 0, CurrentTarget = 0, total_actors = 0, selected_enemy = 0, enemy_selection[4] = {0, 0, 0, 0}, action_selection[4] = {0, 0, 0, 0}, target_selection[7] = {0, 0, 0, 0, 0, 0, 0}, skill_selection[7] = {0, 0, 0, 0, 0, 0, 0}, action_order[7] = {0, 0, 0, 0, 0, 0, 0}, enemy_x, actor_action[4] = {0, 0, 0, 0}, enemy_action[3] = {0, 0, 0}, message_x = 0, message_y = 0;
 
-UINT16 agility[7], turn_order[7], agility_temp, turn_order_temp, skill_damage, damage_modifier;
+UINT16 agility[7] = {0, 0, 0, 0, 0, 0, 0}, turn_order[7] = {0, 0, 0, 0, 0, 0, 0}, agility_temp = 0, turn_order_temp = 0, skill_damage = 0, damage_modifier = 0;
 
-UBYTE CurrentMenu, CurrentSelection, selection_max = 5, CurrentShop, CurrentShopSelection, shop_message_x;
+UBYTE CurrentMenu = 0, CurrentSelection = 0, selection_max = 5, CurrentShop = 0, CurrentShopSelection = 0, shop_message_x = 0;
 
-UBYTE slot_1_filled, slot_2_filled, amount_1, amount_2, slot_selected, CurrentItemType, CurrentItemSlot, CurrentItemSelection, CurrentEquipSelection, CurrentSkillSelection[4], skill_y[4], menu_x, menu_y;
+UBYTE slot_1_filled = 0, slot_2_filled = 0, amount_1 = 0, amount_2 = 0, slot_selected = 0, CurrentItemType = 0, CurrentItemSlot = 0, CurrentItemSelection = 0, CurrentEquipSelection = 0, CurrentSkillSelection[4] = {0, 0, 0, 0}, skill_y[4] = {0, 0, 0, 0}, menu_x = 0, menu_y = 0;
 
-UBYTE selection_x, selection_y, slot_1, slot_2, item_1, item_2, item_slots, party_y, party_max, actor_y, actor_max, equip_y, list_y, stat_change, held_equip, held_stat, skills_y, shop_x, shop_y, ware_count;
+UBYTE selection_x = 0, selection_y = 0, slot_1 = 0, slot_2 = 0, item_1 = 0, item_2 = 0, item_slots = 0, party_y = 0, party_max = 0, actor_y = 0, actor_max = 0, equip_y = 0, list_y = 0, stat_change = 0, held_equip = 0, held_stat = 0, skills_y = 0, shop_x = 0, shop_y = 0, ware_count = 0;
 
 UINT8 PlayerCharacter = 0;
 
-UINT16 grid_x, grid_y, tile;
+UINT16 grid_x = 0, grid_y = 0, tile = 0;
 
-UBYTE camera_x, camera_y, base_byte, count_byte;
+UBYTE camera_x = 0, camera_y = 0, base_byte = 0, count_byte = 0;
 
-UINT8 map_size_x, map_size_y;
+UINT8 map_size_x = 0, map_size_y = 0;
 
-UINT8 clock_tick, walk_tick, blink_tick;
+UINT8 clock_tick = 0, walk_tick = 0, blink_tick = 0;
 
-UINT8 camera_focus;
+UINT8 camera_focus = 0;
 
-UBYTE current_message, current_line, total_lines, current_row, font_value;
+UBYTE current_message = 0, current_line = 0, total_lines = 0, current_row = 0, font_value = 0;
 
-UINT16 map_x, map_y, map_pos, map_y2, load_pos_y_held, load_pos_x, load_pos_y, char_pos_x, char_pos_y;
+UINT16 map_x = 0, map_y = 0, map_pos = 0, map_y2 = 0, load_pos_y_held = 0, load_pos_x = 0, load_pos_y = 0, char_pos_x = 0, char_pos_y = 0;
 
-UBYTE event_x, event_y;
+UBYTE event_x = 0, event_y = 0;
 
-UBYTE parsed_number;
+UBYTE parsed_number = 0;
 
-UINT16 saved_number, large_number;
+UINT16 saved_number = 0, large_number = 0;
 
 UINT16 party_gold = 500;
 
-UINT16 clock_time_second, clock_time_minute, clock_time_hour;
+UINT16 clock_time_second = 0, clock_time_minute = 0, clock_time_hour = 0;
 
-UBYTE step_counter = 6, encounter_rate = 50, encounter_value;
+UBYTE step_counter = 6, encounter_rate = 50, encounter_value = 0;
 
-INT8 i, j, k, l, m, n, r, x, y;
+INT8 i = 0, j = 0, k = 0, l = 0, m = 0, n = 0, r = 0, x = 0, y = 0;
 
-UBYTE u_i, u_j, u_x, u_y, u_l, u_k;
+UBYTE u_i = 0, u_j = 0, u_x = 0, u_y = 0, u_l = 0, u_k = 0;
 
-INT16 s16_i, s16_j;
+INT16 s16_i = 0, s16_j = 0;
 
-UINT16 u16_i, u16_j;
+UINT16 u16_i = 0, u16_j = 0;
 
-UINT16 d, e, f, g, h;
+UINT16 d = 0, e = 0, f = 0, g = 0, h = 0;
 
 unsigned char message_base[16];
 
-unsigned char parsed_decimal[4];
+unsigned char parsed_decimal[4] = {0, 0, 0, 0};
 
-unsigned char held_decimal[3];
+unsigned char held_decimal[3] = {0, 0, 0};
 
 unsigned char inventory[99];
 
@@ -151,9 +151,9 @@ const unsigned char Char_Period[1] =
     0x55
 };
 
-extern unsigned char Experience_List[];
+extern const UINT16 Experience_List[];
 
-extern unsigned char song_Data[];
+extern const unsigned char song_Data[];
 
 GameEnemyDummy enemy_dummy_1;
 GameEnemyDummy enemy_dummy_2;
@@ -170,13 +170,13 @@ extern unsigned char saved_inv_amount[99];
 extern GameActor saved_actor_hiro;
 
 /*  Game Flags:  */
-UBYTE game_scene;
+UBYTE game_scene = 0;
 
-UBYTE PlayerControlFlag;
+UBYTE PlayerControlFlag = 0;
 
-UBYTE MessageBoxFlag;
+UBYTE MessageBoxFlag = 0;
 
-UBYTE TitleScreenEnabledFlag;
+UBYTE TitleScreenEnabledFlag = 0;
 
 /*--------------------------------------------*/
 
@@ -322,8 +322,7 @@ extern void Scene_Handler(UBYTE scene_id);
 /*  Scene Functions  */
 void switch_bank(UBYTE bank)
 {
-    current_bank = bank;
-    SWITCH_ROM_MBC5(bank);
+    SWITCH_ROM_MBC1(bank);
 }
 
 void performant_delay(UBYTE num_loops)
@@ -1548,8 +1547,6 @@ void Gameplay()
 
 void vbl_music_isr(void)
 {
-    gbt_update();
-    SWITCH_ROM_MBC5(current_bank);
 }
 
 void vbl_clock_isr(void)
@@ -1594,7 +1591,7 @@ void interrupt_handler(void)
     set_interrupts(VBL_IFLAG);
 }
 
-void Main()
+void main()
 {
     ENABLE_RAM_MBC5;
 

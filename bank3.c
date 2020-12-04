@@ -10,7 +10,7 @@
 #include "Tiles/Tileset_2.c"
 #include "Tiles/Tileset_3.c"
 
-UBYTE offset_pos_x, offset_pos_y;
+UBYTE offset_pos_x = 0, offset_pos_y = 0;
 
 extern UBYTE Tileset;
 

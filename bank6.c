@@ -9,7 +9,7 @@
 #include "Maps/Map_MessageBox.c"
 #include "Messages/Message_Format.c"
 
-UBYTE pointer_tick;
+UBYTE pointer_tick = 0;
 
 extern UBYTE Joy;
 
