@@ -109,30 +109,51 @@ const unsigned char Item_Clear[] =
     0x01, 0x01, 0x01, 0x01, 0x01
 };
 
-void Use_Item(GameActor* actor, UBYTE item_id)
+void Menu_Item_Sort_Joypad();
+void Menu_Item_Use_Win_Joypad();
+void Menu_Item_Use_Joypad();
+void Menu_Item_Joypad();
+
+UBYTE Use_Item(GameActor* actor, GameItem* item) //Use item on actor;
 {
-    switch(item_id)
+    switch(item->action_id)
     {
-        case 0:
+        case 0: //NULL
+            return false;
             break;
-        case 1:
-            actor->health += 15;
-
-            if(actor->health > actor->max_health)
+        case 1: //Healing Brew
+            if(actor->health != 0 && actor->health < actor->max_health)
             {
-                actor->health = actor->max_health;
-            }
-            break;
-        case 2:
-            actor->mana += 10;
+                actor->health += 15;
 
-            if(actor->mana > actor->max_mana)
-            {
-                actor->mana = actor->max_mana;
+                if(actor->health > actor->max_health)
+                {
+                    actor->health = actor->max_health;
+                }
+
+                return true;
             }
+            else
+            {
+                return false;
+            }            
             break;
         default:
+            return false;
             break;
+    }
+}
+
+void Remove_Item(UBYTE slot, UBYTE amount)
+{
+    if(amount >= inv_amount[slot])
+    {
+        inventory[slot] = 0;
+        inv_amount[slot] = 0;
+    }
+    else
+    {
+        inv_amount[slot] -= amount;
     }
 }
 
@@ -441,70 +462,21 @@ void Hide_Item_Name()
 
 void Use_Item_Win(GameActor* actor, GameItem* item)
 {
-    switch(item->item_type)
+    if(Use_Item(actor, item) == failed)
     {
-        case none:
-            break;
-        case health_recovery:
-            if(actor->health != 0 && actor->health < actor->max_health)
-            {
-                Call_Play_Use(bank13);
+        Call_Play_Use(bank13);
 
-                Use_Item(actor, item->item_id);
+        set_win_map(5, 8, 15, 6, Map_Menu_ResetPLN1, Map_Menu_ResetPLN0);
 
-                inv_amount[CurrentItemSlot + CurrentItemSelection] -= 1;
+        Restructure_Inventory();
 
-                if(inv_amount[CurrentItemSlot + CurrentItemSelection] == 0)
-                {
-                    inventory[CurrentItemSlot + CurrentItemSelection] = 0;
-                }
+        Refresh_Item_Menu();
 
-                set_win_map(5, 8, 15, 6, Map_Menu_ResetPLN1, Map_Menu_ResetPLN0);
-
-                Restructure_Inventory();
-
-                Refresh_Item_Menu();
-
-                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
-
-                CurrentMenu = menu_item_use;
-            }
-            else
-            {
-                Call_Play_Buzz(bank13);
-            }
-            break;
-        case mana_recovery:
-            if(actor->max_mana != 0 && actor->mana < actor->max_mana)
-            {
-                Call_Play_Use(bank13);
-
-                Use_Item(actor, item->item_id);
-
-                inv_amount[CurrentItemSlot + CurrentItemSelection] -= 1;
-
-                if(inv_amount[CurrentItemSlot + CurrentItemSelection] == 0)
-                {
-                    inventory[CurrentItemSlot + CurrentItemSelection] = 0;
-                }
-
-                set_win_map(5, 8, 15, 6, Map_Menu_ResetPLN1, Map_Menu_ResetPLN1);
-
-                Restructure_Inventory();
-
-                Refresh_Item_Menu();
-
-                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
-
-                CurrentMenu = menu_item_use;
-            }
-            else
-            {
-                Call_Play_Buzz(bank13);
-            }
-            break;
-        default:
-            break;
+        Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
+    }
+    else
+    {
+        Call_Play_Buzz(bank13);
     }
 }
 
@@ -568,506 +540,17 @@ void Draw_Item_Menu()
     fade_in();
 }
 
-void Menu_Item_Joypad()
+void Menu_Item_Sort_Joypad()
 {
-    Joy = joypad();
-
-    if(Joy & J_UP)
+    while(1)
     {
-        if(CurrentMenu == menu_item_use)
-        {
-            if(selection_y > 0)
-            {
-                set_win_tiles(9 * selection_x + 1, 4 + 2 * selection_y, 1, 1, Item_Background);
+        performant_delay(1);
 
-                selection_y -= 1;
-                
-                set_win_tiles(9 * selection_x + 1, 4 + 2 * selection_y, 1, 1, Item_Pointer);
+        Blink_Item_Name();
 
-                CurrentItemSlot -= 1;
+        Joy = joypad();
 
-                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
-            }
-            else if(CurrentItemSelection > 0)
-            {
-                CurrentItemSelection -= 1;
-
-                Refresh_Item_Menu();
-
-                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
-            }
-            else
-            {
-                Call_Play_Buzz(bank13);
-            }
-
-            Refresh_Cursors();
-
-            while(joypad() & J_UP)
-            {
-                wait_vbl_done();
-
-                if(joypad() & J_B)
-                {
-                    Call_Play_Confirm(bank13);
-
-                    CurrentMenu = menu_item;
-                    CurrentItemSlot = 0;
-
-                    set_win_tiles(1 + 9 * selection_x, 4 + selection_y * 2, 1, 1, Item_Background);
-
-                    set_win_tiles(1, 15, 18, 2, Null_Item_Description);
-
-                    selection_x = 0;
-                    selection_y = 0;
-
-                    Refresh_Item_Menu();
-
-                    while(joypad() & J_B)
-                    {
-                        wait_vbl_done();
-                    }
-                }
-            }
-        }
-        else if(CurrentMenu == menu_item_sort)
-        {
-            if(selection_y > 0)
-            {
-                set_win_tiles(9 * selection_x + 1, 4 + 2 * selection_y, 1, 1, Item_Background);
-
-                selection_y -= 1;
-                
-                set_win_tiles(9 * selection_x + 1, 4 + 2 * selection_y, 1, 1, Item_Pointer);
-
-                CurrentItemSlot -= 1;
-
-                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
-            }
-            else if(CurrentItemSelection > 0)
-            {
-                CurrentItemSelection -= 1;
-
-                Refresh_Item_Menu();
-
-                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
-            }
-            else
-            {
-                Call_Play_Buzz(bank13);
-            }
-
-            Refresh_Cursors();
-
-            while(joypad() & J_UP)
-            {
-                wait_vbl_done();
-
-                Blink_Item_Name();
-
-                if(joypad() & J_B)
-                {
-                    Call_Play_Confirm(bank13);
-
-                    CurrentMenu = menu_item;
-                    CurrentItemSlot = 0;
-
-                    set_win_tiles(1 + 9 * selection_x, 4 + selection_y * 2, 1, 1, Item_Background);
-
-                    set_win_tiles(1, 15, 18, 2, Null_Item_Description);
-
-                    selection_x = 1;
-                    selection_y = 0;
-
-                    if(slot_1_filled == true)
-                    {
-                        inventory[slot_1] = item_1;
-                        inv_amount[slot_1] = amount_1;
-
-                        Refresh_Item_Menu();
-                    }
-
-                    slot_1 = 0;
-                    amount_1 = 0;
-                    slot_1_filled = false;
-
-                    slot_2 = 0;
-                    amount_2 = 0;
-                    slot_2_filled = false;
-
-                    Refresh_Item_Menu();
-
-                    while(joypad() & J_B)
-                    {
-                        wait_vbl_done();
-                    }
-                }
-            }
-        }
-        else if(CurrentMenu == menu_item_use_win)
-        {
-            if(party_y > 0)
-            {
-                set_win_tiles(6, 13 + party_y, 1, 1, Item_Background);
-                party_y -= 1;
-                set_win_tiles(6, 13 + party_y, 1, 1, Item_Pointer);
-            }
-
-            while(joypad() & J_UP)
-            {
-                wait_vbl_done();
-            }
-        }
-    }
-
-    if(Joy & J_DOWN)
-    {
-        if(CurrentMenu == menu_item_use)
-        {
-            if(selection_y < 3)
-            {
-                set_win_tiles(9 * selection_x + 1, 4 + 2 * selection_y, 1, 1, Item_Background);
-
-                selection_y += 1;
-                
-                set_win_tiles(9 * selection_x + 1, 4 + 2 * selection_y, 1, 1, Item_Pointer);
-
-                CurrentItemSlot += 1;
-
-                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
-            }
-            else if (CurrentItemSelection < 40)
-            {
-                CurrentItemSelection += 1;
-
-                Refresh_Item_Menu();
-
-                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
-            }
-            else
-            {
-                Call_Play_Buzz(bank13);
-            }
-
-            Refresh_Cursors();
-            
-            while(joypad() & J_DOWN)
-            {
-                wait_vbl_done();
-
-                if(joypad() & J_B)
-                {
-                    Call_Play_Confirm(bank13);
-
-                    CurrentMenu = menu_item;
-                    CurrentItemSlot = 0;
-
-                    set_win_tiles(1 + 9 * selection_x, 4 + selection_y * 2, 1, 1, Item_Background);
-
-                    set_win_tiles(1, 15, 18, 2, Null_Item_Description);
-
-                    selection_x = 0;
-                    selection_y = 0;
-
-                    Refresh_Item_Menu();
-
-                    while(joypad() & J_B)
-                    {
-                        wait_vbl_done();
-                    }
-                }
-            }
-        }
-        else if(CurrentMenu == menu_item_sort)
-        {
-            if(selection_y < 3)
-            {
-                set_win_tiles(9 * selection_x + 1, 4 + 2 * selection_y, 1, 1, Item_Background);
-
-                selection_y += 1;
-
-                set_win_tiles(9 * selection_x + 1, 4 + 2 * selection_y, 1, 1, Item_Pointer);
-
-                CurrentItemSlot += 1;
-
-                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
-            }
-            else if (CurrentItemSelection < 40)
-            {
-                CurrentItemSelection += 1;
-
-                Refresh_Item_Menu();
-
-                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
-            }
-            else
-            {
-                Call_Play_Buzz(bank13);
-            }
-
-            Refresh_Cursors();
-
-            while(joypad() & J_DOWN)
-            {
-                wait_vbl_done();
-
-                Blink_Item_Name();
-
-                if(joypad() & J_B)
-                {
-                    Call_Play_Confirm(bank13);
-
-                    CurrentMenu = menu_item;
-                    CurrentItemSlot = 0;
-
-                    set_win_tiles(1 + 9 * selection_x, 4 + selection_y * 2, 1, 1, Item_Background);
-
-                    set_win_tiles(1, 15, 18, 2, Null_Item_Description);
-
-                    selection_x = 1;
-                    selection_y = 0;
-
-                    if(slot_1_filled == true)
-                    {
-                        inventory[slot_1] = item_1;
-                        inv_amount[slot_1] = amount_1;
-
-                        Refresh_Item_Menu();
-                    }
-
-                    slot_1 = 0;
-                    amount_1 = 0;
-                    slot_1_filled = false;
-
-                    slot_2 = 0;
-                    amount_2 = 0;
-                    slot_2_filled = false;
-
-                    Refresh_Item_Menu();
-
-                    while(joypad() & J_B)
-                    {
-                        wait_vbl_done();
-                    }
-                }
-            }
-        }
-        else if(CurrentMenu == menu_item_use_win)
-        {
-            if(party_y < party_max - 1)
-            {
-                set_win_tiles(6, 13 + party_y, 1, 1, Item_Background);
-                party_y += 1;
-                set_win_tiles(6, 13 + party_y, 1, 1, Item_Pointer);
-            }
-
-            while(joypad() & J_DOWN)
-            {
-                wait_vbl_done();
-            }
-        }
-    }
-
-    if(Joy & J_LEFT)
-    {
-        if(CurrentMenu == menu_item)
-        {
-            if(selection_x > 0)
-            {
-                selection_x -= 1;
-
-                set_win_tiles(6, 1, 1, 1, Item_Background);
-                set_win_tiles(2, 1, 1, 1, Item_Pointer);
-            }
-        }
-    }
-
-    if(Joy & J_RIGHT)
-    {
-        if(CurrentMenu == menu_item)
-        {
-            if(selection_x < 1)
-            {
-                selection_x += 1;
-
-                set_win_tiles(2, 1, 1, 1, Item_Background);
-                set_win_tiles(6, 1, 1, 1, Item_Pointer);
-            }
-        }
-    }
-
-    if(Joy & J_B)
-    {
-        if(CurrentMenu == menu_item)
-        {
-            Call_Play_Confirm(bank13);
-            Call_Load_Menu_Main(bank13);
-        }
-        else if(CurrentMenu == menu_item_use)
-        {
-            Call_Play_Confirm(bank13);
-
-            CurrentMenu = menu_item;
-            CurrentItemSlot = 0;
-
-            set_win_tiles(1 + 9 * selection_x, 4 + selection_y * 2, 1, 1, Item_Background);
-
-            set_win_tiles(1, 15, 18, 2, Null_Item_Description);
-
-            selection_x = 0;
-            selection_y = 0;
-
-            Refresh_Item_Menu();
-
-            while(joypad() & J_B)
-            {
-                wait_vbl_done();
-            }
-        }
-        else if(CurrentMenu == menu_item_sort)
-        {
-            Call_Play_Confirm(bank13);
-
-            CurrentMenu = menu_item;
-            CurrentItemSlot = 0;
-
-            set_win_tiles(1 + 9 * selection_x, 4 + selection_y * 2, 1, 1, Item_Background);
-
-            set_win_tiles(1, 15, 18, 2, Null_Item_Description);
-
-            selection_x = 1;
-            selection_y = 0;
-
-            if(slot_1_filled == true)
-            {
-                inventory[slot_1] = item_1;
-                inv_amount[slot_1] = amount_1;
-
-                Refresh_Item_Menu();
-            }
-
-            slot_1 = 0;
-            amount_1 = 0;
-            slot_1_filled = false;
-
-            slot_2 = 0;
-            amount_2 = 0;
-            slot_2_filled = false;
-
-            Refresh_Item_Menu();
-
-            while(joypad() & J_B)
-            {
-                wait_vbl_done();
-            }
-        }
-        else if(CurrentMenu == menu_item_use_win)
-        {
-            Call_Play_Confirm(bank13);
-
-            CurrentMenu = menu_item_use;
-            set_win_map(5, 12, 15, 6, Map_Item_Use_ReplacePLN1, Map_Item_Use_ReplacePLN0);
-
-            Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
-
-            Refresh_Item_Menu();
-
-            Reset_Pointer();
-
-            party_y = 0;
-
-            while(joypad() & J_B)
-            {
-                wait_vbl_done();
-            }
-        }
-    }
-
-    if(Joy & J_A || Joy & J_START)
-    {
-        if(CurrentMenu == menu_item)
-        {
-            if(selection_x == 0)
-            {
-                Call_Play_Confirm(bank13);
-
-                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
-                
-                set_win_tiles(1, 4, 1, 1, Item_Pointer);
-
-                selection_x = 0;
-                selection_y = 0;
-
-                CurrentMenu = menu_item_use;
-
-                while(joypad() & J_A || joypad() & J_START)
-                {
-                    wait_vbl_done();
-                }
-            }
-            else if(selection_x == 1)
-            {
-                Call_Play_Confirm(bank13);
-
-                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
-
-                set_win_tiles(1, 4, 1, 1, Item_Pointer);
-
-                selection_x = 0;
-                selection_y = 0;
-
-                CurrentMenu = menu_item_sort;
-
-                while(joypad() & J_A || joypad() & J_START)
-                {
-                    wait_vbl_done();
-                }
-            }
-        }
-        else if(CurrentMenu == menu_item_use)
-        {
-            slot_1 = CurrentItemSlot + CurrentItemSelection;
-
-            if(inventory[slot_1] != 0)
-            {
-                Call_Play_Confirm(bank13);
-
-                Draw_Party_Window(Get_Item(inventory[slot_1]));
-
-                set_win_tiles(6, 13, 1, 1, Item_Pointer);
-
-                if(party[1] == 0)
-                {
-                    party_max = 1;
-                }
-                else if(party[2] == 0)
-                {
-                    party_max = 2;
-                }
-                else if(party[3] == 0)
-                {
-                    party_max = 3;
-                }
-                else
-                {
-                    party_max = 0;
-                }
-
-                party_y = 0;
-
-                CurrentMenu = menu_item_use_win;
-            }
-            else
-            {
-                Call_Play_Buzz(bank13);
-            }
-
-            while(joypad() & J_A || joypad() & J_START)
-            {
-                wait_vbl_done();
-            }
-        }
-        else if(CurrentMenu == menu_item_sort)
+        if(Joy & J_A)
         {
             if(slot_1_filled == false && inventory[CurrentItemSlot + CurrentItemSelection] != 0)
             {
@@ -1116,18 +599,407 @@ void Menu_Item_Joypad()
 
             while(joypad() & J_A || joypad() & J_START)
             {
-                wait_vbl_done();
+                performant_delay(1);
 
                 Blink_Item_Name();
             }
         }
-        else if(CurrentMenu == menu_item_use_win)
+
+        if(Joy & J_B)
+        {
+            Call_Play_Confirm(bank13);
+
+            CurrentItemSlot = 0;
+
+            set_win_tiles(1 + 9 * selection_x, 4 + selection_y * 2, 1, 1, Item_Background);
+
+            set_win_tiles(1, 15, 18, 2, Null_Item_Description);
+
+            selection_x = 1;
+            selection_y = 0;
+
+            if(slot_1_filled == true)
+            {
+                inventory[slot_1] = item_1;
+                inv_amount[slot_1] = amount_1;
+
+                Refresh_Item_Menu();
+            }
+
+            slot_1 = 0;
+            amount_1 = 0;
+            slot_1_filled = false;
+
+            slot_2 = 0;
+            amount_2 = 0;
+            slot_2_filled = false;
+
+            Refresh_Item_Menu();
+
+            while(joypad() & J_B)
+            {
+                performant_delay(1);
+            }
+
+            Menu_Item_Joypad();
+        }
+
+        if(Joy & J_UP)
+        {
+            if(selection_y > 0)
+            {
+                set_win_tiles(9 * selection_x + 1, 4 + 2 * selection_y, 1, 1, Item_Background);
+
+                selection_y -= 1;
+                
+                set_win_tiles(9 * selection_x + 1, 4 + 2 * selection_y, 1, 1, Item_Pointer);
+
+                CurrentItemSlot -= 1;
+
+                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
+            }
+            else if(CurrentItemSelection > 0)
+            {
+                CurrentItemSelection -= 1;
+
+                Refresh_Item_Menu();
+
+                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
+            }
+            else
+            {
+                Call_Play_Buzz(bank13);
+            }
+
+            Refresh_Cursors();
+
+            while(joypad() & J_UP)
+            {
+                performant_delay(1);
+
+                Blink_Item_Name();
+            }
+        }
+
+        if(Joy & J_DOWN)
+        {
+            if(selection_y < 3)
+            {
+                set_win_tiles(9 * selection_x + 1, 4 + 2 * selection_y, 1, 1, Item_Background);
+
+                selection_y += 1;
+
+                set_win_tiles(9 * selection_x + 1, 4 + 2 * selection_y, 1, 1, Item_Pointer);
+
+                CurrentItemSlot += 1;
+
+                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
+            }
+            else if (CurrentItemSelection < 40)
+            {
+                CurrentItemSelection += 1;
+
+                Refresh_Item_Menu();
+
+                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
+            }
+            else
+            {
+                Call_Play_Buzz(bank13);
+            }
+
+            Refresh_Cursors();
+
+            while(joypad() & J_DOWN)
+            {
+                performant_delay(1);
+
+                Blink_Item_Name();
+            }
+        }
+    }
+}
+
+void Menu_Item_Use_Win_Joypad()
+{
+    while(1)
+    {
+        performant_delay(1);
+
+        Joy = joypad();
+
+        if(Joy & J_A)
         {
             Use_Item_Win(Get_Actor(party[party_y]), Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
 
             while(joypad() & J_A || joypad() & J_START)
             {
-                wait_vbl_done();
+                performant_delay(1);
+            }
+        }
+
+        if(Joy & J_B)
+        {
+            Call_Play_Confirm(bank13);
+
+            set_win_map(5, 12, 15, 6, Map_Item_Use_ReplacePLN1, Map_Item_Use_ReplacePLN0);
+
+            Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
+
+            Refresh_Item_Menu();
+
+            Reset_Pointer();
+
+            party_y = 0;
+
+            while(joypad() & J_B)
+            {
+                performant_delay(1);
+            }
+
+            Menu_Item_Joypad();
+        }
+
+        if(Joy & J_UP)
+        {
+            if(party_y > 0)
+            {
+                set_win_tiles(6, 13 + party_y, 1, 1, Item_Background);
+                party_y -= 1;
+                set_win_tiles(6, 13 + party_y, 1, 1, Item_Pointer);
+            }
+
+            while(joypad() & J_UP)
+            {
+                performant_delay(1);
+            }
+        }
+
+        if(Joy & J_DOWN)
+        {
+            if(party_y < party_max - 1)
+            {
+                set_win_tiles(6, 13 + party_y, 1, 1, Item_Background);
+                party_y += 1;
+                set_win_tiles(6, 13 + party_y, 1, 1, Item_Pointer);
+            }
+
+            while(joypad() & J_DOWN)
+            {
+                performant_delay(1);
+            }
+        }
+    }
+}
+
+void Menu_Item_Use_Joypad()
+{
+    while(1)
+    {
+        performant_delay(1);
+
+        Joy = joypad();
+
+        if(Joy & J_A)
+        {
+            slot_1 = CurrentItemSlot + CurrentItemSelection;
+
+            if(inventory[slot_1] != 0)
+            {
+                Call_Play_Confirm(bank13);
+
+                Draw_Party_Window(Get_Item(inventory[slot_1]));
+
+                set_win_tiles(6, 13, 1, 1, Item_Pointer);
+
+                party_y = 0;
+
+                while(joypad() & J_A || joypad() & J_START)
+                {
+                    performant_delay(1);
+                }
+
+                Menu_Item_Use_Win_Joypad();
+            }
+            else
+            {
+                Call_Play_Buzz(bank13);
+            }
+
+            while(joypad() & J_A || joypad() & J_START)
+            {
+                performant_delay(1);
+            }
+        }
+
+        if(Joy & J_B)
+        {
+            Call_Play_Confirm(bank13);
+
+            CurrentItemSlot = 0;
+
+            set_win_tiles(1 + 9 * selection_x, 4 + selection_y * 2, 1, 1, Item_Background);
+
+            set_win_tiles(1, 15, 18, 2, Null_Item_Description);
+
+            selection_x = 0;
+            selection_y = 0;
+
+            Refresh_Item_Menu();
+
+            while(joypad() & J_B)
+            {
+                performant_delay(1);
+            }
+
+            Menu_Item_Joypad();
+        }
+
+        if(Joy & J_UP)
+        {
+            if(selection_y > 0)
+            {
+                set_win_tiles(9 * selection_x + 1, 4 + 2 * selection_y, 1, 1, Item_Background);
+
+                selection_y -= 1;
+                
+                set_win_tiles(9 * selection_x + 1, 4 + 2 * selection_y, 1, 1, Item_Pointer);
+
+                CurrentItemSlot -= 1;
+
+                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
+            }
+            else if(CurrentItemSelection > 0)
+            {
+                CurrentItemSelection -= 1;
+
+                Refresh_Item_Menu();
+
+                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
+            }
+            else
+            {
+                Call_Play_Buzz(bank13);
+            }
+
+            Refresh_Cursors();
+
+            while(joypad() & J_UP)
+            {
+                performant_delay(1);
+            }
+        }
+
+        if(Joy & J_DOWN)
+        {
+            if(selection_y < 3)
+            {
+                set_win_tiles(9 * selection_x + 1, 4 + 2 * selection_y, 1, 1, Item_Background);
+
+                selection_y += 1;
+                
+                set_win_tiles(9 * selection_x + 1, 4 + 2 * selection_y, 1, 1, Item_Pointer);
+
+                CurrentItemSlot += 1;
+
+                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
+            }
+            else if (CurrentItemSelection < 40)
+            {
+                CurrentItemSelection += 1;
+
+                Refresh_Item_Menu();
+
+                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
+            }
+            else
+            {
+                Call_Play_Buzz(bank13);
+            }
+
+            Refresh_Cursors();
+            
+            while(joypad() & J_DOWN)
+            {
+                performant_delay(1);
+            }
+        }
+    }
+}
+
+void Menu_Item_Joypad()
+{
+    while(1)
+    {
+        performant_delay(1);
+
+        Joy = joypad();
+
+        if(Joy & J_A)
+        {
+            if(selection_x == 0)
+            {
+                Call_Play_Confirm(bank13);
+
+                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
+                
+                set_win_tiles(1, 4, 1, 1, Item_Pointer);
+
+                selection_x = 0;
+                selection_y = 0;
+
+                while(joypad() & J_A || joypad() & J_START)
+                {
+                    performant_delay(1);
+                }
+
+                Menu_Item_Use_Joypad();
+            }
+            else if(selection_x == 1)
+            {
+                Call_Play_Confirm(bank13);
+
+                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
+
+                set_win_tiles(1, 4, 1, 1, Item_Pointer);
+
+                selection_x = 0;
+                selection_y = 0;
+
+                while(joypad() & J_A || joypad() & J_START)
+                {
+                    performant_delay(1);
+                }
+
+                Menu_Item_Sort_Joypad();
+            }
+        }
+
+        if(Joy & J_B)
+        {
+            Call_Play_Confirm(bank13);
+            Call_Load_Menu_Main(bank13);
+        }
+
+        if(Joy & J_LEFT)
+        {
+            if(selection_x > 0)
+            {
+                selection_x -= 1;
+
+                set_win_tiles(6, 1, 1, 1, Item_Background);
+                set_win_tiles(2, 1, 1, 1, Item_Pointer);
+            }
+        }
+
+        if(Joy & J_RIGHT)
+        {
+            if(selection_x < 1)
+            {
+                selection_x += 1;
+
+                set_win_tiles(2, 1, 1, 1, Item_Background);
+                set_win_tiles(6, 1, 1, 1, Item_Pointer);
             }
         }
     }
@@ -1135,21 +1007,13 @@ void Menu_Item_Joypad()
 
 void Menu_Item()
 {
-    CurrentMenu = menu_item;
     Draw_Item_Menu();
 
     while(joypad() & J_A || joypad() & J_START)
     {
-        wait_vbl_done();
+        performant_delay(1);
     }
 
-    while(true)
-    {
-        wait_vbl_done();
-
-        Menu_Item_Joypad();
-
-        Blink_Item_Name();
-    }
+    Menu_Item_Joypad();
 }
 

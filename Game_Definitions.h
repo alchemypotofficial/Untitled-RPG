@@ -4,6 +4,8 @@
 /*  Boolean Tags:  */
 #define true 1
 #define false 0
+#define success 1
+#define failed 0
 
 /*  Direction Tags:  */
 #define up 0

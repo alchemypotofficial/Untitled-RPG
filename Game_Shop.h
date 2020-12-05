@@ -14,5 +14,6 @@ typedef struct GameShop
 } GameShop;
 
 extern const GameShop shop_test;
+extern const GameShop shop_plumvillage_item;
 
 #endif

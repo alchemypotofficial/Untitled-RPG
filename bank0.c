@@ -535,6 +535,19 @@ void toggle_control(UBYTE toggle)
 /*--------------------------------------------*/
 
 /*  General Functions  */
+
+void Init_Variables()
+{
+    memset(inventory, 0, 99);
+    memset(inv_amount, 0, 99);
+    memset(equipment, 0, 99);
+    memset(equipment_weapon, 0, 30);
+    memset(equipment_secondary, 0, 30);
+    memset(equipment_armor, 0, 30);
+    memset(equipment_accessory, 0, 30);
+    memset(flag_switch, 0, 255);
+}
+
 void Set_Start_Variables(void)
 {
     PlayerControlFlag = true;
@@ -900,6 +913,9 @@ GameShop* Get_Shop(UBYTE shop_id)
     {
         case 0:
             return &shop_test;
+            break;
+        case 1:
+            return &shop_plumvillage_item;
             break;
         default:
             return &shop_test;
@@ -1603,6 +1619,10 @@ void main()
 
     BGP_REG = 0xFF;
     OBP0_REG = 0xFF;
+
+    Init_Variables();
+
+    cpu_fast();
 
     if(saved_game_start == true)
     {

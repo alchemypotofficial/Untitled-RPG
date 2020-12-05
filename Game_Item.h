@@ -7,10 +7,12 @@ typedef struct GameItem
 {
     unsigned char* name;
     unsigned char* full_name;
+    unsigned char* description;
     UBYTE item_id;
     UBYTE item_type;
     UINT16 price;
-    unsigned char* description;
+    UBYTE action_id;
+    UBYTE menu_usable;
 
 } GameItem;
 

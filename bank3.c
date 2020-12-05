@@ -5,7 +5,6 @@
 #include "Game_Map.h"
 #include "Game_Tilemap.h"
 #include "Game_NPC.h"
-#include "Maps/Map_Clear.c"
 #include "Tiles/Tileset_1.c"
 #include "Tiles/Tileset_2.c"
 #include "Tiles/Tileset_3.c"
@@ -65,7 +64,7 @@ const UWORD Palette_Sprite_1[] =
 
 void Clear_Map()
 {
-    set_bkg_tiles(0, 0, 32, 32, Map_ClearPLN0);
+    fill_bkg_rect(0, 0, 32, 32, 0);
 }
 
 void Load_Tileset(UBYTE tileset)

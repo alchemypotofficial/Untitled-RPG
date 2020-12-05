@@ -14,7 +14,7 @@ extern const unsigned char Mana_Brew_Description;
 
 
 /*  Game Items:  */
-const GameItem item_null = {name_item_null, full_name_item_null, 0, none, 0, Null_Item_Description};
-const GameItem item_healing_brew = {name_healing_brew, full_name_healing_brew, 1, health_recovery, 5, Healing_Brew_Description};
-const GameItem item_life_leaf = {name_life_leaf, full_name_healing_brew, 2, status_death, 300, Null_Item_Description};
-const GameItem item_mana_brew = {name_mana_brew, full_name_healing_brew, 3, mana_recovery, 500, Mana_Brew_Description};
+const GameItem item_null = {name_item_null, full_name_item_null, Null_Item_Description, 0, none, 0, 0, false};
+const GameItem item_healing_brew = {name_healing_brew, full_name_healing_brew, Healing_Brew_Description, 1, health_recovery, 5, 1, true};
+const GameItem item_life_leaf = {name_life_leaf, full_name_healing_brew, Healing_Brew_Description, 2, status_death, 300, true};
+const GameItem item_mana_brew = {name_mana_brew, full_name_healing_brew, Mana_Brew_Description, 3, mana_recovery, 500, true};

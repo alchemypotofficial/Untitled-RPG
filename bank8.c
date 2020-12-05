@@ -136,31 +136,12 @@ void Draw_Line_Bank8(GameMap* map, UBYTE direction) //* Draws verticle/horizonta
             f = g * map_size_x;
             map_y = f;
         }
-        
-        if(camera_y + 18 > 31)
-        {
-            for(i = 0; i < 32 - camera_y; i += 2)
-            {
-                map_pos = map_x + map_y;
-                Draw_Tile8(load_pos_x, load_pos_y + i, map->data[map_pos]);
-                map_y += map_size_x;
-            }
 
-            for(i = 0; i < camera_y - 14; i += 2)
-            {
-                map_pos = map_x + map_y;
-                Draw_Tile8(load_pos_x, i, map->data[map_pos]);
-                map_y += map_size_x;
-            }
-        }
-        else
+        for(i = 0; i < 18; i += 2)
         {
-            for(i = 0; i < 18; i += 2)
-            {
-                map_pos = map_x + map_y;
-                Draw_Tile8(load_pos_x, load_pos_y + i, map->data[map_pos]);
-                map_y += map_size_x;
-            }
+            map_pos = map_x + map_y;
+            Draw_Tile8(load_pos_x, load_pos_y + i, map->data[map_pos]);
+            map_y += map_size_x;
         }
     }
 
