@@ -33,7 +33,7 @@ extern UINT16 saved_number, large_number;
 
 extern INT8 i, j, k, l, m, n;
 
-extern unsigned char party[4];
+extern GameActor* party[4];
 
 extern unsigned char inventory[99];
 
@@ -129,24 +129,24 @@ void Add_Item(GameItem* item, UBYTE amount)
 
 void Add_Actor(GameActor* actor)
 {
-    if(party[0] == 0)
+    if(party[0] == NULL)
     {
-        party[0] = actor->actor_id;
+        party[0] = actor;
         actor->party_slot = 0;
     }
-    else if(party[1] == 0)
+    else if(party[1] == NULL)
     {
-        party[1] = actor->actor_id;
+        party[1] = actor;
         actor->party_slot = 1;
     }
-    else if(party[2] == 0)
+    else if(party[2] == NULL)
     {
-        party[2] = actor->actor_id;
+        party[2] = actor;
         actor->party_slot = 2;
     }
-    else if(party[3] == 0)
+    else if(party[3] == NULL)
     {
-        party[3] = actor->actor_id;
+        party[3] = actor;
         actor->party_slot = 3;
     }
 
@@ -237,7 +237,7 @@ void Draw_Name(UBYTE tile_x, UBYTE tile_y, unsigned char* name, UBYTE full_name)
 
 void Draw_Actor(GameActor* actor)
 {
-    if(actor != &actor_null)
+    if(actor != NULL)
     {
         if(actor->party_slot == 0 && actor->active_member == true)
         {
@@ -293,10 +293,10 @@ void Draw_Actor(GameActor* actor)
 
 void Draw_Party()
 {
-    Draw_Actor(Get_Actor(party[0]));
-    Draw_Actor(Get_Actor(party[1]));
-    Draw_Actor(Get_Actor(party[2]));
-    Draw_Actor(Get_Actor(party[3]));
+    Draw_Actor(party[0]);
+    Draw_Actor(party[1]);
+    Draw_Actor(party[2]);
+    Draw_Actor(party[3]);
 }
 
 void Draw_Time()
@@ -359,8 +359,8 @@ void Refresh_Main_Menu()
 {
     set_win_tiles(14, 8, 6, 5, Map_Menu_ConfirmBox_RefreshPLN0);
 
-    Draw_Actor(Get_Actor(party[2]));
-    Draw_Actor(Get_Actor(party[3]));
+    Draw_Actor(party[2]);
+    Draw_Actor(party[3]);
 
     set_win_tiles(0, 13, 20, 5, &Map_Menu_MainPLN0[260]);
 

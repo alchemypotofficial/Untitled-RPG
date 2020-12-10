@@ -1,4 +1,5 @@
 #include <gb/gb.h>
+#include "Game_Sprite.h"
 
 #ifndef GAME_ACTOR
 #define GAME_ACTOR
@@ -8,6 +9,7 @@ typedef struct GameActor
     unsigned char* name;
     UBYTE length;
     UBYTE actor_id;
+    const GameCharSprite* sprites;
     UINT16 level;
     UBYTE class;
     UINT16 health;

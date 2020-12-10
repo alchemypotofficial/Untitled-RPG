@@ -287,20 +287,6 @@ void Reload_Map() //* Reloads map based on "CurrentMap".
 
 void Draw_Titlescreen(void)
 {
-    wait_vbl_done();
-    DISPLAY_OFF;
-
-    Load_Tileset(1);
-
-    SHOW_SPRITES;
-
-    Call_Draw_Map(bank3, &map_plum_village);
-    
-    SHOW_BKG;
-    HIDE_WIN;
-
-    wait_vbl_done();
-    DISPLAY_ON;
 }
 
 void Load_Hiro_Tiles(void)

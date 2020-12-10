@@ -24,7 +24,7 @@ extern UINT16 party_gold;
 
 extern INT8 i, j, k, l, m, n;
 
-extern unsigned char party[4];
+extern GameActor* party[4];
 
 extern unsigned char inventory[99];
 
@@ -209,27 +209,27 @@ void Draw_Actor_Equip(UBYTE party_slot) //* Draws actor's name and stats.
 
     if(party_slot == 0)
     {
-        Call_Draw_Name(bank12, 2, 1, Get_Actor(party[0])->name, true);
+        Call_Draw_Name(bank12, 2, 1, party[0]->name, true);
 
-        Refresh_Actor_Stats(Get_Actor(party[0]));
+        Refresh_Actor_Stats(party[0]);
     }
     else if(party_slot == 1)
     {
-        Call_Draw_Name(bank12, 2, 1, Get_Actor(party[1])->name, true);
+        Call_Draw_Name(bank12, 2, 1, party[1]->name, true);
 
-        Refresh_Actor_Stats(Get_Actor(party[1]));
+        Refresh_Actor_Stats(party[1]);
     }
     else if(party_slot == 2)
     {
-        Call_Draw_Name(bank12, 2, 1, Get_Actor(party[2])->name, true);
+        Call_Draw_Name(bank12, 2, 1, party[2]->name, true);
 
-        Refresh_Actor_Stats(Get_Actor(party[2]));
+        Refresh_Actor_Stats(party[2]);
     }
     else if(party_slot == 3)
     {
-        Call_Draw_Name(bank12, 2, 1, Get_Actor(party[3])->name, true);
+        Call_Draw_Name(bank12, 2, 1, party[3]->name, true);
 
-        Refresh_Actor_Stats(Get_Actor(party[3]));
+        Refresh_Actor_Stats(party[3]);
     }
 }
 
@@ -314,11 +314,11 @@ void Draw_Equip_Menu() //* Draws equip menu for "actor_y".
 
     Draw_Actor_Equip(actor_y);
 
-    Draw_Equipped(Get_Actor(party[actor_y]));
+    Draw_Equipped(party[actor_y]);
 
     set_win_tiles(10, 4, 1, 1, Equip_Pointer);
 
-    Draw_Equip_Description(Get_Equip(Get_Actor(party[actor_y])->equipped[0]));
+    Draw_Equip_Description(Get_Equip(party[actor_y]->equipped[0]));
 
     fade_in();
 }
@@ -580,24 +580,24 @@ void Refresh_Stat_Changes() //* Refreshes actor stats to display stat changes an
     switch(equip_y)
     {
         case weapon_slot:
-            Draw_Equip_Stats(Get_Actor(party[actor_y]), Get_Equip(equipment_weapon[list_y + CurrentEquipSelection]), weapon_slot);
+            Draw_Equip_Stats(party[actor_y], Get_Equip(equipment_weapon[list_y + CurrentEquipSelection]), weapon_slot);
 
-            Compare_Stats(Get_Equip(equipment_weapon[list_y + CurrentEquipSelection]), Get_Equip(Get_Actor(party[actor_y])->equipped[weapon_slot]));
+            Compare_Stats(Get_Equip(equipment_weapon[list_y + CurrentEquipSelection]), Get_Equip(party[actor_y]->equipped[weapon_slot]));
             break;
         case secondary_slot:
-            Draw_Equip_Stats(Get_Actor(party[actor_y]), Get_Equip(equipment_secondary[list_y + CurrentEquipSelection]), secondary_slot);
+            Draw_Equip_Stats(party[actor_y], Get_Equip(equipment_secondary[list_y + CurrentEquipSelection]), secondary_slot);
 
-            Compare_Stats(Get_Equip(equipment_secondary[list_y + CurrentEquipSelection]), Get_Equip(Get_Actor(party[actor_y])->equipped[secondary_slot]));
+            Compare_Stats(Get_Equip(equipment_secondary[list_y + CurrentEquipSelection]), Get_Equip(party[actor_y]->equipped[secondary_slot]));
             break;
         case armor_slot:
-            Draw_Equip_Stats(Get_Actor(party[actor_y]), Get_Equip(equipment_armor[list_y + CurrentEquipSelection]), armor_slot);
+            Draw_Equip_Stats(party[actor_y], Get_Equip(equipment_armor[list_y + CurrentEquipSelection]), armor_slot);
 
-            Compare_Stats(Get_Equip(equipment_armor[list_y + CurrentEquipSelection]), Get_Equip(Get_Actor(party[actor_y])->equipped[armor_slot]));
+            Compare_Stats(Get_Equip(equipment_armor[list_y + CurrentEquipSelection]), Get_Equip(party[actor_y]->equipped[armor_slot]));
             break;
         case accessory_slot:
-            Draw_Equip_Stats(Get_Actor(party[actor_y]), Get_Equip(equipment_accessory[list_y + CurrentEquipSelection]), accessory_slot);
+            Draw_Equip_Stats(party[actor_y], Get_Equip(equipment_accessory[list_y + CurrentEquipSelection]), accessory_slot);
 
-            Compare_Stats(Get_Equip(equipment_accessory[list_y + CurrentEquipSelection]), Get_Equip(Get_Actor(party[actor_y])->equipped[accessory_slot]));
+            Compare_Stats(Get_Equip(equipment_accessory[list_y + CurrentEquipSelection]), Get_Equip(party[actor_y]->equipped[accessory_slot]));
             break;
         default:
             break;
@@ -608,7 +608,7 @@ void Refresh_Equip_Menu() //* Redraws actor's equipped equip and pointer.
 {
     set_win_tiles(10, 3, 10, 11, Map_Menu_ListPLN0);
 
-    Draw_Equipped(Get_Actor(party[actor_y]));
+    Draw_Equipped(party[actor_y]);
 
     Draw_Equip_Pointer();
 }
@@ -701,7 +701,7 @@ void Menu_Equip_Joypad() //* Joypad handler for equip menu.
                 set_win_tiles(10, 4 + 2 * equip_y, 1, 1, Equip_Pointer);
             }
 
-            Draw_Equip_Description(Get_Equip(Get_Actor(party[actor_y])->equipped[equip_y]));
+            Draw_Equip_Description(Get_Equip(party[actor_y]->equipped[equip_y]));
 
             while(joypad() & J_UP)
             {
@@ -787,7 +787,7 @@ void Menu_Equip_Joypad() //* Joypad handler for equip menu.
                 set_win_tiles(10, 4 + 2 * equip_y, 1, 1, Equip_Pointer);
             }
 
-            Draw_Equip_Description(Get_Equip(Get_Actor(party[actor_y])->equipped[equip_y]));
+            Draw_Equip_Description(Get_Equip(party[actor_y]->equipped[equip_y]));
 
             while(joypad() & J_DOWN)
             {
@@ -898,16 +898,16 @@ void Menu_Equip_Joypad() //* Joypad handler for equip menu.
         else if(CurrentMenu == menu_equip_list)
         {
             Call_Play_Confirm(bank12);
-            Equip_Actor(Get_Actor(party[actor_y]));
+            Equip_Actor(party[actor_y]);
 
             CurrentEquipSelection = 0;
             list_y = 0;
             CurrentMenu = menu_equip;
 
             Refresh_Equip_Menu();
-            Draw_Equip_Description(Get_Equip(Get_Actor(party[actor_y])->equipped[equip_y]));
+            Draw_Equip_Description(Get_Equip(party[actor_y]->equipped[equip_y]));
 
-            Refresh_Actor_Stats(Get_Actor(party[actor_y]));
+            Refresh_Actor_Stats(party[actor_y]);
 
             set_win_tiles(6, 4, 1, 1, Equip_Background);
             set_win_tiles(6, 6, 1, 1, Equip_Background);
@@ -947,9 +947,9 @@ void Menu_Equip_Joypad() //* Joypad handler for equip menu.
             Call_Play_Confirm(bank12);
 
             Refresh_Equip_Menu();
-            Draw_Equip_Description(Get_Equip(Get_Actor(party[actor_y])->equipped[equip_y]));
+            Draw_Equip_Description(Get_Equip(party[actor_y]->equipped[equip_y]));
 
-            Refresh_Actor_Stats(Get_Actor(party[actor_y]));
+            Refresh_Actor_Stats(party[actor_y]);
 
             set_win_tiles(6, 4, 1, 1, Equip_Background);
             set_win_tiles(6, 6, 1, 1, Equip_Background);

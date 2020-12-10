@@ -29,7 +29,7 @@ extern INT8 i, j, k, l, m, n;
 
 extern UBYTE u_x, u_y;
 
-extern unsigned char party[4];
+extern GameActor* party[4];
 
 extern unsigned char inventory[99];
 
@@ -178,29 +178,29 @@ void Draw_Skill(GameActor* actor, UBYTE skill_id, UBYTE tile_x, UBYTE tile_y)
 
 void Draw_Actor_Skills(UBYTE skill_position)
 {
-    if(Get_Actor(party[actor_y])->skills[skill_position] > 0)
+    if(party[actor_y]->skills[skill_position] > 0)
     {
-        Draw_Skill(Get_Actor(party[actor_y]), Get_Actor(party[actor_y])->skills[skill_position], 2, 4);
+        Draw_Skill(party[actor_y], party[actor_y]->skills[skill_position], 2, 4);
     }
 
-    if(Get_Actor(party[actor_y])->skills[skill_position + 1] > 0)
+    if(party[actor_y]->skills[skill_position + 1] > 0)
     {
-        Draw_Skill(Get_Actor(party[actor_y]), Get_Actor(party[actor_y])->skills[skill_position + 1], 2, 6);
+        Draw_Skill(party[actor_y], party[actor_y]->skills[skill_position + 1], 2, 6);
     }
     
-    if(Get_Actor(party[actor_y])->skills[skill_position + 2] > 0)
+    if(party[actor_y]->skills[skill_position + 2] > 0)
     {
-        Draw_Skill(Get_Actor(party[actor_y]), Get_Actor(party[actor_y])->skills[skill_position + 2], 2, 8);
+        Draw_Skill(party[actor_y], party[actor_y]->skills[skill_position + 2], 2, 8);
     }
     
-    if(Get_Actor(party[actor_y])->skills[skill_position + 3] > 0)
+    if(party[actor_y]->skills[skill_position + 3] > 0)
     {
-        Draw_Skill(Get_Actor(party[actor_y]), Get_Actor(party[actor_y])->skills[skill_position + 3], 2, 10);
+        Draw_Skill(party[actor_y], party[actor_y]->skills[skill_position + 3], 2, 10);
     }
 
-    if(Get_Actor(party[actor_y])->skills[skill_position + 4] > 0)
+    if(party[actor_y]->skills[skill_position + 4] > 0)
     {
-        Draw_Skill(Get_Actor(party[actor_y]), Get_Actor(party[actor_y])->skills[skill_position + 4], 2, 12);
+        Draw_Skill(party[actor_y], party[actor_y]->skills[skill_position + 4], 2, 12);
     }
 }
 
@@ -216,14 +216,14 @@ void Draw_Menu_Skills()
 
     set_win_tiles(1, 4, 1, 1, Skills_Pointer);
 
-    Call_Set_Actor_Skills(bank15, Get_Actor(party[0]));
-    Call_Set_Actor_Skills(bank15, Get_Actor(party[1]));
-    Call_Set_Actor_Skills(bank15, Get_Actor(party[2]));
-    Call_Set_Actor_Skills(bank15, Get_Actor(party[3]));
+    Call_Set_Actor_Skills(bank15, party[0]);
+    Call_Set_Actor_Skills(bank15, party[1]);
+    Call_Set_Actor_Skills(bank15, party[2]);
+    Call_Set_Actor_Skills(bank15, party[3]);
 
-    Call_Draw_Name(bank15, 2, 1, Get_Actor(party[actor_y])->name, true);
-    Draw_Skills_Number(Get_Actor(party[actor_y])->level, 9, 1);
-    Draw_Skills_Class(Get_Class(Get_Actor(party[actor_y])->class)->name, Get_Class(Get_Actor(party[actor_y])->class)->icon, 14, 1);
+    Call_Draw_Name(bank15, 2, 1, party[actor_y]->name, true);
+    Draw_Skills_Number(party[actor_y]->level, 9, 1);
+    Draw_Skills_Class(Get_Class(party[actor_y]->class)->name, Get_Class(party[actor_y]->class)->icon, 14, 1);
 
     Draw_Actor_Skills(0);
 
@@ -269,7 +269,7 @@ void Menu_Skills_Joypad()
     {
         if(CurrentMenu == menu_skills)
         {
-            if(skills_y < 5 && Get_Actor(party[actor_y])->skills[skills_y + 1] > 0)
+            if(skills_y < 5 && party[actor_y]->skills[skills_y + 1] > 0)
             {
                 set_win_tiles(1, 4 + skills_y * 2, 1, 1, Skills_Background);
 
@@ -300,7 +300,7 @@ void Menu_Skills_Joypad()
     {
         if(CurrentMenu == menu_skills)
         {
-            u_x = Get_Actor(party[actor_y])->skills[skills_y];
+            u_x = party[actor_y]->skills[skills_y];
 
             if(Get_Skill_Useable(bank15, Get_Skill(u_x)) == true)
             {

@@ -47,6 +47,7 @@ typedef struct GameEnemyDummy
     UBYTE phys_def;
     UBYTE magic_def;
     UBYTE can_attack;
+    UBYTE is_killed;
 
 } GameEnemyDummy;
 

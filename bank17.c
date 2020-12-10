@@ -46,7 +46,7 @@ extern INT8 i, j, k, l, m, n, x, y;
 
 extern UBYTE u_i, u_j, u_y, u_x;
 
-extern unsigned char party[4];
+extern GameActor* party[4];
 
 extern unsigned char enemy[3];
 
@@ -152,16 +152,16 @@ unsigned char* Get_Name(UBYTE target_id)
     switch(target_id)
     {
         case 0:
-            return Get_Actor(party[0])->name;
+            return party[0]->name;
             break;
         case 1:
-            return Get_Actor(party[1])->name;
+            return party[1]->name;
             break;
         case 2:
-            return Get_Actor(party[2])->name;
+            return party[2]->name;
             break;
         case 3:
-            return Get_Actor(party[3])->name;
+            return party[3]->name;
             break;
         case 4:
             return Get_Enemy(enemy[0])->name;
@@ -173,7 +173,7 @@ unsigned char* Get_Name(UBYTE target_id)
             return Get_Enemy(enemy[2])->name;
             break;
         default:
-            return Get_Actor(party[0])->name;
+            return party[0]->name;
             break;
     }
 }
@@ -183,16 +183,16 @@ UBYTE Get_Name_Length(UBYTE target_id)
     switch(target_id)
     {
         case 0:
-            return Get_Actor(party[0])->length;
+            return party[0]->length;
             break;
         case 1:
-            return Get_Actor(party[1])->length;
+            return party[1]->length;
             break;
         case 2:
-            return Get_Actor(party[2])->length;
+            return party[2]->length;
             break;
         case 3:
-            return Get_Actor(party[3])->length;
+            return party[3]->length;
             break;
         case 4:
             return Get_Enemy(enemy[0])->length;
@@ -204,7 +204,7 @@ UBYTE Get_Name_Length(UBYTE target_id)
             return Get_Enemy(enemy[2])->length;
             break;
         default:
-            return Get_Actor(party[0])->length;
+            return party[0]->length;
             break;
     }
 }
@@ -973,46 +973,46 @@ void Draw_Gold_Message()
 
 void Draw_End_Message()
 {
-    if(party[0] > 0 && Get_Actor(party[0])->health > 0)
+    if(party[0] > 0 && party[0]->health > 0)
     {
-        Draw_Experience_Message(Get_Actor(party[0]));
+        Draw_Experience_Message(party[0]);
 
         u_i = enemy_dummy_1.ability_point + enemy_dummy_2.ability_point + enemy_dummy_3.ability_point;
 
-        Add_Ability_Points(Get_Actor(party[0]), u_i);
+        Add_Ability_Points(party[0], u_i);
     }
 
-    if(party[1] > 0 && Get_Actor(party[1])->health > 0)
+    if(party[1] > 0 && party[1]->health > 0)
     {
         Call_Load_Battle_Message_Box(bank17);
 
-        Draw_Experience_Message(Get_Actor(party[1]));
+        Draw_Experience_Message(party[1]);
 
         u_i = enemy_dummy_1.ability_point + enemy_dummy_2.ability_point + enemy_dummy_3.ability_point;
 
-        Add_Ability_Points(Get_Actor(party[1]), u_i);
+        Add_Ability_Points(party[1], u_i);
     }
 
-    if(party[2] > 0 && Get_Actor(party[2])->health > 0)
+    if(party[2] > 0 && party[2]->health > 0)
     {
         Call_Load_Battle_Message_Box(bank17);
 
-        Draw_Experience_Message(Get_Actor(party[2]));
+        Draw_Experience_Message(party[2]);
 
         u_i = enemy_dummy_1.ability_point + enemy_dummy_2.ability_point + enemy_dummy_3.ability_point;
 
-        Add_Ability_Points(Get_Actor(party[2]), u_i);
+        Add_Ability_Points(party[2], u_i);
     }
 
-    if(party[3] > 0 && Get_Actor(party[3])->health > 0)
+    if(party[3] > 0 && party[3]->health > 0)
     {
         Call_Load_Battle_Message_Box(bank17);
 
-        Draw_Experience_Message(Get_Actor(party[3]));
+        Draw_Experience_Message(party[3]);
 
         u_i = enemy_dummy_1.ability_point + enemy_dummy_2.ability_point + enemy_dummy_3.ability_point;
 
-        Add_Ability_Points(Get_Actor(party[3]), u_i);
+        Add_Ability_Points(party[3], u_i);
     }
 
     Call_Load_Battle_Message_Box(bank17);
@@ -1126,21 +1126,21 @@ void Get_Next_Target()
     }
     else if(CurrentTarget < 4)
     {
-        if(Get_Actor(party[CurrentTarget])->health == 0)
+        if(party[CurrentTarget]->health == 0)
         {
-            if(Get_Actor(party[0])->health != 0 && Get_Actor(party[0]) != &actor_null)
+            if(party[0]->health != 0 && party[0] != NULL)
             {
                 CurrentTarget = 0;
             }
-            else if(Get_Actor(party[1])->health != 0 && Get_Actor(party[1]) != &actor_null)
+            else if(party[1]->health != 0 && party[1] != NULL)
             {
                 CurrentTarget = 1;
             }
-            else if(Get_Actor(party[2])->health != 0 && Get_Actor(party[2]) != &actor_null)
+            else if(party[2]->health != 0 && party[2] != NULL)
             {
                 CurrentTarget = 2;
             }
-            else if(Get_Actor(party[3])->health != 0 && Get_Actor(party[3]) != &actor_null)
+            else if(party[3]->health != 0 && party[3] != NULL)
             {
                 CurrentTarget = 3;
             }
@@ -1152,7 +1152,7 @@ void Execute_Skill_Hit(UBYTE action_performer, UBYTE action_target)
 {
     if(action_performer < 4)
     {
-        damage_modifier = Get_Actor(party[action_performer])->strength + Get_Equip(Get_Actor(party[action_performer])->equipped[weapon_slot])->strength + Get_Equip(Get_Actor(party[action_performer])->equipped[secondary_slot])->strength + Get_Equip(Get_Actor(party[action_performer])->equipped[armor_slot])->strength + Get_Equip(Get_Actor(party[action_performer])->equipped[accessory_slot])->strength;
+        damage_modifier = party[action_performer]->strength + Get_Equip(party[action_performer]->equipped[weapon_slot])->strength + Get_Equip(party[action_performer]->equipped[secondary_slot])->strength + Get_Equip(party[action_performer]->equipped[armor_slot])->strength + Get_Equip(party[action_performer]->equipped[accessory_slot])->strength;
 
         skill_damage = 4 + ((rand() % ((damage_modifier + 1) * 2)));
     }
@@ -1176,13 +1176,13 @@ void Execute_Skill_Hit(UBYTE action_performer, UBYTE action_target)
     }
     else
     {
-        if(Get_Actor(party[action_target])->health <= skill_damage)
+        if(party[action_target]->health <= skill_damage)
         {
-            Get_Actor(party[action_target])->health = 0;
+            party[action_target]->health = 0;
         }
         else
         {
-            Get_Actor(party[action_target])->health -= skill_damage;
+            party[action_target]->health -= skill_damage;
         }
 
         shake_screen();
@@ -1193,7 +1193,7 @@ void Execute_Skill_Fireball(UBYTE action_performer, UBYTE action_target)
 {
     if(action_performer < 4)
     {
-        damage_modifier = Get_Actor(party[action_performer])->wisdom + Get_Equip(Get_Actor(party[action_performer])->equipped[weapon_slot])->wisdom + Get_Equip(Get_Actor(party[action_performer])->equipped[secondary_slot])->wisdom + Get_Equip(Get_Actor(party[action_performer])->equipped[armor_slot])->wisdom + Get_Equip(Get_Actor(party[action_performer])->equipped[accessory_slot])->wisdom;
+        damage_modifier = party[action_performer]->wisdom + Get_Equip(party[action_performer]->equipped[weapon_slot])->wisdom + Get_Equip(party[action_performer]->equipped[secondary_slot])->wisdom + Get_Equip(party[action_performer]->equipped[armor_slot])->wisdom + Get_Equip(party[action_performer]->equipped[accessory_slot])->wisdom;
         skill_damage = 6 + ((rand() % ((damage_modifier + 1) * 2)));
     }
     else
@@ -1216,13 +1216,13 @@ void Execute_Skill_Fireball(UBYTE action_performer, UBYTE action_target)
     }
     else
     {
-        if(Get_Actor(party[action_target])->health <= skill_damage)
+        if(party[action_target]->health <= skill_damage)
         {
-            Get_Actor(party[action_target])->health = 0;
+            party[action_target]->health = 0;
         }
         else
         {
-            Get_Actor(party[action_target])->health -= skill_damage;
+            party[action_target]->health -= skill_damage;
         }
 
         shake_screen();

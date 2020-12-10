@@ -53,7 +53,7 @@ extern INT8 i, j, k, l, m, n, x, y;
 
 extern UBYTE u_x, u_y;
 
-extern unsigned char party[4];
+extern GameActor* party[4];
 
 extern unsigned char enemy[3];
 
@@ -163,7 +163,7 @@ GameEnemyDummy* Get_Enemy_Dummy_Combat(UBYTE enemy_dummy_id)
 
 UBYTE Get_Party_Slot_Filled(UBYTE party_slot)
 {
-    if(Get_Actor(party[party_slot]) != &actor_null)
+    if(party[party_slot] != NULL)
     {
         return true;
     }
@@ -269,92 +269,92 @@ void Draw_Combat_Name(UBYTE tile_x, UBYTE tile_y, unsigned char* name, UBYTE ful
 
 void Draw_Combat_Actors()
 {
-    if(party[0] != 0)
+    if(party[0] != NULL)
     {
-        Draw_Combat_Name(9, 13, Get_Actor(party[0])->name, false);
+        Draw_Combat_Name(9, 13, party[0]->name, false);
 
-        if(Get_Actor(party[0])->max_health < 100)
+        if(party[0]->max_health < 100)
         {
             set_bkg_tiles(15, 13, 1, 1, Combat_Health);
             set_bkg_tiles(16, 13, 1, 1, Combat_Period);
 
-            Draw_Number_Zeros(14, 13, Get_Actor(party[0])->max_health);
-            Draw_Combat_Number(Get_Actor(party[0])->health, 15, 13);
+            Draw_Number_Zeros(14, 13, party[0]->max_health);
+            Draw_Combat_Number(party[0]->health, 15, 13);
         }
         else
         {
             set_bkg_tiles(14, 13, 1, 1, Combat_Health);
             set_bkg_tiles(15, 13, 1, 1, Combat_Period);
 
-            Draw_Number_Zeros(14, 13, Get_Actor(party[0])->max_health);
-            Draw_Combat_Number(Get_Actor(party[0])->health, 15, 13);
+            Draw_Number_Zeros(14, 13, party[0]->max_health);
+            Draw_Combat_Number(party[0]->health, 15, 13);
         }
         
     }
 
-    if(party[1] != 0)
+    if(party[1] != NULL)
     {
-        Draw_Combat_Name(9, 14, Get_Actor(party[1])->name, false);
+        Draw_Combat_Name(9, 14, party[1]->name, false);
 
-        if(Get_Actor(party[1])->max_health < 100)
+        if(party[1]->max_health < 100)
         {
             set_bkg_tiles(15, 14, 1, 1, Combat_Health);
             set_bkg_tiles(16, 14, 1, 1, Combat_Period);
 
-            Draw_Number_Zeros(14, 14, Get_Actor(party[1])->max_health);
-            Draw_Combat_Number(Get_Actor(party[1])->health, 15, 14);
+            Draw_Number_Zeros(14, 14, party[1]->max_health);
+            Draw_Combat_Number(party[1]->health, 15, 14);
         }
         else
         {
             set_bkg_tiles(14, 14, 1, 1, Combat_Health);
             set_bkg_tiles(15, 14, 1, 1, Combat_Period);
 
-            Draw_Number_Zeros(14, 14, Get_Actor(party[1])->max_health);
-            Draw_Combat_Number(Get_Actor(party[1])->health, 15, 14);
+            Draw_Number_Zeros(14, 14, party[1]->max_health);
+            Draw_Combat_Number(party[1]->health, 15, 14);
         }
     }
 
-    if(party[2] != 0)
+    if(party[2] != NULL)
     {
-        Draw_Combat_Name(9, 15, Get_Actor(party[2])->name, false);
+        Draw_Combat_Name(9, 15, party[2]->name, false);
 
-        if(Get_Actor(party[2])->max_health < 100)
+        if(party[2]->max_health < 100)
         {
             set_bkg_tiles(15, 15, 1, 1, Combat_Health);
             set_bkg_tiles(16, 15, 1, 1, Combat_Period);
 
-            Draw_Number_Zeros(14, 15, Get_Actor(party[2])->max_health);
-            Draw_Combat_Number(Get_Actor(party[2])->health, 15, 15);
+            Draw_Number_Zeros(14, 15, party[2]->max_health);
+            Draw_Combat_Number(party[2]->health, 15, 15);
         }
         else
         {
             set_bkg_tiles(14, 15, 1, 1, Combat_Health);
             set_bkg_tiles(15, 15, 1, 1, Combat_Period);
 
-            Draw_Number_Zeros(14, 15, Get_Actor(party[2])->max_health);
-            Draw_Combat_Number(Get_Actor(party[2])->health, 15, 15);
+            Draw_Number_Zeros(14, 15, party[2]->max_health);
+            Draw_Combat_Number(party[2]->health, 15, 15);
         }
     }
 
-    if(party[3] != 0)
+    if(party[3] != NULL)
     {
-        Draw_Combat_Name(9, 16, Get_Actor(party[3])->name, false);
+        Draw_Combat_Name(9, 16, party[3]->name, false);
 
-        if(Get_Actor(party[3])->max_health < 100)
+        if(party[3]->max_health < 100)
         {
             set_bkg_tiles(15, 16, 1, 1, Combat_Health);
             set_bkg_tiles(16, 16, 1, 1, Combat_Period);
 
-            Draw_Number_Zeros(14, 16, Get_Actor(party[3])->max_health);
-            Draw_Combat_Number(Get_Actor(party[3])->health, 15, 16);
+            Draw_Number_Zeros(14, 16, party[3]->max_health);
+            Draw_Combat_Number(party[3]->health, 15, 16);
         }
         else
         {
             set_bkg_tiles(14, 16, 1, 1, Combat_Health);
             set_bkg_tiles(15, 16, 1, 1, Combat_Period);
 
-            Draw_Number_Zeros(14, 16, Get_Actor(party[3])->max_health);
-            Draw_Combat_Number(Get_Actor(party[3])->health, 15, 16);
+            Draw_Number_Zeros(14, 16, party[3]->max_health);
+            Draw_Combat_Number(party[3]->health, 15, 16);
         }
     }
 }
@@ -373,6 +373,28 @@ void Copy_Dummy_Stats(GameEnemy* enemy, GameEnemyDummy* dummy) //* Copies specif
     dummy->skill[0] = enemy->skill[0];
     dummy->skill[1] = enemy->skill[1];
     dummy->skill[2] = enemy->skill[2];
+
+    dummy->can_attack = true;
+    dummy->is_killed = false;
+}
+
+void Clear_Dummy_Stats(GameEnemyDummy* dummy)
+{
+    dummy->health = 0;
+    dummy->max_health = 0;
+    dummy->mana = 0;
+    dummy->max_mana = 0;
+    dummy->strength = 0;
+    dummy->agility = 0;
+    dummy->gold = 0;
+    dummy->experience = 0;
+    dummy->ability_point = 0;
+    dummy->skill[0] = 0;
+    dummy->skill[1] = 0;
+    dummy->skill[2] = 0;
+
+    dummy->can_attack = false;
+    dummy->is_killed = true;
 }
 
 void Load_Enemy_Dummy() //* Loads all three enemy dummies based "enemy[]".
@@ -385,66 +407,78 @@ void Load_Enemy_Dummy() //* Loads all three enemy dummies based "enemy[]".
     if(enemy[0] != 0)
     {
         Copy_Dummy_Stats(Get_Enemy(enemy[0]), &enemy_dummy_1);
-        enemy_dummy_1.can_attack = true;
+    }
+    else
+    {
+        Clear_Dummy_Stats(&enemy_dummy_1);
     }
 
     if(enemy[1] != 0)
     {
         Copy_Dummy_Stats(Get_Enemy(enemy[1]), &enemy_dummy_2);
-        enemy_dummy_2.can_attack = true;
+    }
+    else
+    {
+        Clear_Dummy_Stats(&enemy_dummy_2);
     }
 
     if(enemy[2] != 0)
     {
         Copy_Dummy_Stats(Get_Enemy(enemy[2]), &enemy_dummy_3);
-        enemy_dummy_3.can_attack = true;
     }
+    else
+    {
+        Clear_Dummy_Stats(&enemy_dummy_3);
+    }
+    
 }
 
 void Load_Actor_Info()
 {
-    if(Get_Actor(party[CurrentTurn])->max_health < 100)
+    if(party[CurrentTurn]->max_health < 100)
     {
         set_bkg_tiles(0, 0, 11, 4, Map_Combat_Actor_SmallPLN0);
 
-        Draw_Combat_Name(1, 1, Get_Actor(party[CurrentTurn])->name, false);
+        Draw_Combat_Name(1, 1, party[CurrentTurn]->name, false);
 
-        Draw_Number_Zeros(5, 1, Get_Actor(party[CurrentTurn])->max_health);
+        Draw_Number_Zeros(5, 1, party[CurrentTurn]->max_health);
 
         set_bkg_tiles(7, 1, 1, 1, Combat_Period);
         set_bkg_tiles(6, 1, 1, 1, Combat_Health);
 
-        Draw_Combat_Number(Get_Actor(party[CurrentTurn])->health, 6, 1);
+        Draw_Combat_Number(party[CurrentTurn]->health, 6, 1);
 
-        if(Get_Actor(party[CurrentTurn])->max_mana < 10)
+        if(party[CurrentTurn]->max_mana < 10)
         {
             set_bkg_tiles(8, 2, 1, 1, Combat_Period);
             set_bkg_tiles(7, 2, 1, 1, Combat_Mana);
 
-            Draw_Combat_Number(Get_Actor(party[CurrentTurn])->mana, 6, 2);
+            Draw_Combat_Number(party[CurrentTurn]->mana, 6, 2);
         }
     }
     else
     {
         set_bkg_tiles(0, 0, 12, 4, Map_Combat_Actor_LargePLN0);
         
-        Draw_Combat_Name(1, 1, Get_Actor(party[CurrentTurn])->name, false);
+        Draw_Combat_Name(1, 1, party[CurrentTurn]->name, false);
 
-        Draw_Number_Zeros(6, 1, Get_Actor(party[CurrentTurn])->max_health);
+        Draw_Number_Zeros(6, 1, party[CurrentTurn]->max_health);
 
-        Draw_Combat_Number(Get_Actor(party[CurrentTurn])->health, 7, 1);
+        Draw_Combat_Number(party[CurrentTurn]->health, 7, 1);
 
         set_bkg_tiles(7, 1, 1, 1, Combat_Period);
         set_bkg_tiles(6, 1, 1, 1, Combat_Health);
 
-        if(Get_Actor(party[CurrentTurn])->max_mana < 10)
+        if(party[CurrentTurn]->max_mana < 10)
         {
             set_bkg_tiles(9, 2, 1, 1, Combat_Period);
             set_bkg_tiles(8, 2, 1, 1, Combat_Mana);
 
-            Draw_Combat_Number(Get_Actor(party[CurrentTurn])->mana, 7, 2);
+            Draw_Combat_Number(party[CurrentTurn]->mana, 7, 2);
         }
     }
+
+    Call_Move_Char(bank16, &char_player, 14, 2, 0);
 }
 
 void Load_Random_Troop() //* Loads a random troop id, based on map troops, into "CurrentTroop".
@@ -491,10 +525,10 @@ void Order_Turns() //* Orders battle turns by agility from greatest to least.
 {
     for(j = 0; j < 4; j++)
     {
-        if(Get_Actor(party[j]) != &actor_null && Get_Actor(party[j])->health != 0 && Get_Actor(party[j])->can_attack == true)
+        if(party[j] != NULL && party[j]->health != 0 && party[j]->can_attack == true)
         {
             turn_order[j] = j + 1;
-            agility[j] = Get_Actor(party[j])->agility;
+            agility[j] = party[j]->agility;
         }
         else
         {
@@ -691,10 +725,10 @@ void Draw_Combat_Main()
     enemy_selection[2] = 4;
     enemy_selection[3] = 4;
 
-    Call_Set_Actor_Skills(bank16, Get_Actor(party[0]));
-    Call_Set_Actor_Skills(bank16, Get_Actor(party[1]));
-    Call_Set_Actor_Skills(bank16, Get_Actor(party[2]));
-    Call_Set_Actor_Skills(bank16, Get_Actor(party[3]));
+    Call_Set_Actor_Skills(bank16, party[0]);
+    Call_Set_Actor_Skills(bank16, party[1]);
+    Call_Set_Actor_Skills(bank16, party[2]);
+    Call_Set_Actor_Skills(bank16, party[3]);
 
     flash_in();
 }
@@ -710,15 +744,15 @@ void Draw_Selection_Skill()
 {
     set_bkg_tiles(3, 12, 17, 5, Map_Combat_SkillsPLN0);
 
-    Draw_Current_Skills(Get_Actor(party[CurrentTurn]));
+    Draw_Current_Skills(party[CurrentTurn]);
 
     set_bkg_tiles(10, 13 + skill_y[CurrentTurn], 1, 1, Combat_Pointer);
 
-    Draw_Combat_Name(4, 13, Get_Actor(party[CurrentTurn])->name, false);
+    Draw_Combat_Name(4, 13, party[CurrentTurn]->name, false);
 
-    Call_Draw_Skill_Cost(bank16, Get_Skill(Get_Actor(party[CurrentTurn])->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]]));
+    Call_Draw_Skill_Cost(bank16, Get_Skill(party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]]));
 
-    Draw_Combat_Number(Get_Actor(party[CurrentTurn])->mana, 5, 15);
+    Draw_Combat_Number(party[CurrentTurn]->mana, 5, 15);
 }
 
 void Load_Enemy_Skill()
@@ -769,7 +803,7 @@ void Refresh_Order()
         {
             x = turn_order[j] - 1;
 
-            if(Get_Actor(party[x]) != &actor_null && Get_Actor(party[x])->health == 0)
+            if(party[x] != NULL && party[x]->health == 0)
             {
                 turn_order[j] = 0;
                 target_selection[x] = 0;
@@ -787,6 +821,25 @@ void Refresh_Order()
                 skill_selection[x] = 0;
             }
         }
+    }
+}
+
+void Check_Enemies_Killed()
+{
+    if(enemy_dummy_1.health == 0 && enemy[0] != 0 && enemy_dummy_1.is_killed == false)
+    {
+        Clear_Enemy_Tiles(Get_Enemy(enemy[0]), 10, 10);
+        enemy_dummy_1.is_killed = true;
+    }
+    if(enemy_dummy_2.health == 0 && enemy[1] != 0 && enemy_dummy_2.is_killed == false)
+    {
+        Clear_Enemy_Tiles(Get_Enemy(enemy[1]), 4, 9);
+        enemy_dummy_2.is_killed = true;
+    }
+    if(enemy_dummy_3.health == 0 && enemy[2] != 0 && enemy_dummy_3.is_killed == false)
+    {
+        Clear_Enemy_Tiles(Get_Enemy(enemy[2]), 16, 9);
+        enemy_dummy_3.is_killed = true;
     }
 }
 
@@ -808,34 +861,18 @@ void Execute_Combat()
             Call_Execute_Skill(bank16, skill_selection[turn_order[i] - 1], turn_order[i] - 1, target_selection[turn_order[i] - 1]);
         }
 
-        if(enemy_dummy_1.health == 0 && enemy[0] != 0)
-        {
-            Clear_Enemy_Tiles(Get_Enemy(enemy[0]), 10, 10);
-
-            enemy[0] = 0;
-        }
-        if(enemy_dummy_2.health == 0 && enemy[1] != 0)
-        {
-            Clear_Enemy_Tiles(Get_Enemy(enemy[1]), 4, 9);
-
-            enemy[1] = 0;
-        }
-        if(enemy_dummy_3.health == 0 && enemy[2] != 0)
-        {
-            Clear_Enemy_Tiles(Get_Enemy(enemy[2]), 16, 9);
-
-            enemy[2] = 0;
-        }
-
         turn_order[i] = 0;
 
         Load_Battle_Message_Box();
 
-        if(Get_Actor(party[0])->health == 0 && Get_Actor(party[1])->health == 0 && Get_Actor(party[2])->health == 0 && Get_Actor(party[3])->health == 0)
+        Check_Enemies_Killed();
+
+        if(party[0]->health == 0 && party[1]->health == 0 && party[2]->health == 0 && party[3]->health == 0)
         {
             Close_Combat();
         }
-        if(enemy_dummy_1.health == 0 && enemy_dummy_2.health == 0 && enemy_dummy_3.health == 0)
+
+        if(enemy_dummy_1.health == 0  && enemy_dummy_2.health == 0 && enemy_dummy_3.health == 0)
         {
             Call_Draw_End_Message(bank16);
 
@@ -845,9 +882,7 @@ void Execute_Combat()
 
     turn_number += 1;
 
-    performant_delay(1);
     Draw_Combat_Actors();
-
 }
 
 void Close_Combat()
@@ -909,17 +944,17 @@ void Select_Target()
     }
     else if(enemy_selection[CurrentTurn] < 4)
     {
-        if(Get_Actor(party[enemy_selection[CurrentTurn]])->health == 0 || Get_Actor(party[enemy_selection[CurrentTurn]]) == &actor_null)
+        if(party[enemy_selection[CurrentTurn]]->health == 0 || party[enemy_selection[CurrentTurn]] == NULL)
         {
-            if(Get_Actor(party[1])->health != 0 && Get_Actor(party[1]) != &actor_null)
+            if(party[1]->health != 0 && party[1] != NULL)
             {
                 enemy_selection[CurrentTurn] = 1;
             }
-            else if(Get_Actor(party[2])->health != 0 && Get_Actor(party[2]) != &actor_null)
+            else if(party[2]->health != 0 && party[2] != NULL)
             {
                 enemy_selection[CurrentTurn] = 2;
             }
-            else if(Get_Actor(party[3])->health != 0 && Get_Actor(party[3]) != &actor_null)
+            else if(party[3]->health != 0 && party[3] != NULL)
             {
                 enemy_selection[CurrentTurn] = 3;
             }
@@ -930,9 +965,9 @@ void Select_Target()
 
 void Confirm_Target_Selection()
 {
-    if(Get_Actor(party[CurrentTurn + 1]) != &actor_null && Get_Actor(party[CurrentTurn + 1])->health == 0 && CurrentTurn + 1 <= total_actors)
+    if(party[CurrentTurn + 1] != NULL && party[CurrentTurn + 1]->health == 0 && CurrentTurn + 1 <= total_actors)
     {
-        if(Get_Actor(party[CurrentTurn + 2]) != &actor_null && Get_Actor(party[CurrentTurn + 2])->health != 0 && CurrentTurn + 2 <= total_actors)
+        if(party[CurrentTurn + 2] != NULL && party[CurrentTurn + 2]->health != 0 && CurrentTurn + 2 <= total_actors)
         {
             Call_Play_Confirm(bank16);
             Clear_Pointer();
@@ -949,7 +984,7 @@ void Confirm_Target_Selection()
 
             CurrentCombat = combat_fight;
         }
-        else if(Get_Actor(party[CurrentTurn + 3]) != &actor_null && Get_Actor(party[CurrentTurn + 3])->health != 0 && CurrentTurn + 3 <= total_actors)
+        else if(party[CurrentTurn + 3] != NULL && party[CurrentTurn + 3]->health != 0 && CurrentTurn + 3 <= total_actors)
         {
             Call_Play_Confirm(bank16);
             Clear_Pointer();
@@ -1077,9 +1112,9 @@ void Update_Combat_Joypad()
         {
             if(combat_main_y == 0)
             {
-                if(Get_Actor(party[CurrentTurn]) != &actor_null && Get_Actor(party[CurrentTurn])->health == 0)
+                if(party[CurrentTurn] != NULL && party[CurrentTurn]->health == 0)
                 {
-                    if(Get_Actor(party[CurrentTurn + 1]) != &actor_null && Get_Actor(party[CurrentTurn + 1])->health != 0)
+                    if(party[CurrentTurn + 1] != NULL && party[CurrentTurn + 1]->health != 0)
                     {
                         Call_Play_Confirm(bank16);
 
@@ -1093,7 +1128,7 @@ void Update_Combat_Joypad()
 
                         CurrentCombat = combat_fight;
                     }
-                    else if(Get_Actor(party[CurrentTurn + 2]) != &actor_null && Get_Actor(party[CurrentTurn + 2])->health != 0)
+                    else if(party[CurrentTurn + 2] != NULL && party[CurrentTurn + 2]->health != 0)
                     {
                         Call_Play_Confirm(bank16);
 
@@ -1107,7 +1142,7 @@ void Update_Combat_Joypad()
 
                         CurrentCombat = combat_fight;
                     }
-                    else if(Get_Actor(party[CurrentTurn + 3]) != &actor_null && Get_Actor(party[CurrentTurn + 3])->health != 0)
+                    else if(party[CurrentTurn + 3] != NULL && party[CurrentTurn + 3]->health != 0)
                     {
                         Call_Play_Confirm(bank16);
 
@@ -1184,13 +1219,13 @@ void Update_Combat_Joypad()
         }
         else if(CurrentCombat == combat_skill)
         {
-            u_x = Get_Actor(party[CurrentTurn])->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]];
+            u_x = party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]];
 
-            if(Get_Actor(party[CurrentTurn])->mana >= Call_Get_Skill_Cost(bank16, Get_Skill(u_x)) && Call_Get_Skill_Cost(bank16, Get_Skill(u_x)) > 0)
+            if(party[CurrentTurn]->mana >= Call_Get_Skill_Cost(bank16, Get_Skill(u_x)) && Call_Get_Skill_Cost(bank16, Get_Skill(u_x)) > 0)
             {
                 Call_Play_Confirm(bank16);
 
-                skill_selection[CurrentTurn] = Get_Actor(party[CurrentTurn])->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]];
+                skill_selection[CurrentTurn] = party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]];
 
                 Draw_Selection_Fight();
                 set_bkg_tiles(8, 12, 12, 6, Map_Combat_Actor_BoxPLN0);
@@ -1214,9 +1249,9 @@ void Update_Combat_Joypad()
         }
         else if(CurrentCombat == combat_skill_select)
         {
-            u_x = Get_Actor(party[CurrentTurn])->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]];
+            u_x = party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]];
 
-            Get_Actor(party[CurrentTurn])->mana -= Call_Get_Skill_Cost(bank16, Get_Skill(u_x));
+            party[CurrentTurn]->mana -= Call_Get_Skill_Cost(bank16, Get_Skill(u_x));
 
             Confirm_Target_Selection();
 
@@ -1246,9 +1281,9 @@ void Update_Combat_Joypad()
             }
             else
             {
-                if(Get_Actor(party[CurrentTurn - 1]) != &actor_null && Get_Actor(party[CurrentTurn - 1])->health == 0 && CurrentTurn - 1 >= 0)
+                if(party[CurrentTurn - 1] != NULL && party[CurrentTurn - 1]->health == 0 && CurrentTurn - 1 >= 0)
                 {
-                    if(Get_Actor(party[CurrentTurn - 2]) != &actor_null && Get_Actor(party[CurrentTurn - 2])->health != 0 && CurrentTurn - 2 >= 0)
+                    if(party[CurrentTurn - 2] != NULL && party[CurrentTurn - 2]->health != 0 && CurrentTurn - 2 >= 0)
                     {
                         Call_Play_Confirm(bank16);
                         Clear_Pointer();
@@ -1263,7 +1298,7 @@ void Update_Combat_Joypad()
 
                         CurrentCombat = combat_fight;
                     }
-                    else if(Get_Actor(party[CurrentTurn - 3]) != &actor_null && Get_Actor(party[CurrentTurn - 3])->health != 0 && CurrentTurn - 3 >= 0)
+                    else if(party[CurrentTurn - 3] != NULL && party[CurrentTurn - 3]->health != 0 && CurrentTurn - 3 >= 0)
                     {
                         Call_Play_Confirm(bank16);
                         Clear_Pointer();
@@ -1439,14 +1474,14 @@ void Update_Combat_Joypad()
 
                 set_bkg_tiles(10, 13 + skill_y[CurrentTurn], 1, 1, Combat_Pointer);
             }
-            else if(skill_y[CurrentTurn] == 0 && CurrentSkillSelection[CurrentTurn] > 0 && Get_Actor(party[CurrentTurn])->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn] + 1] != 0)
+            else if(skill_y[CurrentTurn] == 0 && CurrentSkillSelection[CurrentTurn] > 0 && party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn] + 1] != 0)
             {
                 CurrentSkillSelection[CurrentTurn] -= 1;
 
-                Draw_Current_Skills(Get_Actor(party[CurrentTurn]));
+                Draw_Current_Skills(party[CurrentTurn]);
             }
 
-            Call_Draw_Skill_Cost(bank16, Get_Skill(Get_Actor(party[CurrentTurn])->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]]));
+            Call_Draw_Skill_Cost(bank16, Get_Skill(party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]]));
 
             while(joypad() & J_UP)
             {
@@ -1512,7 +1547,7 @@ void Update_Combat_Joypad()
         }
         else if(CurrentCombat == combat_skill)
         {
-            if(skill_y[CurrentTurn] < 2 && Get_Actor(party[CurrentTurn])->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn] + 1] != 0)
+            if(skill_y[CurrentTurn] < 2 && party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn] + 1] != 0)
             {
                 set_bkg_tiles(10, 13 + skill_y[CurrentTurn], 1, 1, Combat_Background);
 
@@ -1520,14 +1555,14 @@ void Update_Combat_Joypad()
 
                 set_bkg_tiles(10, 13 + skill_y[CurrentTurn], 1, 1, Combat_Pointer);
             }
-            else if(skill_y[CurrentTurn] == 2 && CurrentSkillSelection[CurrentTurn] < 7 && Get_Actor(party[CurrentTurn])->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn] + 1] != 0)
+            else if(skill_y[CurrentTurn] == 2 && CurrentSkillSelection[CurrentTurn] < 7 && party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn] + 1] != 0)
             {
                 CurrentSkillSelection[CurrentTurn] += 1;
 
-                Draw_Current_Skills(Get_Actor(party[CurrentTurn]));
+                Draw_Current_Skills(party[CurrentTurn]);
             }
 
-            Call_Draw_Skill_Cost(bank16, Get_Skill(Get_Actor(party[CurrentTurn])->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]]));
+            Call_Draw_Skill_Cost(bank16, Get_Skill(party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]]));
 
             while(joypad() & J_DOWN)
             {

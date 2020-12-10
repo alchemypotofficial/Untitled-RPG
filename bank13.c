@@ -5,7 +5,6 @@
 #include "Game_Equip.h"
 #include "Maps/Map_Menu_Items.c"
 #include "Maps/Map_Menu_Party.c"
-#include "Maps/Map_Menu_Reset.c"
 #include "Maps/Map_Item_Use_Replace.c"
 #include "Maps/Map_Item_Description.c"
 
@@ -21,6 +20,8 @@ extern UBYTE selection_max, selection_x, selection_y, party_max, party_y;
 
 extern UBYTE Tileset;
 
+extern UBYTE total_actors;
+
 extern UINT16 party_gold;
 
 extern UBYTE parsed_number;
@@ -29,7 +30,7 @@ extern UINT16 saved_number, large_number;
 
 extern INT8 i, j, k, l, m, n;
 
-extern unsigned char party[4];
+extern GameActor* party[4];
 
 extern unsigned char inventory[99];
 
@@ -370,10 +371,10 @@ void Draw_Actor_Window(GameActor* actor, UBYTE item_type)
 void Draw_Party_Window(GameItem* item)
 {
     set_win_tiles(5, 12, 15, 6, Map_Menu_PartyPLN0);
-    Draw_Actor_Window(Get_Actor(party[0]), item->item_type);
-    Draw_Actor_Window(Get_Actor(party[1]), item->item_type);
-    Draw_Actor_Window(Get_Actor(party[2]), item->item_type);
-    Draw_Actor_Window(Get_Actor(party[3]), item->item_type);
+    Draw_Actor_Window(party[0], item->item_type);
+    Draw_Actor_Window(party[1], item->item_type);
+    Draw_Actor_Window(party[2], item->item_type);
+    Draw_Actor_Window(party[3], item->item_type);
 }
 
 void Draw_Item_Description(GameItem* item)
@@ -458,26 +459,6 @@ void Hide_Item_Name()
     inv_amount[slot_1] = 0;
 
     Refresh_Item_Menu();
-}
-
-void Use_Item_Win(GameActor* actor, GameItem* item)
-{
-    if(Use_Item(actor, item) == failed)
-    {
-        Call_Play_Use(bank13);
-
-        set_win_map(5, 8, 15, 6, Map_Menu_ResetPLN1, Map_Menu_ResetPLN0);
-
-        Restructure_Inventory();
-
-        Refresh_Item_Menu();
-
-        Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
-    }
-    else
-    {
-        Call_Play_Buzz(bank13);
-    }
 }
 
 void Blink_Item_Name()
@@ -730,7 +711,31 @@ void Menu_Item_Use_Win_Joypad()
 
         if(Joy & J_A)
         {
-            Use_Item_Win(Get_Actor(party[party_y]), Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
+            if(Use_Item(party[party_y], Get_Item(inventory[CurrentItemSlot + CurrentItemSelection])) != failed)
+            {
+                Call_Play_Use(bank13);
+
+                Remove_Item(CurrentItemSlot + CurrentItemSelection, 1);
+
+                set_win_map(5, 12, 15, 6, Map_Item_Use_ReplacePLN1, Map_Item_Use_ReplacePLN0);
+
+                Restructure_Inventory();
+
+                Refresh_Item_Menu();
+
+                Draw_Item_Description(Get_Item(inventory[CurrentItemSlot + CurrentItemSelection]));
+
+                while(joypad() & J_A || joypad() & J_START)
+                {
+                    performant_delay(1);
+                }
+
+                Menu_Item_Use_Joypad();
+            }
+            else
+            {
+                Call_Play_Buzz(bank13);
+            }
 
             while(joypad() & J_A || joypad() & J_START)
             {
@@ -757,7 +762,7 @@ void Menu_Item_Use_Win_Joypad()
                 performant_delay(1);
             }
 
-            Menu_Item_Joypad();
+            Menu_Item_Use_Joypad();
         }
 
         if(Joy & J_UP)
@@ -777,7 +782,7 @@ void Menu_Item_Use_Win_Joypad()
 
         if(Joy & J_DOWN)
         {
-            if(party_y < party_max - 1)
+            if(party_y < total_actors - 1)
             {
                 set_win_tiles(6, 13 + party_y, 1, 1, Item_Background);
                 party_y += 1;

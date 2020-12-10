@@ -7,6 +7,7 @@
 #include "Messages/Message_SampleText.c"
 #include "Messages/Message_Health_Brew.c"
 #include "Messages/Message_TestText.c"
+#include "Messages/Message_Intro_1.c"
 
 extern UBYTE Joy;
 
@@ -24,7 +25,7 @@ extern UINT16 load_pos_x, load_pos_y;
 
 extern INT8 i, j, k, l, m, n;
 
-extern UBYTE u_x, u_y;
+extern UBYTE u_x, u_y, u_c;
 
 extern UINT16 e, f, g, h;
 
@@ -46,7 +47,7 @@ extern void Call_Reset_Char_Sprites(UBYTE bank);
 
 extern UBYTE Get_Font_Value(UBYTE bank);
 
-void Load_Message_Bank10(GameMessage* message)
+void Load_Message_Bank10(GameMessage* message, unsigned char* insert_1, UBYTE length_1)
 {
     Call_Draw_Message_Box(bank10);
 
@@ -60,32 +61,62 @@ void Load_Message_Bank10(GameMessage* message)
         {
             for(h = 0; h < 18; h++)
             {
-                if(joypad() & J_A)
+                e = 18 * current_line;
+                e += h;
+
+                if(message->message[e] == 180 && message->message[e + 1] == 214 && insert_1 != NULL)
                 {
-                    performant_delay(1);
+                    for(u_y = 0; u_y < length_1; u_y++)
+                    {
+                        if(joypad() & J_A)
+                        {
+                            performant_delay(1);
+                        }
+                        else
+                        {
+                            performant_delay(2);
+                        }
+
+                        g = insert_1[u_y] - 16;
+
+                        g = g * 16;
+
+                        for(i = 0; i < 16; i++)
+                        {
+                            message_base[i] = Get_Font_Value(bank10);
+                        }
+
+                        set_bkg_tileset(u_x, 1, message_base);
+
+                        u_x += 1;
+                    }
+
+                    h += 1;
                 }
                 else
                 {
-                    performant_delay(2);
+                    if(joypad() & J_A)
+                    {
+                        performant_delay(1);
+                    }
+                    else
+                    {
+                        performant_delay(2);
+                    }
+
+                    g = message->message[e] - 180;
+
+                    g = g * 16;
+
+                    for(i = 0; i < 16; i++)
+                    {
+                        message_base[i] = Get_Font_Value(bank10);
+                    }
+
+                    set_bkg_tileset(u_x, 1, message_base);
+
+                    u_x += 1;
                 }
-
-                f = h * 16;
-            
-                e = 18 * current_line;
-                e = e + h;
-
-                g = message->message[e] - 180;
-
-                g = g * 16;
-
-                for(i = 0; i < 16; i++)
-                {
-                    message_base[i] = Get_Font_Value(bank10);
-                }
-
-                set_bkg_tileset(u_x, 1, message_base);
-
-                u_x += 1;
             }
 
             current_line += 1;

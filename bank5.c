@@ -41,3 +41,8 @@ void Reset_NPC()
     Call_Build_Char(bank5, &char_npc_3);
     char_npc_3.active = false;
 }
+
+void NPC_Handler(UINT16 action_id)
+{
+
+}

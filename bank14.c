@@ -25,7 +25,7 @@ extern UINT16 saved_number, large_number;
 
 extern INT8 i, j, k, l, m, n;
 
-extern unsigned char party[4];
+extern GameActor* party[4];
 
 extern unsigned char inventory[99];
 
@@ -189,12 +189,12 @@ void Draw_Menu_Status()
 
     set_win_tiles(0, 0, 20, 18, Map_Menu_StatusPLN0);
 
-    Call_Draw_Name(bank14, 2, 2, Get_Actor(party[actor_y])->name, true);
-    Draw_Status_Stats(Get_Actor(party[actor_y]));
-    Draw_Status_Number(Get_Actor(party[actor_y])->experience, 8, 4);
-    Draw_Status_Number(Get_Actor(party[actor_y])->level, 9, 2);
-    Draw_Status_Number(Experience_List[Get_Actor(party[actor_y])->level - 1], 12, 4);
-    Draw_Status_Class(Get_Class(Get_Actor(party[actor_y])->class)->name, Get_Class(Get_Actor(party[actor_y])->class)->icon, 14, 2);
+    Call_Draw_Name(bank14, 2, 2, party[actor_y]->name, true);
+    Draw_Status_Stats(party[actor_y]);
+    Draw_Status_Number(party[actor_y]->experience, 8, 4);
+    Draw_Status_Number(party[actor_y]->level, 9, 2);
+    Draw_Status_Number(Experience_List[party[actor_y]->level - 1], 12, 4);
+    Draw_Status_Class(Get_Class(party[actor_y]->class)->name, Get_Class(party[actor_y]->class)->icon, 14, 2);
 
     fade_in();
 }

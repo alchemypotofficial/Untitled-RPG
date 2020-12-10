@@ -55,7 +55,7 @@ extern void Call_Check_Step_Counter(UBYTE bank);
 extern void Call_Orient_Char(UBYTE bank, GameCharacter* character);
 extern void Call_Draw_Map(UBYTE bank, GameMap* map);
 extern void Call_Draw_Map_Line(UBYTE bank, GameMap* map, UBYTE directiony);
-extern void Call_Draw_Message(UBYTE bank, GameMessage* message);
+extern void Call_Draw_Message(UBYTE bank, GameMessage* message, unsigned char* insert_1, UBYTE length_1);
 extern void Call_Load_Char_Sprite(UBYTE bank, GameCharacter* character, GameSprite* sprite);
 extern void Call_Add_Item(UBYTE bank, GameItem* item, UBYTE amount);
 extern void Call_Add_Equip(UBYTE bank, GameEquip* equip);
@@ -146,9 +146,9 @@ void move_char(GameCharacter* character, UBYTE tile_x, UBYTE tile_y, UBYTE pixel
     move_sprite(character->sprite_id[0] + 3, tile_x + 8 - pixel_offset, tile_y + 16);
 }
 
-void read_message(GameMessage* message) //* Displays specified message.
+void read_message(GameMessage* message, unsigned char* insert_1, UBYTE length_1) //* Displays specified message.
 {
-    Call_Draw_Message(bank2, message);
+    Call_Draw_Message(bank2, message, insert_1, length_1);
 }
 
 void open_shop(GameShop* shop)
@@ -178,8 +178,8 @@ void teleport_player(GameTele* event_tele) //* Teleports player to specified tel
 
         Call_Draw_Map(bank2, Get_Map(event_tele->map_id));
 
-        if(event_tele->direction == up){Call_Load_Char_Sprite(bank2, &char_player, &sprite_hiro_up_0);}
-        else if(event_tele->direction == down){Call_Load_Char_Sprite(bank2, &char_player, &sprite_hiro_down_0);}
+        if(event_tele->direction == up){Call_Load_Char_Sprite(bank2, &char_player, char_player.sprites->actor_up->sprites[0]);}
+        else if(event_tele->direction == down){Call_Load_Char_Sprite(bank2, &char_player, char_player.sprites->actor_down->sprites[0]);}
 
         fade_in();
 
@@ -222,6 +222,23 @@ void teleport_player(GameTele* event_tele) //* Teleports player to specified tel
     }
 }
 
+void Teleport(GameMap* map, UBYTE tile_x, UBYTE tile_y)
+{
+    move_bkg(0, 0);
+    
+    camera_x = 0;
+    camera_y = 0;
+    char_player.walk_count[0] = 0;
+    char_player.walk_count[1] = 0;
+    char_player.walk_count[2] = 0;
+    char_player.walk_count[3] = 0;
+
+    char_player.pos_x = tile_x;
+    char_player.pos_y = tile_y;
+
+    Call_Draw_Map(bank2, map);
+}
+
 void open_chest(UBYTE chest_id)
 {
     switch(chest_id)
@@ -248,7 +265,7 @@ void Check_NPC_Messenger(void)
             char_npc_1.facing = down;
             Call_Load_Char_Sprite(bank2, &char_npc_1, char_npc_1.sprites_down->sprites[0]);
 
-            read_message(Get_Message(char_npc_1.action_id));
+            read_message(Get_Message(char_npc_1.action_id), NULL, 0);
             return;
         }
         else if(char_npc_2.active == true && char_npc_2.visible == true && char_npc_2.npc_type == messenger && check_char_collision(&char_player, 0, -1) == true)
@@ -256,7 +273,7 @@ void Check_NPC_Messenger(void)
             char_npc_2.facing = down;
             Call_Load_Char_Sprite(bank2, &char_npc_2, char_npc_2.sprites_down->sprites[0]);
 
-            read_message(Get_Message(char_npc_2.action_id));
+            read_message(Get_Message(char_npc_2.action_id), NULL, 0);
             return;
         }
         else if(char_npc_3.active == true && char_npc_3.visible == true && char_npc_3.npc_type == messenger && check_char_collision(&char_player, 0, -1) == true)
@@ -264,7 +281,7 @@ void Check_NPC_Messenger(void)
             char_npc_3.facing = down;
             Call_Load_Char_Sprite(bank2, &char_npc_3, char_npc_3.sprites_down->sprites[0]);
 
-            read_message(Get_Message(char_npc_3.action_id));
+            read_message(Get_Message(char_npc_3.action_id), NULL, 0);
             return;
         }
     }
@@ -275,7 +292,7 @@ void Check_NPC_Messenger(void)
             char_npc_1.facing = up;
             Call_Load_Char_Sprite(bank2, &char_npc_1, char_npc_1.sprites_up->sprites[0]);
 
-            read_message(Get_Message(char_npc_1.action_id));
+            read_message(Get_Message(char_npc_1.action_id), NULL, 0);
             return;
         }
         else if(char_npc_2.active == true && char_npc_2.visible == true && char_npc_2.npc_type == messenger && check_char_collision(&char_player, 0, 1) == true)
@@ -283,7 +300,7 @@ void Check_NPC_Messenger(void)
             char_npc_2.facing = up;
             Call_Load_Char_Sprite(bank2, &char_npc_2, char_npc_2.sprites_up->sprites[0]);
 
-            read_message(Get_Message(char_npc_2.action_id));
+            read_message(Get_Message(char_npc_2.action_id), NULL, 0);
             return;
         }
         else if(char_npc_3.active == true && char_npc_3.visible == true && char_npc_3.npc_type == messenger && check_char_collision(&char_player, 0, 1) == true)
@@ -291,7 +308,7 @@ void Check_NPC_Messenger(void)
             char_npc_3.facing = up;
             Call_Load_Char_Sprite(bank2, &char_npc_3, char_npc_3.sprites_up->sprites[0]);
 
-            read_message(Get_Message(char_npc_3.action_id));
+            read_message(Get_Message(char_npc_3.action_id), NULL, 0);
             return;
         }
     }
@@ -302,7 +319,7 @@ void Check_NPC_Messenger(void)
             char_npc_1.facing = right;
             Call_Load_Char_Sprite(bank2, &char_npc_1, char_npc_1.sprites_right->sprites[0]);
 
-            read_message(Get_Message(char_npc_1.action_id));
+            read_message(Get_Message(char_npc_1.action_id), NULL, 0);
             return;
         }
         else if(char_npc_2.active == true && char_npc_2.visible == true && char_npc_2.npc_type == messenger && check_char_collision(&char_player, -1, 0) == true)
@@ -310,7 +327,7 @@ void Check_NPC_Messenger(void)
             char_npc_2.facing = right;
             Call_Load_Char_Sprite(bank2, &char_npc_2, char_npc_2.sprites_right->sprites[0]);
 
-            read_message(Get_Message(char_npc_2.action_id));
+            read_message(Get_Message(char_npc_2.action_id), NULL, 0);
             return;
         }
         else if(char_npc_3.active == true && char_npc_3.visible == true && char_npc_3.npc_type == messenger && check_char_collision(&char_player, -1, 0) == true)
@@ -318,7 +335,7 @@ void Check_NPC_Messenger(void)
             char_npc_3.facing = right;
             Call_Load_Char_Sprite(bank2, &char_npc_3, char_npc_3.sprites_right->sprites[0]);
 
-            read_message(Get_Message(char_npc_3.action_id));
+            read_message(Get_Message(char_npc_3.action_id), NULL, 0);
             return;
         }
     }
@@ -329,7 +346,7 @@ void Check_NPC_Messenger(void)
             char_npc_1.facing = left;
             Call_Load_Char_Sprite(bank2, &char_npc_1, char_npc_1.sprites_left->sprites[0]);
 
-            read_message(Get_Message(char_npc_1.action_id));
+            read_message(Get_Message(char_npc_1.action_id), NULL, 0);
             return;
         }
         else if(char_npc_2.active == true && char_npc_2.visible == true && char_npc_2.npc_type == messenger && check_char_collision(&char_player, 1, 0) == true)
@@ -337,7 +354,7 @@ void Check_NPC_Messenger(void)
             char_npc_2.facing = left;
             Call_Load_Char_Sprite(bank2, &char_npc_2, char_npc_2.sprites_left->sprites[0]);
 
-            read_message(Get_Message(char_npc_2.action_id));
+            read_message(Get_Message(char_npc_2.action_id), NULL, 0);
             return;
         }
         else if(char_npc_3.active == true && char_npc_3.visible == true && char_npc_3.npc_type == messenger && check_char_collision(&char_player, 1, 0) == true)
@@ -345,7 +362,7 @@ void Check_NPC_Messenger(void)
             char_npc_1.facing = left;
             Call_Load_Char_Sprite(bank2, &char_npc_3, char_npc_3.sprites_left->sprites[0]);
 
-            read_message(Get_Message(char_npc_3.action_id));
+            read_message(Get_Message(char_npc_3.action_id), NULL, 0);
             return;
         }
     }
@@ -618,7 +635,7 @@ void Check_Event_Sign(void)
         if(char_player.pos_x + x == Get_Sign(Get_Map(CurrentMap)->event_sign[i])->pos_x && char_player.pos_y + y == Get_Sign(Get_Map(CurrentMap)->event_sign[i])->pos_y)
         {
             r = Get_Sign(Get_Map(CurrentMap)->event_sign[i])->message_id;
-            read_message(Get_Message(r));
+            read_message(Get_Message(r), NULL, 0);
             return;
         }
     }
@@ -928,8 +945,7 @@ void Update_Joypad(void) //* Updates player action using button presses
                 else
                 {
                     char_player.facing = up;
-
-                    Call_Load_Char_Sprite(bank2, &char_player, &sprite_hiro_up_0);
+                    Call_Load_Char_Sprite(bank2, &char_player, char_player.sprites->actor_up->sprites[0]);
                 }
             }
             else
@@ -947,7 +963,7 @@ void Update_Joypad(void) //* Updates player action using button presses
                 else
                 {
                     char_player.facing = up;
-                    Call_Load_Char_Sprite(bank2, &char_player, &sprite_hiro_up_0);
+                    Call_Load_Char_Sprite(bank2, &char_player, char_player.sprites->actor_up->sprites[0]);
                 }
             }
         }
@@ -969,7 +985,7 @@ void Update_Joypad(void) //* Updates player action using button presses
                 else
                 {
                     char_player.facing = down;
-                    Call_Load_Char_Sprite(bank2, &char_player, &sprite_hiro_down_0);
+                    Call_Load_Char_Sprite(bank2, &char_player, char_player.sprites->actor_down->sprites[0]);
                 }
             }
             else
@@ -987,7 +1003,7 @@ void Update_Joypad(void) //* Updates player action using button presses
                 else
                 {
                     char_player.facing = down;
-                    Call_Load_Char_Sprite(bank2, &char_player, &sprite_hiro_down_0);
+                    Call_Load_Char_Sprite(bank2, &char_player, char_player.sprites->actor_down->sprites[0]);
                 }
             }
         }
@@ -1009,7 +1025,7 @@ void Update_Joypad(void) //* Updates player action using button presses
                 else
                 {
                     char_player.facing = left;
-                    Call_Load_Char_Sprite(bank2, &char_player, &sprite_hiro_left_0);
+                    Call_Load_Char_Sprite(bank2, &char_player, char_player.sprites->actor_left->sprites[0]);
                 }
             }
             else
@@ -1027,7 +1043,7 @@ void Update_Joypad(void) //* Updates player action using button presses
                 else
                 {
                     char_player.facing = left;
-                    Call_Load_Char_Sprite(bank2, &char_player, &sprite_hiro_left_0);
+                    Call_Load_Char_Sprite(bank2, &char_player, char_player.sprites->actor_left->sprites[0]);
                 }
             }
         }
@@ -1049,7 +1065,7 @@ void Update_Joypad(void) //* Updates player action using button presses
                 else
                 {
                     char_player.facing = right;
-                    Call_Load_Char_Sprite(bank2, &char_player, &sprite_hiro_right_0);
+                    Call_Load_Char_Sprite(bank2, &char_player, char_player.sprites->actor_right->sprites[0]);
                 }
             }
             else
@@ -1067,7 +1083,7 @@ void Update_Joypad(void) //* Updates player action using button presses
                 else
                 {
                     char_player.facing = right;
-                    Call_Load_Char_Sprite(bank2, &char_player, &sprite_hiro_right_0);
+                    Call_Load_Char_Sprite(bank2, &char_player, char_player.sprites->actor_right->sprites[0]);
                 }
             }
         }
@@ -1103,17 +1119,17 @@ void Update_Anim_Walk()
 {
     if(char_player.walk_count[0] > 0 || char_player.walk_count[1] > 0 || char_player.walk_count[2] > 0 || char_player.walk_count[3] > 0)
     {
-        if(char_player.walk_count[up] == 16){Call_Load_Char_Sprite(bank2, &char_player, &sprite_hiro_up_0);}
-        else if(char_player.walk_count[up] == 8){Call_Load_Char_Sprite(bank2, &char_player, &sprite_hiro_up_0);}
+        if(char_player.walk_count[up] == 16){Call_Load_Char_Sprite(bank2, &char_player, char_player.sprites->actor_up->sprites[0]);}
+        else if(char_player.walk_count[up] == 8){Call_Load_Char_Sprite(bank2, &char_player, char_player.sprites->actor_up->sprites[0]);}
 
-        if(char_player.walk_count[down] == 16){Call_Load_Char_Sprite(bank2, &char_player, &sprite_hiro_down_1);}
-        else if(char_player.walk_count[down] == 8){Call_Load_Char_Sprite(bank2, &char_player, &sprite_hiro_down_0);}
+        if(char_player.walk_count[down] == 16){Call_Load_Char_Sprite(bank2, &char_player, char_player.sprites->actor_down->sprites[0]);}
+        else if(char_player.walk_count[down] == 8){Call_Load_Char_Sprite(bank2, &char_player, char_player.sprites->actor_down->sprites[0]);}
 
-        if(char_player.walk_count[left] == 16){Call_Load_Char_Sprite(bank2, &char_player, &sprite_hiro_left_0);}
-        else if(char_player.walk_count[left] == 8){Call_Load_Char_Sprite(bank2, &char_player, &sprite_hiro_left_0);}
+        if(char_player.walk_count[left] == 16){Call_Load_Char_Sprite(bank2, &char_player, char_player.sprites->actor_left->sprites[0]);}
+        else if(char_player.walk_count[left] == 8){Call_Load_Char_Sprite(bank2, &char_player, char_player.sprites->actor_left->sprites[0]);}
 
-        if(char_player.walk_count[right] == 16){Call_Load_Char_Sprite(bank2, &char_player, &sprite_hiro_right_0);}
-        else if(char_player.walk_count[right] == 8){Call_Load_Char_Sprite(bank2, &char_player, &sprite_hiro_right_0);}
+        if(char_player.walk_count[right] == 16){Call_Load_Char_Sprite(bank2, &char_player, char_player.sprites->actor_right->sprites[0]);}
+        else if(char_player.walk_count[right] == 8){Call_Load_Char_Sprite(bank2, &char_player, char_player.sprites->actor_right->sprites[0]);}
     }
 }
 

@@ -86,9 +86,9 @@ UBYTE u_i = 0, u_j = 0, u_x = 0, u_y = 0, u_l = 0, u_k = 0;
 
 INT16 s16_i = 0, s16_j = 0;
 
-UINT16 u16_i = 0, u16_j = 0;
+UINT16 u16_i = 0, u16_j = 0, u16_c = 0;
 
-UINT16 d = 0, e = 0, f = 0, g = 0, h = 0;
+UINT16 c = 0, d = 0, e = 0, f = 0, g = 0, h = 0;
 
 unsigned char message_base[16];
 
@@ -112,7 +112,7 @@ unsigned char equipment_accessory[30];
 
 unsigned char flag_switch[255];
 
-unsigned char party[4] = {0, 0, 0, 0};
+GameActor* party[4] = {0, 0, 0, 0};
 
 unsigned char enemy[3] = {0, 0, 0};
 
@@ -120,6 +120,8 @@ unsigned char name_hiro[7] =
 {
     0x42, 0x1E, 0x27, 0x24, 0x01, 0x01, 0x01
 };
+
+UBYTE name_hiro_length = 4;
 
 unsigned char name_bud[7] =
 {
@@ -207,6 +209,8 @@ extern void walk_char(GameCharacter* character);
 extern void Check_Event_Tele();
 extern void hide_char(GameCharacter* character);
 
+extern void Teleport(GameMap* map, UBYTE tile_x, UBYTE tile_y);
+
 extern void Update_Joypad();
 extern void test_update_npc();
 extern void Update_Anim_Walk();
@@ -224,6 +228,8 @@ extern void Draw_Titlescreen();
 extern void Load_Hiro_Tiles();
 
 /*  Bank 4  */
+extern void Load_Player_Actor();
+
 extern void Load_Char_Sprite(GameCharacter* character, GameSprite* sprite);
 extern void Set_Char_Tile(GameCharacter* character, UBYTE tile, GameSprite* sprite);
 extern void Set_Sprite_Packages(GameCharacter* character, GameSpritePackage* sprites_up, GameSpritePackage* sprites_down, GameSpritePackage* sprites_left, GameSpritePackage* sprites_right);
@@ -266,7 +272,7 @@ extern void Draw_Line_Bank9(GameMap* map, UBYTE direction);
 extern UBYTE Check_Tile_Collision_Bank9(GameMap* map, GameCharacter* character, INT8 move_x, INT8 move_y);
 
 /*  Bank 10  */
-extern void Load_Message_Bank10(GameMessage* message);
+extern void Load_Message_Bank10(GameMessage* message, unsigned char* insert_1, UBYTE length_1);
 
 /*  Bank 11  */
 extern void Play_Buzz();
@@ -331,6 +337,22 @@ void performant_delay(UBYTE num_loops)
     {
         wait_vbl_done();
     }
+}
+
+void second_delay(UBYTE num_seconds)
+{
+    u16_c = num_seconds * 60;
+
+    for(c = 0; c < u16_c; c++)
+    {
+        performant_delay(1);
+    }
+}
+
+void set_faded()
+{
+    BGP_REG = 0xFF;
+    OBP0_REG = 0xFF;
 }
 
 void fade_out()
@@ -550,32 +572,6 @@ void Init_Variables()
 
 void Set_Start_Variables(void)
 {
-    PlayerControlFlag = true;
-    char_player.pos_x = 6;
-    char_player.pos_y = 6;
-    CurrentMap = 0;
-    
-    char_npc_2.active == true;
-
-    inv_amount[0] = 1;
-
-    switch_bank(bank7);
-
-    Add_Actor(&actor_hiro);
-    Add_Actor(&actor_bud);
-    Add_Actor(&actor_soran);
-
-    switch_bank(bank12);
-
-    Add_Equip(&equip_wooden_staff);
-    Add_Equip(&equip_metal_rod);
-    Add_Equip(&equip_mythril_rod);
-    Add_Equip(&equip_rod_of_spark);
-
-    Equip_Equipment(&actor_hiro, &equip_wooden_sword);
-    Equip_Equipment(&actor_hiro, &equip_hoplon);
-    Equip_Equipment(&actor_hiro, &equip_cotton_garb);
-    Equip_Equipment(&actor_hiro, &equip_copper_bracelet);
 }
 
 void Refresh_Inv_Amount(void)
@@ -604,26 +600,6 @@ void Save_Variables(void) //* Saves all "save" variables.
     memcpy(saved_inv_amount, &inv_amount, sizeof(saved_inv_amount));
 
     saved_game_start = true;
-}
-
-void Count_Actors(void) //* Counts current actors and stores result in "total_actors".
-{
-    if(party[3] > 0)
-    {
-        total_actors = 3;
-    }
-    else if(party[2] > 0)
-    {
-        total_actors = 2;
-    }
-    else if(party[1] > 0)
-    {
-        total_actors = 1;
-    }
-    else
-    {
-        total_actors = 0;
-    }
 }
 
 /*--------------------------------------------*/
@@ -967,14 +943,14 @@ UBYTE Get_Font_Value(UBYTE bank)
     return font_value;
 }
 
-void Call_Draw_Message(UBYTE bank, GameMessage* message) //* Loads message box and draws specified message.
+void Call_Draw_Message(UBYTE bank, GameMessage* message, unsigned char* insert_1, UBYTE length_1) //* Loads message box and draws specified message.
 {
     switch_bank(message->bank);
 
     switch(message->bank)
     {
         case bank10:
-            Load_Message_Bank10(message);
+            Load_Message_Bank10(message, insert_1, length_1);
             break;
         default:
             break;
@@ -1074,6 +1050,17 @@ UBYTE Call_Check_Tile_Collision(UBYTE bank, GameMap* map, GameCharacter* charact
     return Collision;
 }
 
+void Call_Teleport(UBYTE bank, GameMap* map, UBYTE tile_x, UBYTE tile_y)
+{
+    switch_bank(bank2);
+
+    Teleport(map, tile_x, tile_y);
+
+    switch_bank(bank);
+}
+
+
+
 void Call_Draw_Pointer(UBYTE bank)
 {
     switch_bank(bank6);
@@ -1115,6 +1102,15 @@ void Call_Set_Sprite_Packages(UBYTE bank, GameCharacter* character, GameSpritePa
     switch_bank(bank4);
 
     Set_Sprite_Packages(character, sprites_up, sprites_down, sprites_left, sprites_right);
+
+    switch_bank(bank);
+}
+
+void Call_Load_Player_Actor(UBYTE bank)
+{
+    switch_bank(bank4);
+
+    Load_Player_Actor();
 
     switch_bank(bank);
 }
@@ -1324,6 +1320,15 @@ void Call_Set_Actor_Skills(UBYTE bank, GameActor* actor)
     switch_bank(bank17);
 
     Set_Actor_Skills(actor);
+
+    switch_bank(bank);
+}
+
+void Call_Add_Actor(UBYTE bank, GameActor* actor)
+{
+    switch_bank(bank7);
+
+    Add_Actor(actor);
 
     switch_bank(bank);
 }
@@ -1617,12 +1622,11 @@ void main()
 
     interrupt_handler();
 
-    BGP_REG = 0xFF;
-    OBP0_REG = 0xFF;
-
     Init_Variables();
 
     cpu_fast();
+
+    Call_Add_Item(bank2, &item_healing_brew, 1);
 
     if(saved_game_start == true)
     {
@@ -1641,7 +1645,7 @@ void main()
 
         switch_bank(bank7);
 
-        Add_Actor(&actor_hiro);
+        Add_Actor(&actor_bud);
         Add_Actor(&actor_bud);
         Add_Actor(&actor_soran);
 
@@ -1675,8 +1679,7 @@ void main()
 
         switch_bank(bank4);
 
-        Set_Sprite_Packages(&char_player, &sprite_hiro_down, &sprite_hiro_down, &sprite_hiro_down, &sprite_hiro_down);
-        Load_Char_Sprite(&char_player, char_player.sprites_down->sprites[0]);
+        Load_Player_Actor();
 
         switch_bank(bank2);
 
@@ -1697,26 +1700,17 @@ void main()
         Load_Hiro_Tiles();
         Draw_Titlescreen();
 
-        switch_bank(bank2); 
-
-        build_char(&char_player);
-        build_char(&char_npc_1);
-        build_char(&char_npc_2);
-
         switch_bank(bank6);
 
         Load_Window();
 
-        switch_bank(bank4);
-
-        Set_Sprite_Packages(&char_player, &sprite_hiro_down, &sprite_hiro_down, &sprite_hiro_down, &sprite_hiro_down);
-        Load_Char_Sprite(&char_player, char_player.sprites_down->sprites[0]);
-
-        switch_bank(bank2);
+        switch_bank(bank20);
 
         waitpad(J_START);
 
-        fade_in();
+        Scene_Handler(0);
+
+        switch_bank(bank2);
 
         Gameplay();
     }
