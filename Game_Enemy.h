@@ -6,9 +6,9 @@
 
 typedef struct GameEnemy
 {
-    unsigned char* name;
+    unsigned char *name;
     UBYTE length;
-    unsigned char* description;
+    unsigned char *description;
     UBYTE enemy_id;
     UBYTE size[2];
     UBYTE skill[3];

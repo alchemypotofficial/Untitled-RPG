@@ -120,7 +120,7 @@ UBYTE Use_Item(GameActor* actor, GameItem* item) //Use item on actor;
     switch(item->action_id)
     {
         case 0: //NULL
-            return false;
+            return 0x0;
             break;
         case 1: //Healing Brew
             if(actor->health != 0 && actor->health < actor->max_health)
@@ -132,15 +132,15 @@ UBYTE Use_Item(GameActor* actor, GameItem* item) //Use item on actor;
                     actor->health = actor->max_health;
                 }
 
-                return true;
+                return 0x1;
             }
             else
             {
-                return false;
+                return 0x0;
             }            
             break;
         default:
-            return false;
+            return 0x0;
             break;
     }
 }

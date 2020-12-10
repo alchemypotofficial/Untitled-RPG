@@ -17,11 +17,11 @@ typedef struct GameCharacter
     UBYTE facing;
     UBYTE visible;
     UBYTE anim_tick;
-    const GameCharSprite* sprites;
-    GameSpritePackage* sprites_up;
-    GameSpritePackage* sprites_down;
-    GameSpritePackage* sprites_left;
-    GameSpritePackage* sprites_right;
+    const GameCharSprite *sprites;
+    GameSpritePackage *sprites_up;
+    GameSpritePackage *sprites_down;
+    GameSpritePackage *sprites_left;
+    GameSpritePackage *sprites_right;
 
 } GameCharacter;
 

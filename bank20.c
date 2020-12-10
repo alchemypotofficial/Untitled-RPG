@@ -31,9 +31,9 @@ extern INT8 i, j, k, l, m, n;
 
 extern UBYTE u_x, u_y;
 
-extern GameActor* party[4];
+extern GameActor *party[4];
 
-extern unsigned char* name_hiro;
+extern unsigned char *name_hiro;
 extern UBYTE name_hiro_length;
 
 extern unsigned char inventory[99];
@@ -58,11 +58,11 @@ extern void scroll_screen(INT8 move_x, INT8 move_y);
 
 extern void Gameplay();
 
-extern void Call_Teleport(UBYTE bank, GameMap* map, UBYTE tile_x, UBYTE tile_y);
-extern void Call_Add_Actor(UBYTE bank, GameActor* actor);
-extern void Call_Build_Char(UBYTE bank, GameCharacter* character);
+extern void Call_Teleport(UBYTE bank, GameMap *map, UBYTE tile_x, UBYTE tile_y);
+extern void Call_Add_Actor(UBYTE bank, GameActor *actor);
+extern void Call_Build_Char(UBYTE bank, GameCharacter *character);
 extern void Call_Load_Player_Actor(UBYTE bank);
-extern void Call_Draw_Message(UBYTE bank, GameMessage* message, unsigned char* insert_1, UBYTE length_1);
+extern void Call_Draw_Message(UBYTE bank, GameMessage *message, unsigned char *insert_1, UBYTE length_1);
 
 extern void Call_Play_Buzz(UBYTE bank);
 extern void Call_Play_Use(UBYTE bank);
@@ -98,12 +98,12 @@ void Scene_Opening()
 
 void Scene_Handler(UBYTE scene_id)
 {
-    switch(scene_id)
+    switch (scene_id)
     {
-        case 0:
-            Scene_Opening();
-            break;
-        default:
-            break;
+    case 0:
+        Scene_Opening();
+        break;
+    default:
+        break;
     }
 }

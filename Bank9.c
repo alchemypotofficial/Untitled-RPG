@@ -332,14 +332,14 @@ UBYTE Check_Tile_Collision_Bank9(GameMap* map, GameCharacter* character, INT8 mo
     
     if(Tileset == 1)
     {
-        return tilemap_1[tile] == impassable ? true : false;
+        return tilemap_1[tile] == impassable;
     }
     if(Tileset == 2)
     {
-        return tilemap_2[tile] == impassable ? true : false;
+        return tilemap_2[tile] == impassable;
     }
     else
     {
-        return false;
+        return 0x0;
     }
 }

@@ -81,7 +81,7 @@ void Load_Message_Box()
 
 void parallax_char_sprites()
 {
-    if(char_npc_1.active == true)
+    if(char_npc_1.active)
     {
         if(char_npc_1.pos_y > char_player.pos_y + 2)
         {
@@ -105,7 +105,7 @@ void parallax_char_sprites()
             }
         }
     }
-    if(char_npc_2.active == true)
+    if(char_npc_2.active)
     {
         if(char_npc_2.pos_y > char_player.pos_y + 2)
         {
@@ -210,7 +210,7 @@ void clear_messagebox()
 
 void reset_char_sprites()
 {
-    if(char_npc_1.active == true && char_npc_1.visible == true)
+    if(char_npc_1.active && char_npc_1.visible)
     {
         switch(char_npc_1.facing)
         {
@@ -234,7 +234,7 @@ void reset_char_sprites()
                 break;
         }
     }
-    if(char_npc_2.active == true && char_npc_2.visible == true)
+    if(char_npc_2.active && char_npc_2.visible)
     {
         switch(char_npc_2.facing)
         {

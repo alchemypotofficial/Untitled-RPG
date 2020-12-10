@@ -46,7 +46,7 @@ extern INT8 i, j, k, l, m, n, x, y;
 
 extern UBYTE u_i, u_j, u_y, u_x;
 
-extern GameActor* party[4];
+extern GameActor *party[4];
 
 extern unsigned char enemy[3];
 
@@ -94,21 +94,21 @@ extern void set_bkg_map();
 extern void set_win_map();
 extern void set_bkg_tileset(UBYTE first_tile, UBYTE num_tile, unsigned char *tileset);
 
-extern GameMap* Get_Map(UBYTE map_id);
-extern GameActor* Get_Actor(UBYTE actor_id);
-extern GameItem* Get_Item(UBYTE item_id);
-extern GameEquip* Get_Equip(UBYTE equip_id);
-extern GameClass* Get_Class(UBYTE class_id);
-extern GameEnemy* Get_Enemy(UBYTE enemy_id);
-extern GameTroop* Get_Troop(UBYTE troop_id);
-extern GameSkill* Get_Skill(UBYTE skill_id);
+extern GameMap *Get_Map(UBYTE map_id);
+extern GameActor *Get_Actor(UBYTE actor_id);
+extern GameItem *Get_Item(UBYTE item_id);
+extern GameEquip *Get_Equip(UBYTE equip_id);
+extern GameClass *Get_Class(UBYTE class_id);
+extern GameEnemy *Get_Enemy(UBYTE enemy_id);
+extern GameTroop *Get_Troop(UBYTE troop_id);
+extern GameSkill *Get_Skill(UBYTE skill_id);
 
 extern void Call_Menu_Main();
 extern void Call_Load_Menu_Main();
 extern void Call_Reload_Map();
 
 extern void Call_Clear_Map(UBYTE bank);
-extern void Call_Move_Char(UBYTE bank, GameCharacter* character, UINT8 tile_x, UINT8 tile_y, UINT8 pixel_offset);
+extern void Call_Move_Char(UBYTE bank, GameCharacter *character, UINT8 tile_x, UINT8 tile_y, UINT8 pixel_offset);
 extern void Call_Load_Font_Menu();
 extern void Call_Draw_Number();
 extern void Call_Draw_Name();
@@ -128,125 +128,125 @@ const unsigned char Skill_The[3] = {0x4E, 0x1D, 0x1A};
 const unsigned char Skill_Party[5] = {0x25, 0x16, 0x27, 0x2A, 0x2F};
 const unsigned char Skill_Gold[4] = {0x1C, 0x24, 0x21, 0x19};
 
-GameEnemyDummy* Get_Enemy_Dummy(UBYTE enemy_dummy_id)
+GameEnemyDummy *Get_Enemy_Dummy(UBYTE enemy_dummy_id)
 {
-    switch(enemy_dummy_id)
+    switch (enemy_dummy_id)
     {
-        case 0:
-            return &enemy_dummy_1;
-            break;
-        case 1:
-            return &enemy_dummy_2;
-            break;
-        case 2:
-            return &enemy_dummy_3;
-            break;
-        default:
-            return &enemy_dummy_1;
-            break;
+    case 0:
+        return &enemy_dummy_1;
+        break;
+    case 1:
+        return &enemy_dummy_2;
+        break;
+    case 2:
+        return &enemy_dummy_3;
+        break;
+    default:
+        return &enemy_dummy_1;
+        break;
     }
 }
 
-unsigned char* Get_Name(UBYTE target_id)
+unsigned char *Get_Name(UBYTE target_id)
 {
-    switch(target_id)
+    switch (target_id)
     {
-        case 0:
-            return party[0]->name;
-            break;
-        case 1:
-            return party[1]->name;
-            break;
-        case 2:
-            return party[2]->name;
-            break;
-        case 3:
-            return party[3]->name;
-            break;
-        case 4:
-            return Get_Enemy(enemy[0])->name;
-            break;
-        case 5:
-            return Get_Enemy(enemy[1])->name;
-            break;
-        case 6:
-            return Get_Enemy(enemy[2])->name;
-            break;
-        default:
-            return party[0]->name;
-            break;
+    case 0:
+        return party[0]->name;
+        break;
+    case 1:
+        return party[1]->name;
+        break;
+    case 2:
+        return party[2]->name;
+        break;
+    case 3:
+        return party[3]->name;
+        break;
+    case 4:
+        return Get_Enemy(enemy[0])->name;
+        break;
+    case 5:
+        return Get_Enemy(enemy[1])->name;
+        break;
+    case 6:
+        return Get_Enemy(enemy[2])->name;
+        break;
+    default:
+        return party[0]->name;
+        break;
     }
 }
 
 UBYTE Get_Name_Length(UBYTE target_id)
 {
-    switch(target_id)
+    switch (target_id)
     {
-        case 0:
-            return party[0]->length;
-            break;
-        case 1:
-            return party[1]->length;
-            break;
-        case 2:
-            return party[2]->length;
-            break;
-        case 3:
-            return party[3]->length;
-            break;
-        case 4:
-            return Get_Enemy(enemy[0])->length;
-            break;
-        case 5:
-            return Get_Enemy(enemy[1])->length;
-            break;
-        case 6:
-            return Get_Enemy(enemy[2])->length;
-            break;
-        default:
-            return party[0]->length;
-            break;
+    case 0:
+        return party[0]->length;
+        break;
+    case 1:
+        return party[1]->length;
+        break;
+    case 2:
+        return party[2]->length;
+        break;
+    case 3:
+        return party[3]->length;
+        break;
+    case 4:
+        return Get_Enemy(enemy[0])->length;
+        break;
+    case 5:
+        return Get_Enemy(enemy[1])->length;
+        break;
+    case 6:
+        return Get_Enemy(enemy[2])->length;
+        break;
+    default:
+        return party[0]->length;
+        break;
     }
 }
 
-UBYTE Get_Skill_Cost(GameSkill* skill)
+UBYTE Get_Skill_Cost(GameSkill *skill)
 {
     return skill->mana_cost;
 }
 
-void Set_Actor_Skills(GameActor* actor)
+void Set_Actor_Skills(GameActor *actor)
 {
     u_y = 0;
 
-    for(u_x = 0; u_x < 10; u_x++)
+    for (u_x = 0; u_x < 10; u_x++)
     {
         actor->skills[u_x] = 0;
     }
 
-    if(actor->skill_ap[Get_Equip(actor->equipped[0])->skill_id] < Get_Skill(Get_Equip(actor->equipped[0])->skill_id)->required_ap)
+    if (actor->skill_ap[Get_Equip(actor->equipped[0])->skill_id] < Get_Skill(Get_Equip(actor->equipped[0])->skill_id)->required_ap)
     {
         actor->skills[0] = Get_Equip(actor->equipped[0])->skill_id;
     }
 
-    for(u_x = 0; u_x < 119; u_x++)
+    for (u_x = 0; u_x < 119; u_x++)
     {
-        if(actor->skill_ap[u_x] == Get_Skill(u_x)->required_ap && Get_Skill(u_x)->required_ap > 0 && Get_Skill(u_x)->class == actor->class)
+        if (actor->skill_ap[u_x] == Get_Skill(u_x)->required_ap && Get_Skill(u_x)->required_ap > 0 && Get_Skill(u_x)->class == actor->class)
         {
             actor->skills[1 + u_y] = u_x;
             u_y += 1;
 
-            if(u_y > 9)
+            if (u_y > 9)
             {
                 break;
             }
         }
     }
 
-    for(u_y = 0; u_y < 10; u_y++)
+    for (u_y = 0; u_y < 10; u_y++)
     {
-        for(u_x = 0; u_x < 10; u_x++)
+        for (u_x = 0; u_x < 10; u_x++)
         {
-            if(actor->skills[u_x] < actor->skills[u_y])
+            if (actor->skills[u_x] < actor->skills[u_y])
             {
                 u_i = actor->skills[u_y];
                 actor->skills[u_y] = actor->skills[u_x];
@@ -256,17 +256,17 @@ void Set_Actor_Skills(GameActor* actor)
     }
 }
 
-void Add_Ability_Points(GameActor* actor, UBYTE points)
+void Add_Ability_Points(GameActor *actor, UBYTE points)
 {
-    for(u_x = 0; u_x < 10; u_x++)
+    for (u_x = 0; u_x < 10; u_x++)
     {
         u_y = actor->skills[u_x];
-        
-        if(u_y > 0 && actor->skill_ap[u_y] < Get_Skill(u_y)->required_ap)
+
+        if (u_y > 0 && actor->skill_ap[u_y] < Get_Skill(u_y)->required_ap)
         {
-            if((actor->skill_ap[u_y] + points) < Get_Skill(u_y)->required_ap)
+            if ((actor->skill_ap[u_y] + points) < Get_Skill(u_y)->required_ap)
             {
-                actor->skill_ap[u_y] += points;   
+                actor->skill_ap[u_y] += points;
             }
             else
             {
@@ -284,12 +284,12 @@ void Draw_Skill_Number(UINT16 number, UBYTE tile_x, UBYTE tile_y)
 
     large_number = number;
 
-    for(n = 0; n < 3; n++)
+    for (n = 0; n < 3; n++)
     {
         parsed_decimal[n] = 0;
     }
 
-    while(large_number >= 1000)
+    while (large_number >= 1000)
     {
         large_number -= 1000;
         parsed_number += 1;
@@ -298,7 +298,7 @@ void Draw_Skill_Number(UINT16 number, UBYTE tile_x, UBYTE tile_y)
     parsed_decimal[0] = parsed_number;
     parsed_number = 0;
 
-    while(large_number >= 100)
+    while (large_number >= 100)
     {
         large_number -= 100;
         parsed_number += 1;
@@ -307,7 +307,7 @@ void Draw_Skill_Number(UINT16 number, UBYTE tile_x, UBYTE tile_y)
     parsed_decimal[1] = parsed_number;
     parsed_number = 0;
 
-    while(large_number >= 10)
+    while (large_number >= 10)
     {
         large_number -= 10;
         parsed_number += 1;
@@ -322,15 +322,15 @@ void Draw_Skill_Number(UINT16 number, UBYTE tile_x, UBYTE tile_y)
     parsed_decimal[2] += 49;
     parsed_decimal[3] += 49;
 
-    if(saved_number < 10)
+    if (saved_number < 10)
     {
         set_bkg_tiles(tile_x + 3, tile_y, 1, 1, parsed_decimal + 3);
     }
-    else if(saved_number < 100)
+    else if (saved_number < 100)
     {
         set_bkg_tiles(tile_x + 2, tile_y, 2, 1, parsed_decimal + 2);
     }
-    else if(saved_number < 1000)
+    else if (saved_number < 1000)
     {
         set_bkg_tiles(tile_x + 1, tile_y, 3, 1, parsed_decimal + 1);
     }
@@ -338,10 +338,9 @@ void Draw_Skill_Number(UINT16 number, UBYTE tile_x, UBYTE tile_y)
     {
         set_bkg_tiles(tile_x, tile_y, 4, 1, parsed_decimal);
     }
-    
 }
 
-void Draw_Skill_Cost(GameSkill* skill)
+void Draw_Skill_Cost(GameSkill *skill)
 {
     Draw_Skill_Number(skill->mana_cost, 4, 14);
 }
@@ -354,12 +353,12 @@ void Draw_Damage_Message(UINT16 number, UBYTE tile_x, UBYTE tile_y)
 
     large_number = number;
 
-    for(n = 0; n < 3; n++)
+    for (n = 0; n < 3; n++)
     {
         parsed_decimal[n] = 0;
     }
 
-    while(large_number >= 1000)
+    while (large_number >= 1000)
     {
         large_number -= 1000;
         parsed_number += 1;
@@ -368,7 +367,7 @@ void Draw_Damage_Message(UINT16 number, UBYTE tile_x, UBYTE tile_y)
     parsed_decimal[0] = parsed_number;
     parsed_number = 0;
 
-    while(large_number >= 100)
+    while (large_number >= 100)
     {
         large_number -= 100;
         parsed_number += 1;
@@ -377,7 +376,7 @@ void Draw_Damage_Message(UINT16 number, UBYTE tile_x, UBYTE tile_y)
     parsed_decimal[1] = parsed_number;
     parsed_number = 0;
 
-    while(large_number >= 10)
+    while (large_number >= 10)
     {
         large_number -= 10;
         parsed_number += 1;
@@ -392,24 +391,24 @@ void Draw_Damage_Message(UINT16 number, UBYTE tile_x, UBYTE tile_y)
     parsed_decimal[2] += 49;
     parsed_decimal[3] += 49;
 
-    if(saved_number < 10)
+    if (saved_number < 10)
     {
         performant_delay(2);
 
         set_bkg_tiles(tile_x, tile_y, 1, 1, &parsed_decimal[3]);
     }
-    else if(saved_number < 100)
+    else if (saved_number < 100)
     {
-        for(x = 0; x < 2; x++)
+        for (x = 0; x < 2; x++)
         {
             performant_delay(2);
 
             set_bkg_tiles(tile_x + x, tile_y, 1, 1, &parsed_decimal[x + 2]);
         }
     }
-    else if(saved_number < 1000)
+    else if (saved_number < 1000)
     {
-        for(x = 0; x < 3; x++)
+        for (x = 0; x < 3; x++)
         {
             performant_delay(2);
 
@@ -418,14 +417,13 @@ void Draw_Damage_Message(UINT16 number, UBYTE tile_x, UBYTE tile_y)
     }
     else
     {
-        for(x = 0; x < 4; x++)
+        for (x = 0; x < 4; x++)
         {
             performant_delay(2);
 
             set_bkg_tiles(tile_x + x, tile_y, 1, 1, &parsed_decimal[x]);
         }
     }
-    
 }
 
 void Move_Damage(UBYTE tile_x, UBYTE tile_y, UBYTE full_number)
@@ -433,7 +431,7 @@ void Move_Damage(UBYTE tile_x, UBYTE tile_y, UBYTE full_number)
     tile_x = tile_x * 8;
     tile_y = tile_y * 8;
 
-    if(full_number == false)
+    if (full_number == false)
     {
         set_sprite_data(104, 20, Tiles_Number);
 
@@ -466,12 +464,12 @@ void Draw_Skill_Damage(UINT16 number)
 
     large_number = number;
 
-    for(n = 0; n < 3; n++)
+    for (n = 0; n < 3; n++)
     {
         parsed_decimal[n] = 0;
     }
 
-    while(large_number >= 1000)
+    while (large_number >= 1000)
     {
         large_number -= 1000;
         parsed_number += 1;
@@ -480,7 +478,7 @@ void Draw_Skill_Damage(UINT16 number)
     parsed_decimal[0] = parsed_number;
     parsed_number = 0;
 
-    while(large_number >= 100)
+    while (large_number >= 100)
     {
         large_number -= 100;
         parsed_number += 1;
@@ -489,7 +487,7 @@ void Draw_Skill_Damage(UINT16 number)
     parsed_decimal[1] = parsed_number;
     parsed_number = 0;
 
-    while(large_number >= 10)
+    while (large_number >= 10)
     {
         large_number -= 10;
         parsed_number += 1;
@@ -509,7 +507,7 @@ void Draw_Skill_Damage(UINT16 number)
     parsed_decimal[2] += 104;
     parsed_decimal[3] += 104;
 
-    if(saved_number < 100)
+    if (saved_number < 100)
     {
         set_sprite_data(104, 20, Tiles_Number);
 
@@ -519,7 +517,7 @@ void Draw_Skill_Damage(UINT16 number)
         set_sprite_tile(38, parsed_decimal[3]);
         set_sprite_tile(39, parsed_decimal[3] + 1);
     }
-    else if(saved_number < 1000)
+    else if (saved_number < 1000)
     {
         set_sprite_data(104, 20, Tiles_Number);
 
@@ -534,20 +532,27 @@ void Draw_Skill_Damage(UINT16 number)
     }
 }
 
-void Draw_Skill_Message(GameSkill* skill, UBYTE action_performer, UBYTE action_target)
+void Draw_Skill_Message(GameSkill *skill, UBYTE action_performer, UBYTE action_target)
 {
     message_x = 0;
     message_y = 0;
 
-    for(u_x = 0; u_x < 7; u_x++) //* Action performer's name.
+    for (u_x = 0; u_x < 7; u_x++) //* Action performer's name.
     {
-        if(joypad() & J_A){performant_delay(1);}else{performant_delay(2);}
+        if (joypad() & J_A)
+        {
+            performant_delay(1);
+        }
+        else
+        {
+            performant_delay(2);
+        }
 
         set_bkg_tiles(1 + message_x, 13 + message_y, 1, 1, &Get_Name(action_performer)[u_x]);
 
         message_x += 1;
 
-        if(Get_Name(action_performer)[u_x + 1] == 0x01 && Get_Name(action_performer)[u_x + 2] == 0x01)
+        if (Get_Name(action_performer)[u_x + 1] == 0x01 && Get_Name(action_performer)[u_x + 2] == 0x01)
         {
             break;
         }
@@ -555,21 +560,28 @@ void Draw_Skill_Message(GameSkill* skill, UBYTE action_performer, UBYTE action_t
 
     message_x += 1;
 
-    if(message_x > 17)
+    if (message_x > 17)
     {
         message_x = 0;
         message_y += 1;
     }
 
-    for(u_x = 0; u_x < skill->length; u_x++) //* Skill message.
+    for (u_x = 0; u_x < skill->length; u_x++) //* Skill message.
     {
-        if(joypad() & J_A){performant_delay(1);}else{performant_delay(2);}
+        if (joypad() & J_A)
+        {
+            performant_delay(1);
+        }
+        else
+        {
+            performant_delay(2);
+        }
 
         set_bkg_tiles(1 + message_x, 13 + message_y, 1, 1, &skill->description[u_x]);
 
         message_x += 1;
 
-        if(skill->description[u_x + 1] == 0x01)
+        if (skill->description[u_x + 1] == 0x01)
         {
             break;
         }
@@ -577,23 +589,30 @@ void Draw_Skill_Message(GameSkill* skill, UBYTE action_performer, UBYTE action_t
 
     message_x += 1;
 
-    if(skill->is_ability == true) //* Skill name.
+    if (skill->is_ability) //* Skill name.
     {
-        if(message_x + skill->name_length > 17)
+        if (message_x + skill->name_length > 17)
         {
             message_x = 0;
             message_y += 1;
         }
 
-        for(u_x = 0; u_x < 8; u_x++) //* Skill message.
+        for (u_x = 0; u_x < 8; u_x++) //* Skill message.
         {
-            if(joypad() & J_A){performant_delay(1);}else{performant_delay(2);}
+            if (joypad() & J_A)
+            {
+                performant_delay(1);
+            }
+            else
+            {
+                performant_delay(2);
+            }
 
             set_bkg_tiles(1 + message_x, 13 + message_y, 1, 1, &skill->name[u_x]);
 
             message_x += 1;
 
-            if(skill->name[u_x + 1] == 0x01)
+            if (skill->name[u_x + 1] == 0x01)
             {
                 break;
             }
@@ -601,15 +620,22 @@ void Draw_Skill_Message(GameSkill* skill, UBYTE action_performer, UBYTE action_t
 
         message_x += 1;
 
-        if(message_x + 2 > 17)
+        if (message_x + 2 > 17)
         {
             message_x = 0;
             message_y += 1;
         }
 
-        for(u_x = 0; u_x < 2; u_x++)
+        for (u_x = 0; u_x < 2; u_x++)
         {
-            if(joypad() & J_A){performant_delay(1);}else{performant_delay(2);}
+            if (joypad() & J_A)
+            {
+                performant_delay(1);
+            }
+            else
+            {
+                performant_delay(2);
+            }
 
             set_bkg_tiles(1 + message_x, 13 + message_y, 1, 1, &Skill_On[u_x]);
 
@@ -619,21 +645,28 @@ void Draw_Skill_Message(GameSkill* skill, UBYTE action_performer, UBYTE action_t
         message_x += 1;
     }
 
-    if(message_x + Get_Name_Length(action_target) > 17)
+    if (message_x + Get_Name_Length(action_target) > 17)
     {
         message_x = 0;
         message_y += 1;
     }
 
-    for(u_x = 0; u_x < 7; u_x++) //* Action target's name.
+    for (u_x = 0; u_x < 7; u_x++) //* Action target's name.
     {
-        if(joypad() & J_A){performant_delay(1);}else{performant_delay(2);}
+        if (joypad() & J_A)
+        {
+            performant_delay(1);
+        }
+        else
+        {
+            performant_delay(2);
+        }
 
         set_bkg_tiles(1 + message_x, 13 + message_y, 1, 1, &Get_Name(action_target)[u_x]);
 
         message_x += 1;
 
-        if(Get_Name(action_target)[u_x + 1] == 0x01)
+        if (Get_Name(action_target)[u_x + 1] == 0x01)
         {
             break;
         }
@@ -645,13 +678,13 @@ void Draw_Skill_Message(GameSkill* skill, UBYTE action_performer, UBYTE action_t
 
     message_x += 1;
 
-    if(message_x > 17)
+    if (message_x > 17)
     {
         message_x = 0;
         message_y += 1;
     }
 
-    if(message_x + Get_Name_Length(action_target) + 1 > 17)
+    if (message_x + Get_Name_Length(action_target) + 1 > 17)
     {
         message_x = 0;
         message_y += 1;
@@ -659,15 +692,22 @@ void Draw_Skill_Message(GameSkill* skill, UBYTE action_performer, UBYTE action_t
 
     performant_delay(15);
 
-    for(u_x = 0; u_x < 7; u_x++) //* Action target's name.
+    for (u_x = 0; u_x < 7; u_x++) //* Action target's name.
     {
-        if(joypad() & J_A){performant_delay(1);}else{performant_delay(2);}
+        if (joypad() & J_A)
+        {
+            performant_delay(1);
+        }
+        else
+        {
+            performant_delay(2);
+        }
 
         set_bkg_tiles(1 + message_x, 13 + message_y, 1, 1, &Get_Name(action_target)[u_x]);
 
         message_x += 1;
 
-        if(Get_Name(action_target)[u_x + 1] == 0x01)
+        if (Get_Name(action_target)[u_x + 1] == 0x01)
         {
             break;
         }
@@ -675,15 +715,22 @@ void Draw_Skill_Message(GameSkill* skill, UBYTE action_performer, UBYTE action_t
 
     message_x += 1;
 
-    if(message_x > 17)
+    if (message_x > 17)
     {
         message_x = 0;
         message_y += 1;
     }
 
-    for(u_x = 0; u_x < 4; u_x++) //* Skill message.
+    for (u_x = 0; u_x < 4; u_x++) //* Skill message.
     {
-        if(joypad() & J_A){performant_delay(1);}else{performant_delay(2);}
+        if (joypad() & J_A)
+        {
+            performant_delay(1);
+        }
+        else
+        {
+            performant_delay(2);
+        }
 
         set_bkg_tiles(1 + message_x, 13 + message_y, 1, 1, &Skill_Took[u_x]);
 
@@ -692,60 +739,67 @@ void Draw_Skill_Message(GameSkill* skill, UBYTE action_performer, UBYTE action_t
 
     message_x += 1;
 
-    if(message_x > 17)
+    if (message_x > 17)
     {
         message_x = 0;
         message_y += 1;
     }
 
-    if(skill_damage < 10) //* 'skill_damage' number.
+    if (skill_damage < 10) //* 'skill_damage' number.
     {
         Draw_Damage_Message(skill_damage, message_x + 1, 13 + message_y);
 
         message_x += 1;
     }
-    else if(skill_damage > 9)
+    else if (skill_damage > 9)
     {
-        if(message_x + 2 > 17)
+        if (message_x + 2 > 17)
         {
             message_x = 0;
             message_y += 1;
         }
 
         Draw_Damage_Message(skill_damage, message_x, 13 + message_y);
-        
+
         message_x += 2;
     }
-    else if(skill_damage > 99)
+    else if (skill_damage > 99)
     {
-        if(message_x + 3 > 17)
+        if (message_x + 3 > 17)
         {
             message_x = 0;
             message_y += 1;
         }
 
         Draw_Damage_Message(skill_damage, message_x, 13 + message_y);
-        
+
         message_x += 3;
     }
 
     message_x += 1;
 
-    if(message_x + 6 > 17)
+    if (message_x + 6 > 17)
     {
         message_x = 0;
         message_y += 1;
     }
 
-    for(u_x = 0; u_x < 6; u_x++) //* Damage message.
+    for (u_x = 0; u_x < 6; u_x++) //* Damage message.
     {
-        if(joypad() & J_A){performant_delay(1);}else{performant_delay(2);}
+        if (joypad() & J_A)
+        {
+            performant_delay(1);
+        }
+        else
+        {
+            performant_delay(2);
+        }
 
         set_bkg_tiles(1 + message_x, 13 + message_y, 1, 1, &Skill_Damaged[u_x]);
 
         message_x += 1;
 
-        if(message_x > 17)
+        if (message_x > 17)
         {
             message_x = 0;
             message_y += 1;
@@ -757,12 +811,12 @@ void Draw_Skill_Message(GameSkill* skill, UBYTE action_performer, UBYTE action_t
     waitpad(J_A);
 }
 
-void Draw_Experience_Message(GameActor* actor)
+void Draw_Experience_Message(GameActor *actor)
 {
     message_x = 0;
     message_y = 0;
 
-    for(u_x = 0; u_x < 7; u_x++) //* Party member name.
+    for (u_x = 0; u_x < 7; u_x++) //* Party member name.
     {
         performant_delay(2);
 
@@ -770,7 +824,7 @@ void Draw_Experience_Message(GameActor* actor)
 
         message_x += 1;
 
-        if(actor->name[u_x + 1] == 0x01)
+        if (actor->name[u_x + 1] == 0x01)
         {
             break;
         }
@@ -778,13 +832,13 @@ void Draw_Experience_Message(GameActor* actor)
 
     message_x += 1;
 
-    if(message_x > 17)
+    if (message_x > 17)
     {
         message_x = 0;
         message_y += 1;
     }
 
-    for(u_x = 0; u_x < 6; u_x++) //* Gained message.
+    for (u_x = 0; u_x < 6; u_x++) //* Gained message.
     {
         performant_delay(2);
 
@@ -795,56 +849,56 @@ void Draw_Experience_Message(GameActor* actor)
 
     message_x += 1;
 
-    if(message_x > 17)
+    if (message_x > 17)
     {
         message_x = 0;
         message_y += 1;
     }
 
     u_x = enemy_dummy_1.experience + enemy_dummy_2.experience + enemy_dummy_3.experience;
-    
+
     actor->experience += u_x;
 
-    if(u_x < 10) //* 'experience' number.
+    if (u_x < 10) //* 'experience' number.
     {
         Draw_Damage_Message(u_x, message_x + 1, 13 + message_y);
 
         message_x += 1;
     }
-    else if(u_x > 9)
+    else if (u_x > 9)
     {
-        if(message_x + 2 > 17)
+        if (message_x + 2 > 17)
         {
             message_x = 0;
             message_y += 1;
         }
 
         Draw_Damage_Message(u_x, message_x + 1, 13 + message_y);
-        
+
         message_x += 2;
     }
-    else if(u_x > 99)
+    else if (u_x > 99)
     {
-        if(message_x + 3 > 17)
+        if (message_x + 3 > 17)
         {
             message_x = 0;
             message_y += 1;
         }
 
         Draw_Damage_Message(u_x, message_x + 1, 13 + message_y);
-        
+
         message_x += 3;
     }
 
     message_x += 1;
 
-    if(message_x + 11 > 17)
+    if (message_x + 11 > 17)
     {
         message_x = 0;
         message_y += 1;
     }
 
-    for(u_x = 0; u_x < 10; u_x++) //* Experience message.
+    for (u_x = 0; u_x < 10; u_x++) //* Experience message.
     {
         performant_delay(2);
 
@@ -852,7 +906,7 @@ void Draw_Experience_Message(GameActor* actor)
 
         message_x += 1;
     }
-    
+
     set_bkg_tiles(1 + message_x, 13 + message_y, 1, 1, Skill_Period);
 
     waitpad(J_A);
@@ -863,7 +917,7 @@ void Draw_Gold_Message()
     message_x = 0;
     message_y = 0;
 
-    for(u_x = 0; u_x < 3; u_x++) //* The message.
+    for (u_x = 0; u_x < 3; u_x++) //* The message.
     {
         performant_delay(2);
 
@@ -874,13 +928,13 @@ void Draw_Gold_Message()
 
     message_x += 1;
 
-    if(message_x > 17)
+    if (message_x > 17)
     {
         message_x = 0;
         message_y += 1;
     }
 
-    for(u_x = 0; u_x < 5; u_x++) //* Party message.
+    for (u_x = 0; u_x < 5; u_x++) //* Party message.
     {
         performant_delay(2);
 
@@ -891,13 +945,13 @@ void Draw_Gold_Message()
 
     message_x += 1;
 
-    if(message_x > 17)
+    if (message_x > 17)
     {
         message_x = 0;
         message_y += 1;
     }
 
-    for(u_x = 0; u_x < 6; u_x++) //* Gained message.
+    for (u_x = 0; u_x < 6; u_x++) //* Gained message.
     {
         performant_delay(2);
 
@@ -908,56 +962,56 @@ void Draw_Gold_Message()
 
     message_x += 1;
 
-    if(message_x > 17)
+    if (message_x > 17)
     {
         message_x = 0;
         message_y += 1;
     }
 
     u_x = enemy_dummy_1.gold + enemy_dummy_2.gold + enemy_dummy_3.gold;
-    
+
     party_gold += u_x;
 
-    if(u_x < 10) //* 'gold' number.
+    if (u_x < 10) //* 'gold' number.
     {
         Draw_Damage_Message(u_x, message_x + 1, 13 + message_y);
 
         message_x += 1;
     }
-    else if(u_x > 9)
+    else if (u_x > 9)
     {
-        if(message_x + 2 > 17)
+        if (message_x + 2 > 17)
         {
             message_x = 0;
             message_y += 1;
         }
 
         Draw_Damage_Message(u_x, message_x + 1, 13 + message_y);
-        
+
         message_x += 2;
     }
-    else if(u_x > 99)
+    else if (u_x > 99)
     {
-        if(message_x + 3 > 17)
+        if (message_x + 3 > 17)
         {
             message_x = 0;
             message_y += 1;
         }
 
         Draw_Damage_Message(u_x, message_x + 1, 13 + message_y);
-        
+
         message_x += 3;
     }
 
     message_x += 1;
 
-    if(message_x + 4 > 17)
+    if (message_x + 4 > 17)
     {
         message_x = 0;
         message_y += 1;
     }
 
-    for(u_x = 0; u_x < 4; u_x++) //* Gold message.
+    for (u_x = 0; u_x < 4; u_x++) //* Gold message.
     {
         performant_delay(2);
 
@@ -965,7 +1019,7 @@ void Draw_Gold_Message()
 
         message_x += 1;
     }
-    
+
     set_bkg_tiles(1 + message_x, 13 + message_y, 1, 1, Skill_Period);
 
     waitpad(J_A);
@@ -973,7 +1027,7 @@ void Draw_Gold_Message()
 
 void Draw_End_Message()
 {
-    if(party[0] > 0 && party[0]->health > 0)
+    if (party[0] > 0 && party[0]->health > 0)
     {
         Draw_Experience_Message(party[0]);
 
@@ -982,7 +1036,7 @@ void Draw_End_Message()
         Add_Ability_Points(party[0], u_i);
     }
 
-    if(party[1] > 0 && party[1]->health > 0)
+    if (party[1] > 0 && party[1]->health > 0)
     {
         Call_Load_Battle_Message_Box(bank17);
 
@@ -993,7 +1047,7 @@ void Draw_End_Message()
         Add_Ability_Points(party[1], u_i);
     }
 
-    if(party[2] > 0 && party[2]->health > 0)
+    if (party[2] > 0 && party[2]->health > 0)
     {
         Call_Load_Battle_Message_Box(bank17);
 
@@ -1004,7 +1058,7 @@ void Draw_End_Message()
         Add_Ability_Points(party[2], u_i);
     }
 
-    if(party[3] > 0 && party[3]->health > 0)
+    if (party[3] > 0 && party[3]->health > 0)
     {
         Call_Load_Battle_Message_Box(bank17);
 
@@ -1053,34 +1107,34 @@ void Load_Damage_Sprite(UBYTE action_target)
 {
     Draw_Skill_Damage(skill_damage);
 
-    if(action_target > 3)
+    if (action_target > 3)
     {
-        if(skill_damage < 100)
+        if (skill_damage < 100)
         {
-            if(action_target == 4)
+            if (action_target == 4)
             {
                 Move_Damage(10, 10, false);
             }
-            if(action_target == 5)
+            if (action_target == 5)
             {
                 Move_Damage(4, 9, false);
             }
-            else if(action_target == 6)
+            else if (action_target == 6)
             {
                 Move_Damage(16, 9, false);
             }
         }
-        else if(skill_damage < 1000)
+        else if (skill_damage < 1000)
         {
-            if(action_target == 4)
+            if (action_target == 4)
             {
                 Move_Damage(10, 10, true);
             }
-            if(action_target == 5)
+            if (action_target == 5)
             {
                 Move_Damage(4, 9, true);
             }
-            else if(action_target == 6)
+            else if (action_target == 6)
             {
                 Move_Damage(16, 9, true);
             }
@@ -1094,53 +1148,53 @@ void Load_Damage_Sprite(UBYTE action_target)
     Clear_Damage();
 }
 
-void Draw_Skill_Name(GameSkill* skill, UBYTE tile_x, UBYTE tile_y)
+void Draw_Skill_Name(GameSkill *skill, UBYTE tile_x, UBYTE tile_y)
 {
     set_bkg_tiles(tile_x, tile_y, 8, 1, skill->name);
 }
 
-void Draw_Skills_Name(GameSkill* skill, UBYTE tile_x, UBYTE tile_y)
+void Draw_Skills_Name(GameSkill *skill, UBYTE tile_x, UBYTE tile_y)
 {
     set_win_tiles(tile_x, tile_y, 8, 1, skill->name);
 }
 
 void Get_Next_Target()
 {
-    if(CurrentTarget > 3)
+    if (CurrentTarget > 3)
     {
-        if(Get_Enemy_Dummy(CurrentTarget - 4)->health == 0)
+        if (Get_Enemy_Dummy(CurrentTarget - 4)->health == 0)
         {
-            if(Get_Enemy_Dummy(0)->health != 0 && Get_Enemy(enemy[0]) != &enemy_null)
+            if (Get_Enemy_Dummy(0)->health != 0 && Get_Enemy(enemy[0]) != &enemy_null)
             {
                 CurrentTarget = 4;
             }
-            else if(Get_Enemy_Dummy(1)->health != 0 && Get_Enemy(enemy[1]) != &enemy_null)
+            else if (Get_Enemy_Dummy(1)->health != 0 && Get_Enemy(enemy[1]) != &enemy_null)
             {
                 CurrentTarget = 5;
             }
-            else if(Get_Enemy_Dummy(2)->health != 0 && Get_Enemy(enemy[2]) != &enemy_null)
+            else if (Get_Enemy_Dummy(2)->health != 0 && Get_Enemy(enemy[2]) != &enemy_null)
             {
                 CurrentTarget = 6;
             }
         }
     }
-    else if(CurrentTarget < 4)
+    else if (CurrentTarget < 4)
     {
-        if(party[CurrentTarget]->health == 0)
+        if (party[CurrentTarget]->health == 0)
         {
-            if(party[0]->health != 0 && party[0] != NULL)
+            if (party[0]->health != 0 && party[0] != NULL)
             {
                 CurrentTarget = 0;
             }
-            else if(party[1]->health != 0 && party[1] != NULL)
+            else if (party[1]->health != 0 && party[1] != NULL)
             {
                 CurrentTarget = 1;
             }
-            else if(party[2]->health != 0 && party[2] != NULL)
+            else if (party[2]->health != 0 && party[2] != NULL)
             {
                 CurrentTarget = 2;
             }
-            else if(party[3]->health != 0 && party[3] != NULL)
+            else if (party[3]->health != 0 && party[3] != NULL)
             {
                 CurrentTarget = 3;
             }
@@ -1150,7 +1204,7 @@ void Get_Next_Target()
 
 void Execute_Skill_Hit(UBYTE action_performer, UBYTE action_target)
 {
-    if(action_performer < 4)
+    if (action_performer < 4)
     {
         damage_modifier = party[action_performer]->strength + Get_Equip(party[action_performer]->equipped[weapon_slot])->strength + Get_Equip(party[action_performer]->equipped[secondary_slot])->strength + Get_Equip(party[action_performer]->equipped[armor_slot])->strength + Get_Equip(party[action_performer]->equipped[accessory_slot])->strength;
 
@@ -1161,9 +1215,9 @@ void Execute_Skill_Hit(UBYTE action_performer, UBYTE action_target)
         skill_damage = 2 + (rand() % ((Get_Enemy_Dummy(action_performer - 4)->strength + 1) * 2));
     }
 
-    if(action_target > 3)
+    if (action_target > 3)
     {
-        if(Get_Enemy_Dummy(action_target - 4)->health <= skill_damage)
+        if (Get_Enemy_Dummy(action_target - 4)->health <= skill_damage)
         {
             Get_Enemy_Dummy(action_target - 4)->health = 0;
         }
@@ -1176,7 +1230,7 @@ void Execute_Skill_Hit(UBYTE action_performer, UBYTE action_target)
     }
     else
     {
-        if(party[action_target]->health <= skill_damage)
+        if (party[action_target]->health <= skill_damage)
         {
             party[action_target]->health = 0;
         }
@@ -1191,7 +1245,7 @@ void Execute_Skill_Hit(UBYTE action_performer, UBYTE action_target)
 
 void Execute_Skill_Fireball(UBYTE action_performer, UBYTE action_target)
 {
-    if(action_performer < 4)
+    if (action_performer < 4)
     {
         damage_modifier = party[action_performer]->wisdom + Get_Equip(party[action_performer]->equipped[weapon_slot])->wisdom + Get_Equip(party[action_performer]->equipped[secondary_slot])->wisdom + Get_Equip(party[action_performer]->equipped[armor_slot])->wisdom + Get_Equip(party[action_performer]->equipped[accessory_slot])->wisdom;
         skill_damage = 6 + ((rand() % ((damage_modifier + 1) * 2)));
@@ -1201,9 +1255,9 @@ void Execute_Skill_Fireball(UBYTE action_performer, UBYTE action_target)
         skill_damage = 4 + (rand() % ((Get_Enemy_Dummy(action_performer - 4)->wisdom + 1) * 2));
     }
 
-    if(action_target > 3)
+    if (action_target > 3)
     {
-        if(Get_Enemy_Dummy(action_target - 4)->health <= skill_damage)
+        if (Get_Enemy_Dummy(action_target - 4)->health <= skill_damage)
         {
             Get_Enemy_Dummy(action_target - 4)->health = 0;
         }
@@ -1216,7 +1270,7 @@ void Execute_Skill_Fireball(UBYTE action_performer, UBYTE action_target)
     }
     else
     {
-        if(party[action_target]->health <= skill_damage)
+        if (party[action_target]->health <= skill_damage)
         {
             party[action_target]->health = 0;
         }
@@ -1235,25 +1289,25 @@ void Execute_Skill(UBYTE skill_id, UBYTE action_performer, UBYTE action_target)
 
     Get_Next_Target();
 
-    switch(skill_id)
+    switch (skill_id)
     {
-        case 0:
-            break;
-        case 1:
-            Execute_Skill_Hit(action_performer, CurrentTarget);
-            break;
-        case 3:
-            Execute_Skill_Fireball(action_performer, CurrentTarget);
-            break;
-        default:
-            Execute_Skill_Hit(action_performer, CurrentTarget);
-            break;
+    case 0:
+        break;
+    case 1:
+        Execute_Skill_Hit(action_performer, CurrentTarget);
+        break;
+    case 3:
+        Execute_Skill_Fireball(action_performer, CurrentTarget);
+        break;
+    default:
+        Execute_Skill_Hit(action_performer, CurrentTarget);
+        break;
     }
 
     Draw_Skill_Message(Get_Skill(skill_id), action_performer, CurrentTarget);
 }
 
-void Draw_Troop(unsigned char* tiles, unsigned char* data) //* Draws troop tiles.
+void Draw_Troop(unsigned char *tiles, unsigned char *data) //* Draws troop tiles.
 {
     set_bkg_tileset(128, 64, tiles);
     set_bkg_tiles(0, 0, 20, 12, data);

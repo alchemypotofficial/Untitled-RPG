@@ -6,11 +6,11 @@
 
 typedef struct GameClass
 {
-    unsigned char* name;
-    unsigned char* icon;
-    unsigned char* description;
+    unsigned char *name;
+    unsigned char *icon;
+    unsigned char *description;
     UBYTE class_id;
-    
+
 } GameClass;
 
 extern const GameClass class_traveler;

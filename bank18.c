@@ -34,30 +34,30 @@ extern const unsigned char Tileset_3_Map[60][4];
 
 void Draw_Tile18(UINT16 tile_x, UINT16 tile_y, UBYTE tile_num)
 {
-    switch(Tileset)
+    switch (Tileset)
     {
-        case 1:
-            set_bkg_tiles(tile_x, tile_y, 2, 2, Tileset_1_Map[tile_num]);
-            break;
-        case 2:
-            set_bkg_tiles(tile_x, tile_y, 2, 2, Tileset_2_Map[tile_num]);
-            break;
-        case 3:
-            set_bkg_tiles(tile_x, tile_y, 2, 2, Tileset_3_Map[tile_num]);
-            break;
-        default:
-            set_bkg_tiles(tile_x, tile_y, 2, 2, Tileset_1_Map[tile_num]);
-            break;
+    case 1:
+        set_bkg_tiles(tile_x, tile_y, 2, 2, Tileset_1_Map[tile_num]);
+        break;
+    case 2:
+        set_bkg_tiles(tile_x, tile_y, 2, 2, Tileset_2_Map[tile_num]);
+        break;
+    case 3:
+        set_bkg_tiles(tile_x, tile_y, 2, 2, Tileset_3_Map[tile_num]);
+        break;
+    default:
+        set_bkg_tiles(tile_x, tile_y, 2, 2, Tileset_1_Map[tile_num]);
+        break;
     }
 }
 
-void Draw_Map_Bank18(GameMap* map) //* Draws map tiles.
+void Draw_Map_Bank18(GameMap *map) //* Draws map tiles.
 {
-    if(char_player.pos_x <= 5)
+    if (char_player.pos_x <= 5)
     {
         u_x = 0;
     }
-    else if(char_player.pos_x >= map_size_x - 5)
+    else if (char_player.pos_x >= map_size_x - 5)
     {
         u_x = map_size_x - 10;
     }
@@ -66,11 +66,11 @@ void Draw_Map_Bank18(GameMap* map) //* Draws map tiles.
         u_x = char_player.pos_x - 5;
     }
 
-    if(char_player.pos_y <= 5)
+    if (char_player.pos_y <= 5)
     {
         u_y = 0;
     }
-    else if(char_player.pos_y > map_size_y - 5)
+    else if (char_player.pos_y > map_size_y - 5)
     {
         u_y = map_size_y - 9;
     }
@@ -85,36 +85,36 @@ void Draw_Map_Bank18(GameMap* map) //* Draws map tiles.
     i = 0;
     j = 0;
 
-    while(1)
-    { 
+    while (1)
+    {
         f = Map_YggdridLUT[u_y + j];
         base_byte = map->data[f + u_i];
         count_byte = map->data[f + u_i + 1];
 
-        if(count_byte > u_x)
+        if (count_byte > u_x)
         {
             count_byte -= u_x;
             u_x = 0;
 
-            while(1)
+            while (1)
             {
                 Draw_Tile18(i * 2, j * 2, base_byte);
 
                 i++;
                 count_byte--;
 
-                if(count_byte == 0)
+                if (count_byte == 0)
                 {
                     u_i += 2;
                     break;
                 }
-                else if(i == 10)
+                else if (i == 10)
                 {
                     break;
                 }
             }
         }
-        else if(count_byte <= u_x)
+        else if (count_byte <= u_x)
         {
             u_x -= count_byte;
             count_byte = 0;
@@ -122,7 +122,7 @@ void Draw_Map_Bank18(GameMap* map) //* Draws map tiles.
             u_i += 2;
         }
 
-        if(i == 10)
+        if (i == 10)
         {
             i = 0;
             j++;
@@ -130,35 +130,41 @@ void Draw_Map_Bank18(GameMap* map) //* Draws map tiles.
             u_x = u_j;
         }
 
-        if(j == 9)
+        if (j == 9)
         {
             break;
         }
     }
 }
 
-void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizontal line of map tiles.
+void Draw_Line_Bank18(GameMap *map, UBYTE direction) //* Draws verticle/horizontal line of map tiles.
 {
     u_i = 0;
     i = 0;
     j = 0;
     u_k = 0;
 
-    if(direction == right && char_player.pos_x <= map_size_x - 5)
+    if (direction == right && char_player.pos_x <= map_size_x - 5)
     {
         load_pos_x = camera_x + 20;
-        if(load_pos_x >= 32){load_pos_x = load_pos_x - 32;}
+        if (load_pos_x >= 32)
+        {
+            load_pos_x = load_pos_x - 32;
+        }
 
         load_pos_y = camera_y;
-        if(load_pos_y >= 32){load_pos_y = load_pos_y - 32;}
+        if (load_pos_y >= 32)
+        {
+            load_pos_y = load_pos_y - 32;
+        }
 
         u_x = char_player.pos_x + 5;
 
-        if(char_player.pos_y <= 5)
+        if (char_player.pos_y <= 5)
         {
             u_y = 0;
         }
-        else if(char_player.pos_y >= map_size_y - 4)
+        else if (char_player.pos_y >= map_size_y - 4)
         {
             u_y = map_size_y - 9;
         }
@@ -169,17 +175,17 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
 
         u_j = u_x;
 
-        if(camera_y + 18 > 31)
+        if (camera_y + 18 > 31)
         {
-            while(1)
+            while (1)
             {
                 f = Map_YggdridLUT[u_y + j];
                 base_byte = map->data[f + u_i];
                 count_byte = map->data[f + u_i + 1];
 
-                if(count_byte > u_x)
+                if (count_byte > u_x)
                 {
-                    if(u_k == 0)
+                    if (u_k == 0)
                     {
                         Draw_Tile18(load_pos_x, load_pos_y + i, base_byte);
                     }
@@ -187,19 +193,19 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
                     {
                         Draw_Tile18(load_pos_x, i, base_byte);
                     }
-                    
+
                     j++;
                     i += 2;
                     u_x = u_j;
                     u_i = 0;
 
-                    if(i == 32 - camera_y && u_k == 0)
+                    if (i == 32 - camera_y && u_k == 0)
                     {
                         i = 0;
                         u_k = 1;
                     }
                 }
-                else if(count_byte <= u_x)
+                else if (count_byte <= u_x)
                 {
                     u_x -= count_byte;
                     count_byte = 0;
@@ -207,7 +213,7 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
                     u_i += 2;
                 }
 
-                if(i == camera_y - 14 && u_k == 1)
+                if (i == camera_y - 14 && u_k == 1)
                 {
                     break;
                 }
@@ -215,13 +221,13 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
         }
         else
         {
-            while(1)
+            while (1)
             {
                 f = Map_YggdridLUT[u_y + j];
                 base_byte = map->data[f + u_i];
                 count_byte = map->data[f + u_i + 1];
 
-                if(count_byte > u_x)
+                if (count_byte > u_x)
                 {
                     Draw_Tile18(load_pos_x, load_pos_y + j * 2, base_byte);
 
@@ -229,7 +235,7 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
                     u_x = u_j;
                     u_i = 0;
                 }
-                else if(count_byte <= u_x)
+                else if (count_byte <= u_x)
                 {
                     u_x -= count_byte;
                     count_byte = 0;
@@ -237,7 +243,7 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
                     u_i += 2;
                 }
 
-                if(j == 9)
+                if (j == 9)
                 {
                     break;
                 }
@@ -245,21 +251,30 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
         }
     }
 
-    else if(direction == left && char_player.pos_x >= 5)
+    else if (direction == left && char_player.pos_x >= 5)
     {
-        if(camera_x == 0){load_pos_x = 30;}
-        else{load_pos_x = camera_x - 2;}
-        
+        if (camera_x == 0)
+        {
+            load_pos_x = 30;
+        }
+        else
+        {
+            load_pos_x = camera_x - 2;
+        }
+
         load_pos_y = camera_y;
-        if(load_pos_y >= 32){load_pos_y = load_pos_y - 32;}
+        if (load_pos_y >= 32)
+        {
+            load_pos_y = load_pos_y - 32;
+        }
 
         u_x = char_player.pos_x - 6;
 
-        if(char_player.pos_y <= 5)
+        if (char_player.pos_y <= 5)
         {
             u_y = 0;
         }
-        else if(char_player.pos_y >= map_size_y - 4)
+        else if (char_player.pos_y >= map_size_y - 4)
         {
             u_y = map_size_y - 9;
         }
@@ -270,17 +285,17 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
 
         u_j = u_x;
 
-        if(camera_y + 18 > 31)
+        if (camera_y + 18 > 31)
         {
-            while(1)
+            while (1)
             {
                 f = Map_YggdridLUT[u_y + j];
                 base_byte = map->data[f + u_i];
                 count_byte = map->data[f + u_i + 1];
 
-                if(count_byte > u_x)
+                if (count_byte > u_x)
                 {
-                    if(u_k == 0)
+                    if (u_k == 0)
                     {
                         Draw_Tile18(load_pos_x, load_pos_y + i, base_byte);
                     }
@@ -288,19 +303,19 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
                     {
                         Draw_Tile18(load_pos_x, i, base_byte);
                     }
-                    
+
                     j++;
                     i += 2;
                     u_x = u_j;
                     u_i = 0;
 
-                    if(i == 32 - camera_y && u_k == 0)
+                    if (i == 32 - camera_y && u_k == 0)
                     {
                         i = 0;
                         u_k = 1;
                     }
                 }
-                else if(count_byte <= u_x)
+                else if (count_byte <= u_x)
                 {
                     u_x -= count_byte;
                     count_byte = 0;
@@ -308,7 +323,7 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
                     u_i += 2;
                 }
 
-                if(i == camera_y - 14 && u_k == 1)
+                if (i == camera_y - 14 && u_k == 1)
                 {
                     break;
                 }
@@ -316,13 +331,13 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
         }
         else
         {
-            while(1)
+            while (1)
             {
                 f = Map_YggdridLUT[u_y + j];
                 base_byte = map->data[f + u_i];
                 count_byte = map->data[f + u_i + 1];
 
-                if(count_byte > u_x)
+                if (count_byte > u_x)
                 {
                     Draw_Tile18(load_pos_x, load_pos_y + j * 2, base_byte);
 
@@ -330,7 +345,7 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
                     u_x = u_j;
                     u_i = 0;
                 }
-                else if(count_byte <= u_x)
+                else if (count_byte <= u_x)
                 {
                     u_x -= count_byte;
                     count_byte = 0;
@@ -338,7 +353,7 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
                     u_i += 2;
                 }
 
-                if(j == 9)
+                if (j == 9)
                 {
                     break;
                 }
@@ -346,19 +361,25 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
         }
     }
 
-    else if(direction == down && char_player.pos_y <= map_size_y - 4)
+    else if (direction == down && char_player.pos_y <= map_size_y - 4)
     {
         load_pos_x = camera_x;
-        if(load_pos_x >= 32){load_pos_x = load_pos_x - 32;}
+        if (load_pos_x >= 32)
+        {
+            load_pos_x = load_pos_x - 32;
+        }
 
         load_pos_y = camera_y + 18;
-        if(load_pos_y >= 32){load_pos_y = load_pos_y - 32;}
+        if (load_pos_y >= 32)
+        {
+            load_pos_y = load_pos_y - 32;
+        }
 
-        if(char_player.pos_x <= 5)
+        if (char_player.pos_x <= 5)
         {
             u_x = 0;
         }
-        else if(char_player.pos_x >= map_size_x - 5)
+        else if (char_player.pos_x >= map_size_x - 5)
         {
             u_x = map_size_x - 10;
         }
@@ -369,33 +390,33 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
 
         u_y = char_player.pos_y + 4;
 
-        if(camera_x + 20 > 32)
+        if (camera_x + 20 > 32)
         {
-            while(1)
+            while (1)
             {
                 f = Map_YggdridLUT[u_y];
                 base_byte = map->data[f + u_i];
                 count_byte = map->data[f + u_i + 1];
 
-                if(count_byte > u_x)
+                if (count_byte > u_x)
                 {
                     count_byte -= u_x;
                     u_x = 0;
 
-                    if(u_k == 0)
+                    if (u_k == 0)
                     {
-                        while(1)
+                        while (1)
                         {
                             Draw_Tile18(load_pos_x + i, load_pos_y, base_byte);
 
                             i += 2;
                             count_byte--;
 
-                            if(count_byte == 0)
+                            if (count_byte == 0)
                             {
                                 u_i += 2;
-                                
-                                if(i == 32 - camera_x)
+
+                                if (i == 32 - camera_x)
                                 {
                                     u_k = 1;
 
@@ -410,7 +431,7 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
 
                                 break;
                             }
-                            else if(i == 32 - camera_x)
+                            else if (i == 32 - camera_x)
                             {
                                 u_k = 1;
                                 i = 0;
@@ -419,29 +440,29 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
                             }
                         }
                     }
-                    
-                    if(u_k == 1)
+
+                    if (u_k == 1)
                     {
-                        while(1)
+                        while (1)
                         {
                             Draw_Tile18(i, load_pos_y, base_byte);
 
                             i += 2;
                             count_byte--;
 
-                            if(count_byte == 0)
+                            if (count_byte == 0)
                             {
                                 u_i += 2;
                                 break;
                             }
-                            else if(i == camera_x - 12)
+                            else if (i == camera_x - 12)
                             {
                                 break;
                             }
                         }
                     }
                 }
-                else if(count_byte <= u_x)
+                else if (count_byte <= u_x)
                 {
                     u_x -= count_byte;
                     count_byte = 0;
@@ -449,44 +470,44 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
                     u_i += 2;
                 }
 
-                if(i == camera_x - 12 && u_k == 1)
+                if (i == camera_x - 12 && u_k == 1)
                 {
                     break;
                 }
-            }   
+            }
         }
         else
         {
-            while(1)
+            while (1)
             {
                 f = Map_YggdridLUT[u_y];
                 base_byte = map->data[f + u_i];
                 count_byte = map->data[f + u_i + 1];
 
-                if(count_byte > u_x)
+                if (count_byte > u_x)
                 {
                     count_byte -= u_x;
                     u_x = 0;
 
-                    while(1)
+                    while (1)
                     {
                         Draw_Tile18(load_pos_x + i * 2, load_pos_y, base_byte);
 
                         i++;
                         count_byte--;
 
-                        if(count_byte == 0)
+                        if (count_byte == 0)
                         {
                             u_i += 2;
                             break;
                         }
-                        else if(i == 10)
+                        else if (i == 10)
                         {
                             break;
                         }
                     }
                 }
-                else if(count_byte <= u_x)
+                else if (count_byte <= u_x)
                 {
                     u_x -= count_byte;
                     count_byte = 0;
@@ -494,27 +515,36 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
                     u_i += 2;
                 }
 
-                if(i == 10)
+                if (i == 10)
                 {
                     break;
                 }
-            }   
+            }
         }
     }
 
-    else if(direction == up && char_player.pos_y >= 5)
+    else if (direction == up && char_player.pos_y >= 5)
     {
         load_pos_x = camera_x;
-        if(load_pos_x >= 32){load_pos_x = load_pos_x - 32;}
+        if (load_pos_x >= 32)
+        {
+            load_pos_x = load_pos_x - 32;
+        }
 
-        if(camera_y == 0){load_pos_y = 30;}
-        else{load_pos_y = camera_y - 2;}
+        if (camera_y == 0)
+        {
+            load_pos_y = 30;
+        }
+        else
+        {
+            load_pos_y = camera_y - 2;
+        }
 
-        if(char_player.pos_x <= 5)
+        if (char_player.pos_x <= 5)
         {
             u_x = 0;
         }
-        else if(char_player.pos_x >= map_size_x - 5)
+        else if (char_player.pos_x >= map_size_x - 5)
         {
             u_x = map_size_x - 10;
         }
@@ -525,33 +555,33 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
 
         u_y = char_player.pos_y - 6;
 
-        if(camera_x + 20 > 32)
+        if (camera_x + 20 > 32)
         {
-            while(1)
+            while (1)
             {
                 f = Map_YggdridLUT[u_y];
                 base_byte = map->data[f + u_i];
                 count_byte = map->data[f + u_i + 1];
 
-                if(count_byte > u_x)
+                if (count_byte > u_x)
                 {
                     count_byte -= u_x;
                     u_x = 0;
 
-                    if(u_k == 0)
+                    if (u_k == 0)
                     {
-                        while(1)
+                        while (1)
                         {
                             Draw_Tile18(load_pos_x + i, load_pos_y, base_byte);
 
                             i += 2;
                             count_byte--;
 
-                            if(count_byte == 0)
+                            if (count_byte == 0)
                             {
                                 u_i += 2;
-                                
-                                if(i == 32 - camera_x)
+
+                                if (i == 32 - camera_x)
                                 {
                                     u_k = 1;
 
@@ -566,7 +596,7 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
 
                                 break;
                             }
-                            else if(i == 32 - camera_x)
+                            else if (i == 32 - camera_x)
                             {
                                 u_k = 1;
                                 i = 0;
@@ -575,29 +605,29 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
                             }
                         }
                     }
-                    
-                    if(u_k == 1)
+
+                    if (u_k == 1)
                     {
-                        while(1)
+                        while (1)
                         {
                             Draw_Tile18(i, load_pos_y, base_byte);
 
                             i += 2;
                             count_byte--;
 
-                            if(count_byte == 0)
+                            if (count_byte == 0)
                             {
                                 u_i += 2;
                                 break;
                             }
-                            else if(i == camera_x - 12)
+                            else if (i == camera_x - 12)
                             {
                                 break;
                             }
                         }
                     }
                 }
-                else if(count_byte <= u_x)
+                else if (count_byte <= u_x)
                 {
                     u_x -= count_byte;
                     count_byte = 0;
@@ -605,44 +635,44 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
                     u_i += 2;
                 }
 
-                if(i == camera_x - 12 && u_k == 1)
+                if (i == camera_x - 12 && u_k == 1)
                 {
                     break;
                 }
-            }   
+            }
         }
         else
         {
-            while(1)
+            while (1)
             {
                 f = Map_YggdridLUT[u_y];
                 base_byte = map->data[f + u_i];
                 count_byte = map->data[f + u_i + 1];
 
-                if(count_byte > u_x)
+                if (count_byte > u_x)
                 {
                     count_byte -= u_x;
                     u_x = 0;
 
-                    while(1)
+                    while (1)
                     {
                         Draw_Tile18(load_pos_x + i * 2, load_pos_y, base_byte);
 
                         i++;
                         count_byte--;
 
-                        if(count_byte == 0)
+                        if (count_byte == 0)
                         {
                             u_i += 2;
                             break;
                         }
-                        else if(i == 10)
+                        else if (i == 10)
                         {
                             break;
                         }
                     }
                 }
-                else if(count_byte <= u_x)
+                else if (count_byte <= u_x)
                 {
                     u_x -= count_byte;
                     count_byte = 0;
@@ -650,33 +680,33 @@ void Draw_Line_Bank18(GameMap* map, UBYTE direction) //* Draws verticle/horizont
                     u_i += 2;
                 }
 
-                if(i == 10)
+                if (i == 10)
                 {
                     break;
                 }
-            }   
+            }
         }
     }
 }
 
-UBYTE Check_Tile_Collision_Bank18(GameMap* map, GameCharacter* character, INT8 move_x, INT8 move_y)
+UBYTE Check_Tile_Collision_Bank18(GameMap *map, GameCharacter *character, INT8 move_x, INT8 move_y)
 {
     u_i = 0;
 
     u_x = character->pos_x + move_x;
     u_y = character->pos_y + move_y;
 
-    while(1)
+    while (1)
     {
         f = Map_YggdridLUT[u_y];
         base_byte = map->data[f + u_i];
         count_byte = map->data[f + u_i + 1];
 
-        if(count_byte > u_x)
+        if (count_byte > u_x)
         {
-            return tilemap_3[base_byte] == impassable ? true : false;
+            return tilemap_3[base_byte] == impassable;
         }
-        else if(count_byte <= u_x)
+        else if (count_byte <= u_x)
         {
             u_x -= count_byte;
             count_byte = 0;

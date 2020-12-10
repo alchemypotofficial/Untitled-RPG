@@ -66,30 +66,30 @@ extern void toggle_control(UBYTE toggle);
 extern void fade_out();
 extern void fade_in();
 
-extern GameActor* Get_Actor(UBYTE actor_id);
-extern GameEquip* Get_Equip(UBYTE equip_id);
-extern GameItem* Get_Item(UBYTE item_id);
-extern GameClass* Get_Class(UBYTE class_id);
-extern GameSkill* Get_Skill(UBYTE skill_id);
-extern GameShop* Get_Shop(UBYTE shop_id);
+extern GameActor *Get_Actor(UBYTE actor_id);
+extern GameEquip *Get_Equip(UBYTE equip_id);
+extern GameItem *Get_Item(UBYTE item_id);
+extern GameClass *Get_Class(UBYTE class_id);
+extern GameSkill *Get_Skill(UBYTE skill_id);
+extern GameShop *Get_Shop(UBYTE shop_id);
 
 extern void Gameplay();
 
-extern void Call_Draw_Name(UBYTE bank, UBYTE tile_x, UBYTE tile_y, unsigned char* name, BOOLEAN full_name);
-extern void Call_Draw_Skills_Name(UBYTE bank, GameSkill* skill, UBYTE tile_x, UBYTE tile_y);
+extern void Call_Draw_Name(UBYTE bank, UBYTE tile_x, UBYTE tile_y, unsigned char *name, BOOLEAN full_name);
+extern void Call_Draw_Skills_Name(UBYTE bank, GameSkill *skill, UBYTE tile_x, UBYTE tile_y);
 extern void Call_Load_Menu_Main(UBYTE bank);
 extern void Call_Menu_Main(UBYTE bank);
 extern void Call_Menu_Item(UBYTE bank);
-extern void Call_Set_Actor_Skills(UBYTE bank, GameActor* actor);
+extern void Call_Set_Actor_Skills(UBYTE bank, GameActor *actor);
 extern void Call_Load_Font_Menu(UBYTE bank);
 extern void Call_Load_Tileset(UBYTE bank, UBYTE tileset);
-extern void Call_Draw_Item_Description(UBYTE bank, GameItem* item);
-extern void Call_Draw_Equip_Description_Large(UBYTE bank, GameEquip* equip);
-extern void Call_Add_Item(UBYTE bank, GameItem* item, UBYTE amount);
-extern void Call_Add_Equip(UBYTE bank, GameEquip* equip);
+extern void Call_Draw_Item_Description(UBYTE bank, GameItem *item);
+extern void Call_Draw_Equip_Description_Large(UBYTE bank, GameEquip *equip);
+extern void Call_Add_Item(UBYTE bank, GameItem *item, UBYTE amount);
+extern void Call_Add_Equip(UBYTE bank, GameEquip *equip);
 
-extern UINT16 Get_Required_AP(UBYTE bank, GameSkill* skill);
-extern UINT16 Get_Skill_Useable(UBYTE bank, GameSkill* skill);
+extern UINT16 Get_Required_AP(UBYTE bank, GameSkill *skill);
+extern UINT16 Get_Skill_Useable(UBYTE bank, GameSkill *skill);
 
 extern void Call_Play_Buzz(UBYTE bank);
 extern void Call_Play_Use(UBYTE bank);
@@ -119,16 +119,15 @@ const unsigned char Shop_Will[4] = {0x2D, 0x1E, 0x21, 0x21};
 const unsigned char Shop_Be[2] = {0x17, 0x1A};
 
 const unsigned char Shop_Clear[] =
-{
-    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 
-    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 
-    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 
-    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 
-    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 
-    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 
-    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 
-    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01
-};
+    {
+        0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+        0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+        0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+        0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+        0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+        0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+        0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+        0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01};
 
 void Draw_Shop_Number(UINT16 number, UBYTE tile_x, UBYTE tile_y)
 {
@@ -138,12 +137,12 @@ void Draw_Shop_Number(UINT16 number, UBYTE tile_x, UBYTE tile_y)
 
     large_number = number;
 
-    for(n = 0; n < 3; n++)
+    for (n = 0; n < 3; n++)
     {
         parsed_decimal[n] = 0;
     }
 
-    while(large_number >= 1000)
+    while (large_number >= 1000)
     {
         large_number -= 1000;
         parsed_number += 1;
@@ -152,7 +151,7 @@ void Draw_Shop_Number(UINT16 number, UBYTE tile_x, UBYTE tile_y)
     parsed_decimal[0] = parsed_number;
     parsed_number = 0;
 
-    while(large_number >= 100)
+    while (large_number >= 100)
     {
         large_number -= 100;
         parsed_number += 1;
@@ -161,7 +160,7 @@ void Draw_Shop_Number(UINT16 number, UBYTE tile_x, UBYTE tile_y)
     parsed_decimal[1] = parsed_number;
     parsed_number = 0;
 
-    while(large_number >= 10)
+    while (large_number >= 10)
     {
         large_number -= 10;
         parsed_number += 1;
@@ -176,15 +175,15 @@ void Draw_Shop_Number(UINT16 number, UBYTE tile_x, UBYTE tile_y)
     parsed_decimal[2] += 49;
     parsed_decimal[3] += 49;
 
-    if(saved_number < 10)
+    if (saved_number < 10)
     {
         set_win_tiles(tile_x + 3, tile_y, 1, 1, parsed_decimal + 3);
     }
-    else if(saved_number < 100)
+    else if (saved_number < 100)
     {
         set_win_tiles(tile_x + 2, tile_y, 2, 1, parsed_decimal + 2);
     }
-    else if(saved_number < 1000)
+    else if (saved_number < 1000)
     {
         set_win_tiles(tile_x + 1, tile_y, 3, 1, parsed_decimal + 1);
     }
@@ -192,7 +191,6 @@ void Draw_Shop_Number(UINT16 number, UBYTE tile_x, UBYTE tile_y)
     {
         set_win_tiles(tile_x, tile_y, 4, 1, parsed_decimal);
     }
-    
 }
 
 void Draw_Shop_Number_Reveal(UINT16 number, UBYTE tile_x, UBYTE tile_y)
@@ -203,12 +201,12 @@ void Draw_Shop_Number_Reveal(UINT16 number, UBYTE tile_x, UBYTE tile_y)
 
     large_number = number;
 
-    for(n = 0; n < 3; n++)
+    for (n = 0; n < 3; n++)
     {
         parsed_decimal[n] = 0;
     }
 
-    while(large_number >= 1000)
+    while (large_number >= 1000)
     {
         large_number -= 1000;
         parsed_number += 1;
@@ -217,7 +215,7 @@ void Draw_Shop_Number_Reveal(UINT16 number, UBYTE tile_x, UBYTE tile_y)
     parsed_decimal[0] = parsed_number;
     parsed_number = 0;
 
-    while(large_number >= 100)
+    while (large_number >= 100)
     {
         large_number -= 100;
         parsed_number += 1;
@@ -226,7 +224,7 @@ void Draw_Shop_Number_Reveal(UINT16 number, UBYTE tile_x, UBYTE tile_y)
     parsed_decimal[1] = parsed_number;
     parsed_number = 0;
 
-    while(large_number >= 10)
+    while (large_number >= 10)
     {
         large_number -= 10;
         parsed_number += 1;
@@ -241,24 +239,24 @@ void Draw_Shop_Number_Reveal(UINT16 number, UBYTE tile_x, UBYTE tile_y)
     parsed_decimal[2] += 49;
     parsed_decimal[3] += 49;
 
-    if(saved_number < 10)
+    if (saved_number < 10)
     {
         performant_delay(1);
         set_win_tiles(tile_x, tile_y, 1, 1, parsed_decimal + 3);
         u_x++;
     }
-    else if(saved_number < 100)
+    else if (saved_number < 100)
     {
-        for(i = 0; i < 2; i++)
+        for (i = 0; i < 2; i++)
         {
             performant_delay(1);
             set_win_tiles(tile_x + i, tile_y, 1, 1, parsed_decimal + 2 + i);
             u_x++;
         }
     }
-    else if(saved_number < 1000)
+    else if (saved_number < 1000)
     {
-        for(i = 0; i < 3; i++)
+        for (i = 0; i < 3; i++)
         {
             performant_delay(1);
             set_win_tiles(tile_x + i, tile_y, 1, 1, parsed_decimal + 1 + i);
@@ -267,23 +265,22 @@ void Draw_Shop_Number_Reveal(UINT16 number, UBYTE tile_x, UBYTE tile_y)
     }
     else
     {
-        for(i = 0; i < 4; i++)
+        for (i = 0; i < 4; i++)
         {
             performant_delay(1);
             set_win_tiles(tile_x + i, tile_y, 1, 1, parsed_decimal + i);
             u_x++;
         }
     }
-    
 }
 
-UINT16 Count_Item(GameItem* item)
+UINT16 Count_Item(GameItem *item)
 {
     u16_i = 0;
 
-    for(i = 0; i < 99; i++)
+    for (i = 0; i < 99; i++)
     {
-        if(inventory[i] == item->item_id)
+        if (inventory[i] == item->item_id)
         {
             u16_i += inv_amount[i];
             return u16_i;
@@ -293,36 +290,36 @@ UINT16 Count_Item(GameItem* item)
     return u16_i;
 }
 
-UINT16 Count_Equip(GameEquip* equip)
+UINT16 Count_Equip(GameEquip *equip)
 {
     u16_i = 0;
 
-    for(i = 0; i < 99; i++)
+    for (i = 0; i < 99; i++)
     {
-        if(equip->equip_type == weapon)
+        if (equip->equip_type == weapon)
         {
-            if(equipment_weapon[i] == equip->equip_id)
+            if (equipment_weapon[i] == equip->equip_id)
             {
                 u16_i++;
             }
         }
-        else if(equip->equip_type == secondary)
+        else if (equip->equip_type == secondary)
         {
-            if(equipment_secondary[i] == equip->equip_id)
+            if (equipment_secondary[i] == equip->equip_id)
             {
                 u16_i++;
             }
         }
-        else if(equip->equip_type == armor)
+        else if (equip->equip_type == armor)
         {
-            if(equipment_armor[i] == equip->equip_id)
+            if (equipment_armor[i] == equip->equip_id)
             {
                 u16_i++;
             }
         }
-        else if(equip->equip_type == accessory)
+        else if (equip->equip_type == accessory)
         {
-            if(equipment_accessory[i] == equip->equip_id)
+            if (equipment_accessory[i] == equip->equip_id)
             {
                 u16_i++;
             }
@@ -332,40 +329,40 @@ UINT16 Count_Equip(GameEquip* equip)
     return u16_i;
 }
 
-void Draw_Shop_Item(GameItem* item, UBYTE tile_x, UBYTE tile_y)
+void Draw_Shop_Item(GameItem *item, UBYTE tile_x, UBYTE tile_y)
 {
     set_win_tiles(tile_x, tile_y, 6, 1, item->name);
 
     set_win_tiles(tile_x + 6, tile_y, 2, 1, Shop_Clear);
     Draw_Shop_Number(item->price, tile_x + 6, tile_y);
-    
-    if(Count_Item(item) < 10)
+
+    if (Count_Item(item) < 10)
     {
         set_win_tiles(tile_x + 14, tile_y, 1, 1, Shop_Zeros);
         set_win_tiles(tile_x + 13, tile_y, 1, 1, Shop_Num);
         Draw_Shop_Number(Count_Item(item), tile_x + 12, tile_y);
     }
-    else if(Count_Item(item) < 100)
+    else if (Count_Item(item) < 100)
     {
         set_win_tiles(tile_x + 13, tile_y, 1, 1, Shop_Num);
         Draw_Shop_Number(Count_Item(item), tile_x + 12, tile_y);
     }
 }
 
-void Draw_Shop_Equip(GameEquip* equip, UBYTE tile_x, UBYTE tile_y)
+void Draw_Shop_Equip(GameEquip *equip, UBYTE tile_x, UBYTE tile_y)
 {
     set_win_tiles(tile_x, tile_y, 7, 1, equip->name);
 
     set_win_tiles(tile_x + 7, tile_y, 2, 1, Shop_Clear);
     Draw_Shop_Number(equip->price, tile_x + 7, tile_y);
 
-    if(Count_Equip(equip) < 10)
+    if (Count_Equip(equip) < 10)
     {
         set_win_tiles(tile_x + 14, tile_y, 1, 1, Shop_Zeros);
         set_win_tiles(tile_x + 13, tile_y, 1, 1, Shop_Num);
         Draw_Shop_Number(Count_Equip(equip), tile_x + 12, tile_y);
     }
-    else if(Count_Equip(equip) < 100)
+    else if (Count_Equip(equip) < 100)
     {
         set_win_tiles(tile_x + 13, tile_y, 1, 1, Shop_Num);
         Draw_Shop_Number(Count_Equip(equip), tile_x + 12, tile_y);
@@ -374,13 +371,13 @@ void Draw_Shop_Equip(GameEquip* equip, UBYTE tile_x, UBYTE tile_y)
 
 void Draw_Shop_Message()
 {
-    if(shop_message_x != 36)
+    if (shop_message_x != 36)
     {
         set_win_tiles(1 + message_x, 13 + (message_y * 2), 1, 1, &Get_Shop(CurrentShop)->message[shop_message_x]);
         shop_message_x++;
         message_x++;
 
-        if(message_x == 18)
+        if (message_x == 18)
         {
             message_x = 0;
             message_y++;
@@ -396,37 +393,37 @@ void Draw_Confirm_Message()
 
     u_x++;
 
-    if(Get_Shop(CurrentShop)->shop_type == item_shop)
+    if (Get_Shop(CurrentShop)->shop_type == item_shop)
     {
-        for(i = 0; i < 6 ; i++)
+        for (i = 0; i < 6; i++)
         {
             performant_delay(1);
             set_win_tiles(1 + u_x, 13, 1, 1, Get_Item(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection])->name + i);
-            
-            if(i > 3 && Get_Item(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection])->name[i] == 0x01)
+
+            if (i > 3 && Get_Item(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection])->name[i] == 0x01)
             {
                 break;
             }
-            
+
             u_x++;
         }
     }
     else
     {
-        for(i = 0; i < 7 ; i++)
+        for (i = 0; i < 7; i++)
         {
             performant_delay(1);
             set_win_tiles(1 + u_x, 13, 1, 1, Get_Equip(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection])->name + i);
             u_x++;
 
-            if(i > 3 && Get_Equip(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection])->name[i] == 0x01)
+            if (i > 3 && Get_Equip(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection])->name[i] == 0x01)
             {
                 break;
             }
         }
     }
 
-    for(i = 0; i < 3; i++)
+    for (i = 0; i < 3; i++)
     {
         performant_delay(1);
         set_win_tiles(1 + u_x, 13, 1, 1, Shop_Plural + i);
@@ -435,7 +432,7 @@ void Draw_Confirm_Message()
 
     u_x = 0;
 
-    for(i = 0; i < 4; i++)
+    for (i = 0; i < 4; i++)
     {
         performant_delay(1);
         set_win_tiles(1 + u_x, 15, 1, 1, Shop_Will + i);
@@ -444,7 +441,7 @@ void Draw_Confirm_Message()
 
     u_x++;
 
-    for(i = 0; i < 2; i++)
+    for (i = 0; i < 2; i++)
     {
         performant_delay(1);
         set_win_tiles(1 + u_x, 15, 1, 1, Shop_Be + i);
@@ -453,7 +450,7 @@ void Draw_Confirm_Message()
 
     u_x++;
 
-    if(Get_Shop(CurrentShop)->shop_type == item_shop)
+    if (Get_Shop(CurrentShop)->shop_type == item_shop)
     {
         u16_i = ware_count * Get_Item(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection])->price;
         Draw_Shop_Number_Reveal(u16_i, 1 + u_x, 15);
@@ -474,19 +471,19 @@ void Draw_Confirm_Message()
 
 void Draw_Item_Wares()
 {
-    if(Get_Shop(CurrentShop)->wares[0 + CurrentShopSelection] != 0)
+    if (Get_Shop(CurrentShop)->wares[0 + CurrentShopSelection] != 0)
     {
         Draw_Shop_Item(Get_Item(Get_Shop(CurrentShop)->wares[0 + CurrentShopSelection]), 2, 4);
     }
-    if(Get_Shop(CurrentShop)->wares[1 + CurrentShopSelection] != 0)
+    if (Get_Shop(CurrentShop)->wares[1 + CurrentShopSelection] != 0)
     {
         Draw_Shop_Item(Get_Item(Get_Shop(CurrentShop)->wares[1 + CurrentShopSelection]), 2, 6);
     }
-    if(Get_Shop(CurrentShop)->wares[2 + CurrentShopSelection] != 0)
+    if (Get_Shop(CurrentShop)->wares[2 + CurrentShopSelection] != 0)
     {
         Draw_Shop_Item(Get_Item(Get_Shop(CurrentShop)->wares[2 + CurrentShopSelection]), 2, 8);
     }
-    if(Get_Shop(CurrentShop)->wares[3 + CurrentShopSelection] != 0)
+    if (Get_Shop(CurrentShop)->wares[3 + CurrentShopSelection] != 0)
     {
         Draw_Shop_Item(Get_Item(Get_Shop(CurrentShop)->wares[3 + CurrentShopSelection]), 2, 10);
     }
@@ -494,19 +491,19 @@ void Draw_Item_Wares()
 
 void Draw_Equip_Wares()
 {
-    if(Get_Shop(CurrentShop)->wares[0] != 0)
+    if (Get_Shop(CurrentShop)->wares[0] != 0)
     {
         Draw_Shop_Equip(Get_Equip(Get_Shop(CurrentShop)->wares[0 + CurrentShopSelection]), 2, 4);
     }
-    if(Get_Shop(CurrentShop)->wares[1] != 0)
+    if (Get_Shop(CurrentShop)->wares[1] != 0)
     {
         Draw_Shop_Equip(Get_Equip(Get_Shop(CurrentShop)->wares[1 + CurrentShopSelection]), 2, 6);
     }
-    if(Get_Shop(CurrentShop)->wares[2] != 0)
+    if (Get_Shop(CurrentShop)->wares[2] != 0)
     {
         Draw_Shop_Equip(Get_Equip(Get_Shop(CurrentShop)->wares[2 + CurrentShopSelection]), 2, 8);
     }
-    if(Get_Shop(CurrentShop)->wares[3] != 0)
+    if (Get_Shop(CurrentShop)->wares[3] != 0)
     {
         Draw_Shop_Equip(Get_Equip(Get_Shop(CurrentShop)->wares[3 + CurrentShopSelection]), 2, 10);
     }
@@ -514,11 +511,11 @@ void Draw_Equip_Wares()
 
 void Draw_Wares()
 {
-    if(Get_Shop(CurrentShop)->shop_type == item_shop)
+    if (Get_Shop(CurrentShop)->shop_type == item_shop)
     {
         Draw_Item_Wares();
     }
-    else if(Get_Shop(CurrentShop)->shop_type == equip_shop)
+    else if (Get_Shop(CurrentShop)->shop_type == equip_shop)
     {
         Draw_Equip_Wares();
     }
@@ -535,9 +532,9 @@ UBYTE Get_Max_Count(UINT16 base_cost)
     u16_j = party_gold;
     u_x = 0;
 
-    while(1)
+    while (1)
     {
-        if(u16_j >= base_cost && u_x < 99)
+        if (u16_j >= base_cost && u_x < 99)
         {
             u16_j -= base_cost;
             u_x++;
@@ -554,7 +551,7 @@ void Draw_Count()
     set_win_tiles(0, 12, 20, 6, Map_Shop_CountPLN0);
     Draw_Ware_Count();
 
-    if(Get_Shop(CurrentShop)->shop_type == item_shop)
+    if (Get_Shop(CurrentShop)->shop_type == item_shop)
     {
         u16_i = ware_count * Get_Item(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection])->price;
         Draw_Shop_Number(u16_i, 14, 16);
@@ -580,14 +577,14 @@ void Draw_Confirm()
 void Close_Count()
 {
     set_win_tiles(0, 12, 20, 6, Map_Shop_Count_ReplacePLN0);
-    
-    if(Get_Shop(CurrentShop)->shop_type == item_shop)
+
+    if (Get_Shop(CurrentShop)->shop_type == item_shop)
     {
-        Call_Draw_Item_Description(bank19, Get_Item(Get_Shop(CurrentShop)->wares[shop_y +  CurrentShopSelection]));
+        Call_Draw_Item_Description(bank19, Get_Item(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection]));
     }
     else
     {
-        Call_Draw_Equip_Description_Large(bank19, Get_Equip(Get_Shop(CurrentShop)->wares[shop_y +  CurrentShopSelection]));
+        Call_Draw_Equip_Description_Large(bank19, Get_Equip(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection]));
     }
 }
 
@@ -651,54 +648,54 @@ void Shop_Joypad()
 {
     Joy = joypad();
 
-    if(Joy & J_A)
+    if (Joy & J_A)
     {
-        if(CurrentMenu == shop_main)
+        if (CurrentMenu == shop_main)
         {
-            if(shop_x == 0)
+            if (shop_x == 0)
             {
                 Call_Play_Confirm(bank19);
 
                 set_win_tiles(1, 13, 18, 4, Shop_Clear);
-                
-                if(Get_Shop(CurrentShop)->shop_type == item_shop)
+
+                if (Get_Shop(CurrentShop)->shop_type == item_shop)
                 {
-                    Call_Draw_Item_Description(bank19, Get_Item(Get_Shop(CurrentShop)->wares[shop_y +  CurrentShopSelection]));
+                    Call_Draw_Item_Description(bank19, Get_Item(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection]));
                 }
                 else
                 {
-                    Call_Draw_Equip_Description_Large(bank19, Get_Equip(Get_Shop(CurrentShop)->wares[shop_y +  CurrentShopSelection]));
+                    Call_Draw_Equip_Description_Large(bank19, Get_Equip(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection]));
                 }
 
                 CurrentMenu = shop_buy;
 
                 set_win_tiles(1, 4 + shop_y * 2, 1, 1, Shop_Pointer);
 
-                while(joypad() & J_A)
+                while (joypad() & J_A)
                 {
                     performant_delay(1);
                 }
             }
-            else if(shop_x == 1)
+            else if (shop_x == 1)
             {
                 Call_Play_Confirm(bank19);
                 CurrentMenu = shop_sell;
 
                 set_win_tiles(1, 4 + shop_y * 2, 1, 1, Shop_Pointer);
 
-                while(joypad() & J_A)
+                while (joypad() & J_A)
                 {
                     performant_delay(1);
                 }
             }
         }
-        else if(CurrentMenu == shop_buy)
+        else if (CurrentMenu == shop_buy)
         {
-            if(Get_Shop(CurrentShop)->shop_type == item_shop)
+            if (Get_Shop(CurrentShop)->shop_type == item_shop)
             {
-                if(Count_Item(Get_Item(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection])) < 99)
+                if (Count_Item(Get_Item(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection])) < 99)
                 {
-                    if(party_gold >= Get_Item(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection])->price)
+                    if (party_gold >= Get_Item(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection])->price)
                     {
                         Call_Play_Confirm(bank19);
 
@@ -720,7 +717,7 @@ void Shop_Joypad()
             }
             else
             {
-                if(party_gold >= Get_Equip(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection])->price)
+                if (party_gold >= Get_Equip(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection])->price)
                 {
                     Call_Play_Confirm(bank19);
 
@@ -739,14 +736,13 @@ void Shop_Joypad()
                     Call_Play_Buzz(bank19);
                 }
             }
-            
 
-            while(joypad() & J_A)
+            while (joypad() & J_A)
             {
                 performant_delay(1);
             }
         }
-        else if(CurrentMenu == shop_buy_amount)
+        else if (CurrentMenu == shop_buy_amount)
         {
             Call_Play_Confirm(bank19);
 
@@ -758,18 +754,18 @@ void Shop_Joypad()
 
             CurrentMenu = shop_buy_confirm;
 
-            while(joypad() & J_A)
+            while (joypad() & J_A)
             {
                 performant_delay(1);
             }
         }
-        else if(CurrentMenu == shop_buy_confirm)
+        else if (CurrentMenu == shop_buy_confirm)
         {
             Call_Play_Confirm(bank19);
 
-            if(confirm_y == 0)
+            if (confirm_y == 0)
             {
-                if(Get_Shop(CurrentShop)->shop_type == item_shop)
+                if (Get_Shop(CurrentShop)->shop_type == item_shop)
                 {
                     u16_i = ware_count * Get_Item(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection])->price;
                     party_gold = party_gold - u16_i;
@@ -791,24 +787,24 @@ void Shop_Joypad()
 
                 set_win_tiles(14, 7, 6, 5, Map_Shop_Confirm_ReplacePLN0);
 
-                if(Get_Shop(CurrentShop)->shop_type == item_shop)
+                if (Get_Shop(CurrentShop)->shop_type == item_shop)
                 {
-                    if(Get_Shop(CurrentShop)->wares[2 + CurrentShopSelection] != 0)
+                    if (Get_Shop(CurrentShop)->wares[2 + CurrentShopSelection] != 0)
                     {
                         Draw_Shop_Item(Get_Item(Get_Shop(CurrentShop)->wares[2 + CurrentShopSelection]), 2, 8);
                     }
-                    if(Get_Shop(CurrentShop)->wares[3 + CurrentShopSelection] != 0)
+                    if (Get_Shop(CurrentShop)->wares[3 + CurrentShopSelection] != 0)
                     {
                         Draw_Shop_Item(Get_Item(Get_Shop(CurrentShop)->wares[3 + CurrentShopSelection]), 2, 10);
                     }
                 }
-                else if(Get_Shop(CurrentShop)->shop_type == equip_shop)
+                else if (Get_Shop(CurrentShop)->shop_type == equip_shop)
                 {
-                    if(Get_Shop(CurrentShop)->wares[2] != 0)
+                    if (Get_Shop(CurrentShop)->wares[2] != 0)
                     {
                         Draw_Shop_Equip(Get_Equip(Get_Shop(CurrentShop)->wares[2]), 2, 8);
                     }
-                    if(Get_Shop(CurrentShop)->wares[3] != 0)
+                    if (Get_Shop(CurrentShop)->wares[3] != 0)
                     {
                         Draw_Shop_Equip(Get_Equip(Get_Shop(CurrentShop)->wares[3]), 2, 10);
                     }
@@ -822,26 +818,26 @@ void Shop_Joypad()
             {
                 set_win_tiles(14, 7, 6, 5, Map_Shop_Confirm_ReplacePLN0);
 
-                if(Get_Shop(CurrentShop)->shop_type == item_shop)
+                if (Get_Shop(CurrentShop)->shop_type == item_shop)
                 {
-                    if(Get_Shop(CurrentShop)->wares[2 + CurrentShopSelection] != 0)
+                    if (Get_Shop(CurrentShop)->wares[2 + CurrentShopSelection] != 0)
                     {
                         Draw_Shop_Item(Get_Item(Get_Shop(CurrentShop)->wares[2 + CurrentShopSelection]), 2, 8);
                     }
-                    if(Get_Shop(CurrentShop)->wares[3 + CurrentShopSelection] != 0)
+                    if (Get_Shop(CurrentShop)->wares[3 + CurrentShopSelection] != 0)
                     {
                         Draw_Shop_Item(Get_Item(Get_Shop(CurrentShop)->wares[3 + CurrentShopSelection]), 2, 10);
                     }
 
                     CurrentMenu = shop_buy_amount;
                 }
-                else if(Get_Shop(CurrentShop)->shop_type == equip_shop)
+                else if (Get_Shop(CurrentShop)->shop_type == equip_shop)
                 {
-                    if(Get_Shop(CurrentShop)->wares[2] != 0)
+                    if (Get_Shop(CurrentShop)->wares[2] != 0)
                     {
                         Draw_Shop_Equip(Get_Equip(Get_Shop(CurrentShop)->wares[2]), 2, 8);
                     }
-                    if(Get_Shop(CurrentShop)->wares[3] != 0)
+                    if (Get_Shop(CurrentShop)->wares[3] != 0)
                     {
                         Draw_Shop_Equip(Get_Equip(Get_Shop(CurrentShop)->wares[3]), 2, 10);
                     }
@@ -852,30 +848,30 @@ void Shop_Joypad()
                 Close_Count();
             }
 
-            while(joypad() & J_A)
+            while (joypad() & J_A)
             {
                 performant_delay(1);
             }
         }
     }
 
-    else if(Joy & J_B)
+    else if (Joy & J_B)
     {
-        if(CurrentMenu == shop_main)
+        if (CurrentMenu == shop_main)
         {
             Call_Play_Confirm(bank19);
             Close_Shop();
 
-            while(joypad() & J_B)
+            while (joypad() & J_B)
             {
                 performant_delay(1);
                 Draw_Shop_Message();
             }
         }
-        else if(CurrentMenu == shop_buy || CurrentMenu == shop_sell)
+        else if (CurrentMenu == shop_buy || CurrentMenu == shop_sell)
         {
             Call_Play_Confirm(bank19);
-            
+
             CurrentMenu = shop_main;
 
             Clear_Shop_Pointer();
@@ -885,38 +881,38 @@ void Shop_Joypad()
             message_x = 0;
             message_y = 0;
 
-            while(joypad() & J_B)
+            while (joypad() & J_B)
             {
                 performant_delay(1);
                 Draw_Shop_Message();
             }
         }
-        else if(CurrentMenu == shop_buy_amount)
+        else if (CurrentMenu == shop_buy_amount)
         {
             Call_Play_Confirm(bank19);
 
             Close_Count();
-            
+
             CurrentMenu = shop_buy;
 
-            while(joypad() & J_B)
+            while (joypad() & J_B)
             {
                 performant_delay(1);
             }
         }
-        else if(CurrentMenu == shop_buy_confirm)
+        else if (CurrentMenu == shop_buy_confirm)
         {
             Call_Play_Confirm(bank19);
 
-            if(Get_Shop(CurrentShop)->shop_type == item_shop)
+            if (Get_Shop(CurrentShop)->shop_type == item_shop)
             {
                 set_win_tiles(14, 7, 6, 5, Map_Shop_Confirm_ReplacePLN0);
 
-                if(Get_Shop(CurrentShop)->wares[2 + CurrentShopSelection] != 0)
+                if (Get_Shop(CurrentShop)->wares[2 + CurrentShopSelection] != 0)
                 {
                     Draw_Shop_Item(Get_Item(Get_Shop(CurrentShop)->wares[2 + CurrentShopSelection]), 2, 8);
                 }
-                if(Get_Shop(CurrentShop)->wares[3 + CurrentShopSelection] != 0)
+                if (Get_Shop(CurrentShop)->wares[3 + CurrentShopSelection] != 0)
                 {
                     Draw_Shop_Item(Get_Item(Get_Shop(CurrentShop)->wares[3 + CurrentShopSelection]), 2, 10);
                 }
@@ -925,15 +921,15 @@ void Shop_Joypad()
 
                 CurrentMenu = shop_buy_amount;
             }
-            else if(Get_Shop(CurrentShop)->shop_type == equip_shop)
+            else if (Get_Shop(CurrentShop)->shop_type == equip_shop)
             {
                 set_win_tiles(14, 7, 6, 5, Map_Shop_Confirm_ReplacePLN0);
 
-                if(Get_Shop(CurrentShop)->wares[2] != 0)
+                if (Get_Shop(CurrentShop)->wares[2] != 0)
                 {
                     Draw_Shop_Equip(Get_Equip(Get_Shop(CurrentShop)->wares[2]), 2, 8);
                 }
-                if(Get_Shop(CurrentShop)->wares[3] != 0)
+                if (Get_Shop(CurrentShop)->wares[3] != 0)
                 {
                     Draw_Shop_Equip(Get_Equip(Get_Shop(CurrentShop)->wares[3]), 2, 10);
                 }
@@ -942,19 +938,19 @@ void Shop_Joypad()
 
                 CurrentMenu = shop_buy;
             }
-        
-            while(joypad() & J_B)
+
+            while (joypad() & J_B)
             {
                 performant_delay(1);
             }
         }
     }
 
-    else if(Joy & J_UP)
+    else if (Joy & J_UP)
     {
-        if(CurrentMenu == shop_buy)
+        if (CurrentMenu == shop_buy)
         {
-            if(shop_y > 0)
+            if (shop_y > 0)
             {
                 set_win_tiles(1, 4 + shop_y * 2, 1, 1, Shop_Background);
 
@@ -962,43 +958,43 @@ void Shop_Joypad()
 
                 set_win_tiles(1, 4 + shop_y * 2, 1, 1, Shop_Pointer);
 
-                if(Get_Shop(CurrentShop)->shop_type == item_shop)
+                if (Get_Shop(CurrentShop)->shop_type == item_shop)
                 {
-                    Call_Draw_Item_Description(bank19, Get_Item(Get_Shop(CurrentShop)->wares[shop_y +  CurrentShopSelection]));
+                    Call_Draw_Item_Description(bank19, Get_Item(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection]));
                 }
                 else
                 {
-                    Call_Draw_Equip_Description_Large(bank19, Get_Equip(Get_Shop(CurrentShop)->wares[shop_y +  CurrentShopSelection]));
+                    Call_Draw_Equip_Description_Large(bank19, Get_Equip(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection]));
                 }
             }
-            else if(CurrentShopSelection > 0)
+            else if (CurrentShopSelection > 0)
             {
                 CurrentShopSelection--;
                 Draw_Wares();
-                
-                if(Get_Shop(CurrentShop)->shop_type == item_shop)
+
+                if (Get_Shop(CurrentShop)->shop_type == item_shop)
                 {
-                    Call_Draw_Item_Description(bank19, Get_Item(Get_Shop(CurrentShop)->wares[shop_y +  CurrentShopSelection]));
+                    Call_Draw_Item_Description(bank19, Get_Item(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection]));
                 }
                 else
                 {
-                    Call_Draw_Equip_Description_Large(bank19, Get_Equip(Get_Shop(CurrentShop)->wares[shop_y +  CurrentShopSelection]));
+                    Call_Draw_Equip_Description_Large(bank19, Get_Equip(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection]));
                 }
             }
 
-            while(joypad() & J_UP)
+            while (joypad() & J_UP)
             {
                 performant_delay(1);
             }
         }
-        else if(CurrentMenu == shop_buy_amount)
+        else if (CurrentMenu == shop_buy_amount)
         {
             u_i = Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection];
 
             u_y = Get_Max_Count(Get_Item(u_i)->price);
             u_j = 99 - Count_Item(Get_Item(u_i));
 
-            if(ware_count < u_y && ware_count < u_j)
+            if (ware_count < u_y && ware_count < u_j)
             {
                 ware_count++;
                 Draw_Count();
@@ -1009,14 +1005,14 @@ void Shop_Joypad()
                 Draw_Count();
             }
 
-            while(joypad() & J_UP)
+            while (joypad() & J_UP)
             {
                 performant_delay(1);
             }
         }
-        else if(CurrentMenu == shop_buy_confirm)
+        else if (CurrentMenu == shop_buy_confirm)
         {
-            if(confirm_y == 1)
+            if (confirm_y == 1)
             {
                 set_win_tiles(15, 8 + (confirm_y * 2), 1, 1, Shop_Background);
 
@@ -1025,20 +1021,20 @@ void Shop_Joypad()
                 set_win_tiles(15, 8 + (confirm_y * 2), 1, 1, Shop_Pointer);
             }
 
-            while(joypad() & J_UP)
+            while (joypad() & J_UP)
             {
                 performant_delay(1);
             }
         }
     }
 
-    else if(Joy & J_DOWN)
+    else if (Joy & J_DOWN)
     {
-        if(CurrentMenu == shop_buy)
+        if (CurrentMenu == shop_buy)
         {
-            if(shop_y < 3)
+            if (shop_y < 3)
             {
-                if(Get_Shop(CurrentShop)->wares[shop_y + 1] != 0)
+                if (Get_Shop(CurrentShop)->wares[shop_y + 1] != 0)
                 {
                     set_win_tiles(1, 4 + shop_y * 2, 1, 1, Shop_Background);
 
@@ -1046,42 +1042,42 @@ void Shop_Joypad()
 
                     set_win_tiles(1, 4 + shop_y * 2, 1, 1, Shop_Pointer);
 
-                    if(Get_Shop(CurrentShop)->shop_type == item_shop)
+                    if (Get_Shop(CurrentShop)->shop_type == item_shop)
                     {
-                        Call_Draw_Item_Description(bank19, Get_Item(Get_Shop(CurrentShop)->wares[shop_y +  CurrentShopSelection]));
+                        Call_Draw_Item_Description(bank19, Get_Item(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection]));
                     }
                     else
                     {
-                        Call_Draw_Equip_Description_Large(bank19, Get_Equip(Get_Shop(CurrentShop)->wares[shop_y +  CurrentShopSelection]));
+                        Call_Draw_Equip_Description_Large(bank19, Get_Equip(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection]));
                     }
                 }
             }
-            else if(CurrentShopSelection < 6)
+            else if (CurrentShopSelection < 6)
             {
-                if(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection + 1] != 0)
+                if (Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection + 1] != 0)
                 {
                     CurrentShopSelection++;
                     Draw_Wares();
-                    
-                    if(Get_Shop(CurrentShop)->shop_type == item_shop)
+
+                    if (Get_Shop(CurrentShop)->shop_type == item_shop)
                     {
-                        Call_Draw_Item_Description(bank19, Get_Item(Get_Shop(CurrentShop)->wares[shop_y +  CurrentShopSelection]));
+                        Call_Draw_Item_Description(bank19, Get_Item(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection]));
                     }
                     else
                     {
-                        Call_Draw_Equip_Description_Large(bank19, Get_Equip(Get_Shop(CurrentShop)->wares[shop_y +  CurrentShopSelection]));
+                        Call_Draw_Equip_Description_Large(bank19, Get_Equip(Get_Shop(CurrentShop)->wares[shop_y + CurrentShopSelection]));
                     }
                 }
             }
 
-            while(joypad() & J_DOWN)
+            while (joypad() & J_DOWN)
             {
                 performant_delay(1);
             }
         }
-        else if(CurrentMenu == shop_buy_amount)
+        else if (CurrentMenu == shop_buy_amount)
         {
-            if(ware_count > 1)
+            if (ware_count > 1)
             {
                 ware_count--;
                 Draw_Count();
@@ -1093,7 +1089,7 @@ void Shop_Joypad()
                 u_y = Get_Max_Count(Get_Item(u_i)->price);
                 u_j = 99 - Count_Item(Get_Item(u_i));
 
-                if(u_y > u_j)
+                if (u_y > u_j)
                 {
                     ware_count = u_j;
                 }
@@ -1105,14 +1101,14 @@ void Shop_Joypad()
                 Draw_Count();
             }
 
-            while(joypad() & J_DOWN)
+            while (joypad() & J_DOWN)
             {
                 performant_delay(1);
             }
         }
-        else if(CurrentMenu == shop_buy_confirm)
+        else if (CurrentMenu == shop_buy_confirm)
         {
-            if(confirm_y == 0)
+            if (confirm_y == 0)
             {
                 set_win_tiles(15, 8 + (confirm_y * 2), 1, 1, Shop_Background);
 
@@ -1121,18 +1117,18 @@ void Shop_Joypad()
                 set_win_tiles(15, 8 + (confirm_y * 2), 1, 1, Shop_Pointer);
             }
 
-            while(joypad() & J_DOWN)
+            while (joypad() & J_DOWN)
             {
                 performant_delay(1);
             }
         }
     }
 
-    else if(Joy & J_LEFT)
+    else if (Joy & J_LEFT)
     {
-        if(CurrentMenu == shop_main)
+        if (CurrentMenu == shop_main)
         {
-            if(shop_x == 1)
+            if (shop_x == 1)
             {
                 set_win_tiles(2 + shop_x * 4, 1, 1, 1, Shop_Background);
 
@@ -1143,7 +1139,7 @@ void Shop_Joypad()
                 Draw_Wares();
             }
 
-            while(joypad() & J_LEFT)
+            while (joypad() & J_LEFT)
             {
                 performant_delay(1);
                 Draw_Shop_Message();
@@ -1151,11 +1147,11 @@ void Shop_Joypad()
         }
     }
 
-    else if(Joy & J_RIGHT)
+    else if (Joy & J_RIGHT)
     {
-        if(CurrentMenu == shop_main)
+        if (CurrentMenu == shop_main)
         {
-            if(shop_x == 0)
+            if (shop_x == 0)
             {
                 set_win_tiles(2 + shop_x * 4, 1, 1, 1, Shop_Background);
 
@@ -1164,7 +1160,7 @@ void Shop_Joypad()
                 set_win_tiles(2 + shop_x * 4, 1, 1, 1, Shop_Pointer);
             }
 
-            while(joypad() & J_RIGHT)
+            while (joypad() & J_RIGHT)
             {
                 performant_delay(1);
                 Draw_Shop_Message();
@@ -1175,11 +1171,11 @@ void Shop_Joypad()
 
 void Shop()
 {
-    while(1)
+    while (1)
     {
         performant_delay(1);
 
-        if(CurrentMenu == shop_main)
+        if (CurrentMenu == shop_main)
         {
             Draw_Shop_Message();
         }
@@ -1192,7 +1188,7 @@ void Load_Shop()
 {
     Draw_Shop();
 
-    while(joypad() & J_A)
+    while (joypad() & J_A)
     {
         performant_delay(1);
         Draw_Shop_Message();

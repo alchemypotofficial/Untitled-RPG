@@ -6,10 +6,10 @@
 
 typedef struct GameActor
 {
-    unsigned char* name;
+    unsigned char *name;
     UBYTE length;
     UBYTE actor_id;
-    const GameCharSprite* sprites;
+    const GameCharSprite *sprites;
     UINT16 level;
     UBYTE class;
     UINT16 health;
