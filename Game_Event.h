@@ -1,21 +1,20 @@
 #include <gb/gb.h>
 #include "Game_Shop.h"
+#include "Game_Message.h"
 
 #ifndef GAME_EVENT
 #define GAME_EVENT
 
-typedef struct GameEvent
+typedef struct GameChest
 {
-    UINT8 event_id[100];
-    UINT8 map_id[100];
-    UINT8 pos_x[100];
-    UINT8 pos_y[100];
-    UINT8 direction[100];
-    UINT8 used[100];
-    UINT8 content_id[100];
-    UINT8 message_id[100];
-    
-} GameEvent;
+    UBYTE event_id;
+    UBYTE pos_x;
+    UBYTE pos_y;
+    UBYTE chest_id;
+    const GameMessage* message;
+    UBYTE flag_switch;
+
+} GameChest;
 
 typedef struct GameTele
 {
@@ -29,7 +28,7 @@ typedef struct GameTele
 } GameTele;
 
 typedef struct GameSign
-{
+{    
     UBYTE event_id;
     UBYTE pos_x;
     UBYTE pos_y;
@@ -54,7 +53,9 @@ typedef struct GameTrigger
 
 } GameTrigger;
 
-extern GameEvent event_chest;
+extern const GameChest chest_null;
+extern const GameChest chest_hiro_house;
+extern const GameChest chest_plum_village;
 
 extern const GameSign sign_null;
 extern const GameSign sign_plum_gravestone;

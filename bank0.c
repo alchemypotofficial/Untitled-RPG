@@ -38,11 +38,13 @@ UBYTE Playing = 0, Joy = 0, Seed = 0;
 
 UBYTE current_bank = 2, held_bank = 0;
 
-UBYTE CurrentMap = 0, CurrentMapBank = 0, Tileset = 0, Collision = 0;
+UBYTE CurrentMapBank = 0, Tileset = 0, Collision = 0;
+
+const GameMap* current_map; //Current GameMap.
 
 UBYTE confirm_x = 0, confirm_y = 0;
 
-UBYTE CurrentCombat = 0, CurrentTroop = 0, combat_main_y = 0, combat_selection_y = 0, CurrentTurn = 0, turn_number = 0, CurrentTarget = 0, total_actors = 0, selected_enemy = 0, enemy_selection[4] = {0, 0, 0, 0}, action_selection[4] = {0, 0, 0, 0}, target_selection[7] = {0, 0, 0, 0, 0, 0, 0}, skill_selection[7] = {0, 0, 0, 0, 0, 0, 0}, action_order[7] = {0, 0, 0, 0, 0, 0, 0}, enemy_x, actor_action[4] = {0, 0, 0, 0}, enemy_action[3] = {0, 0, 0}, message_x = 0, message_y = 0;
+UBYTE CurrentCombat = 0, CurrentTroop = 0, combat_main_y = 0, combat_selection_y = 0, CurrentTurn = 0, turn_number = 0, CurrentTarget = 0, total_actors = 0, selected_enemy = 0, enemy_selection[4] = {0, 0, 0, 0}, action_selection[4] = {0, 0, 0, 0}, target_selection[7] = {0, 0, 0, 0, 0, 0, 0}, action_order[7] = {0, 0, 0, 0, 0, 0, 0}, enemy_x, actor_action[4] = {0, 0, 0, 0}, enemy_action[3] = {0, 0, 0}, message_x = 0, message_y = 0;
 
 UINT16 agility[7] = {0, 0, 0, 0, 0, 0, 0}, turn_order[7] = {0, 0, 0, 0, 0, 0, 0}, agility_temp = 0, turn_order_temp = 0, skill_damage = 0, damage_modifier = 0;
 
@@ -54,19 +56,27 @@ UBYTE selection_x = 0, selection_y = 0, slot_1 = 0, slot_2 = 0, item_1 = 0, item
 
 UINT8 PlayerCharacter = 0;
 
+UBYTE offset_pos_x = 0, offset_pos_y = 0;
+
+UBYTE starting_x = 0, starting_y = 0;
+
+UBYTE tile_offset_x = 0, tile_offset_y = 0;
+
 UINT16 grid_x = 0, grid_y = 0, tile = 0;
 
 UBYTE camera_x = 0, camera_y = 0, base_byte = 0, count_byte = 0;
 
-UINT8 map_size_x = 0, map_size_y = 0;
+UBYTE map_size_x = 0, map_size_y = 0;
 
-UINT8 clock_tick = 0, walk_tick = 0, blink_tick = 0;
+UBYTE clock_tick = 0, walk_tick = 0, blink_tick = 0;
 
-UINT8 camera_focus = 0;
+UBYTE camera_focus = 0;
 
 UBYTE current_message = 0, current_line = 0, total_lines = 0, current_row = 0, font_value = 0;
 
 UINT16 map_x = 0, map_y = 0, map_pos = 0, map_y2 = 0, load_pos_y_held = 0, load_pos_x = 0, load_pos_y = 0, char_pos_x = 0, char_pos_y = 0;
+
+UINT16 u16_move_x = 0, u16_move_y = 0;
 
 UBYTE event_x = 0, event_y = 0;
 
@@ -90,6 +100,8 @@ UINT16 u16_i = 0, u16_j = 0, u16_c = 0;
 
 UINT16 c = 0, d = 0, e = 0, f = 0, g = 0, h = 0;
 
+const GameSkill* skill_selection[7] = {&skill_null, &skill_null, &skill_null, &skill_null, &skill_null, &skill_null, &skill_null};
+
 unsigned char message_base[16];
 
 unsigned char parsed_decimal[4] = {0, 0, 0, 0};
@@ -100,17 +112,23 @@ unsigned char inventory[99];
 
 unsigned char inv_amount[99];
 
-unsigned char equipment[99];
+const GameEquip* equipment_weapon[30];
 
-unsigned char equipment_weapon[30];
+const GameEquip* equipment_secondary[30];
 
-unsigned char equipment_secondary[30];
+const GameEquip* equipment_armor[30];
 
-unsigned char equipment_armor[30];
-
-unsigned char equipment_accessory[30];
+const GameEquip* equipment_accessory[30];
 
 unsigned char flag_switch[255];
+
+GameCharacter* temp_char;
+
+const GameEquip* temp_equip;
+
+const GameSkill* temp_skill;
+
+const GameChest* tempChest;
 
 GameActor* party[4] = {0, 0, 0, 0};
 
@@ -122,6 +140,13 @@ unsigned char name_hiro[7] =
 };
 
 UBYTE name_hiro_length = 4;
+
+GameNPC* npc_list[7] =
+{
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL
+};
+
+char temp_string[15];
 
 unsigned char name_bud[7] =
 {
@@ -174,11 +199,13 @@ extern GameActor saved_actor_hiro;
 /*  Game Flags:  */
 UBYTE game_scene = 0;
 
-UBYTE PlayerControlFlag = 0;
+UBYTE ADownFlag = false;
 
-UBYTE MessageBoxFlag = 0;
+UBYTE PlayerControlFlag = false;
 
-UBYTE TitleScreenEnabledFlag = 0;
+UBYTE MessageBoxFlag = false;
+
+UBYTE TitleScreenEnabledFlag = false;
 
 /*--------------------------------------------*/
 
@@ -192,8 +219,8 @@ void set_win_map(UINT8 tile_x, UINT8 tile_y, UINT8 width, UINT8 height, unsigned
 void set_bkg_tileset(UINT8 first_tile, UINT8 num_tile, unsigned char *tileset);
 void toggle_control(UBYTE toggle);
 
-void Call_Draw_Map(UBYTE bank, GameMap* map);
-void Call_Draw_Map_Line(UBYTE bank, GameMap* map, UBYTE direction);
+void Call_Draw_Map(UBYTE bank, const GameMap* map);
+void Call_Draw_Map_Line(UBYTE bank, const GameMap* map, UBYTE direction);
 void Call_Move_Char(UBYTE bank, GameCharacter* character, UINT8 tile_x, UINT8 tile_y, UINT8 pixel_offset);
 
 void Menu();
@@ -205,7 +232,9 @@ void main();
 extern void build_char(GameCharacter* character);
 extern void move_char(GameCharacter* character, UBYTE tile_x, UBYTE tile_y, UBYTE pixel_offset);
 extern void walk_player();
+extern void walk_distance(GameCharacter* character, UBYTE move_x, UBYTE move_y);
 extern void walk_char(GameCharacter* character);
+extern void Walk_Chars();
 extern void Check_Event_Tele();
 extern void hide_char(GameCharacter* character);
 
@@ -215,6 +244,7 @@ extern void Update_Joypad();
 extern void test_update_npc();
 extern void Update_Anim_Walk();
 extern void Update_NPC();
+extern void Update_Chest();
 
 /*  Bank 3  */
 extern void Clear_Map();
@@ -222,7 +252,7 @@ extern void Reload_Map();
 
 extern void Load_Tileset(UBYTE tileset);
 extern void Orient_Char(GameCharacter* character);
-extern void Draw_Map(GameMap* map);
+extern void Draw_Map(const GameMap* map);
 extern void Draw_Titlescreen();
 
 extern void Load_Hiro_Tiles();
@@ -230,16 +260,15 @@ extern void Load_Hiro_Tiles();
 /*  Bank 4  */
 extern void Load_Player_Actor();
 
-extern void Load_Char_Sprite(GameCharacter* character, GameSprite* sprite);
-extern void Set_Char_Tile(GameCharacter* character, UBYTE tile, GameSprite* sprite);
-extern void Set_Sprite_Packages(GameCharacter* character, GameSpritePackage* sprites_up, GameSpritePackage* sprites_down, GameSpritePackage* sprites_left, GameSpritePackage* sprites_right);
-
 /*  Bank 5  */
-extern void Add_NPC(GameCharacter* character, GameNPC* npc);
+extern void Add_NPC(const char* name, GameNPC* npc, UBYTE pos_x, UBYTE pos_y, UBYTE facing);
+extern void Clear_Char(GameCharacter* character);
+extern void Remove_NPC(const char* name);
 extern void Reset_NPC();
+extern void Jump_Character(GameCharacter* character);
 
 /*  Bank 6  */
-extern UBYTE Retrieve_Font_Value();
+extern UBYTE Retrieve_Font_Value(UINT16 font_pos);
 extern void Load_Window();
 extern void Load_Message_Box();
 extern void scroll_message();
@@ -262,17 +291,19 @@ extern void Menu_Main();
 extern void Load_Menu_Main();
 
 /*  Bank 8  */
-extern void Draw_Map_Bank8(GameMap* map);
-extern void Draw_Line_Bank8(GameMap* map, UBYTE direction);
-extern UBYTE Check_Tile_Collision_Bank8(GameMap* map, GameCharacter* character, INT8 move_x, INT8 move_y);
+extern void Draw_Tile_At8(UBYTE pos_x, UBYTE pos_y, UBYTE tile_num);
+extern void Draw_Map_Bank8(const GameMap* map);
+extern void Draw_Line_Bank8(const GameMap* map, UBYTE direction);
+extern UBYTE Check_Tile_Collision_Bank8(const GameMap* map, GameCharacter* character, INT8 move_x, INT8 move_y);
 
 /*  Bank 9  */
-extern void Draw_Map_Bank9(GameMap* map);
-extern void Draw_Line_Bank9(GameMap* map, UBYTE direction);
-extern UBYTE Check_Tile_Collision_Bank9(GameMap* map, GameCharacter* character, INT8 move_x, INT8 move_y);
+extern void Draw_Tile_At9(UBYTE pos_x, UBYTE pos_y, UBYTE tile_num);
+extern void Draw_Map_Bank9(const GameMap* map);
+extern void Draw_Line_Bank9(const GameMap* map, UBYTE direction);
+extern UBYTE Check_Tile_Collision_Bank9(const GameMap* map, GameCharacter* character, INT8 move_x, INT8 move_y);
 
 /*  Bank 10  */
-extern void Load_Message_Bank10(GameMessage* message, unsigned char* insert_1, UBYTE length_1);
+extern void Load_Message_Bank10(const GameMessage* message, unsigned char* insert_1, UBYTE length_1, UBYTE speedable);
 
 /*  Bank 11  */
 extern void Play_Buzz();
@@ -300,22 +331,22 @@ extern void Load_Menu_Skills();
 extern void Load_Combat_Main();
 extern void Check_Step_Counter();
 extern void Draw_Troop(unsigned char* tiles, unsigned char* data);
-extern void Draw_Skill_Name(GameSkill* skill, UBYTE tile_x, UBYTE tile_y);
 extern void Load_Battle_Message_Box();
 
 /*  Bank 17  */
-extern void Execute_Skill(UBYTE skill_id, UBYTE action_performer, UBYTE action_target);
-extern void Draw_Skill_Cost(GameSkill* skill);
-extern UBYTE Get_Skill_Cost(GameSkill* skill);
+extern void Execute_Skill(const GameSkill* skill, UBYTE action_performer, UBYTE action_target);
+extern void Draw_Skill_Cost(const GameSkill* skill);
+extern UBYTE Get_Skill_Cost(const GameSkill* skill);
 extern void Draw_End_Message();
 extern void Set_Actor_Skills(GameActor* actor);
-extern void Draw_Skills_Name(GameSkill* skill, UBYTE tile_x, UBYTE tile_y);
-extern void Draw_Skill_Name(GameSkill* skill, UBYTE tile_x, UBYTE tile_y);
+extern void Draw_Skills_Name(const GameSkill* skill, UBYTE tile_x, UBYTE tile_y);
+extern void Draw_Skill_Name(const GameSkill* skill, UBYTE tile_x, UBYTE tile_y);
 
 /*  Bank 18  */
-extern void Draw_Map_Bank18(GameMap* map);
-extern void Draw_Line_Bank18(GameMap* map, UBYTE direction);
-extern UBYTE Check_Tile_Collision_Bank18(GameMap* map, GameCharacter* character, INT8 move_x, INT8 move_y);
+extern void Draw_Tile_At18(UBYTE pos_x, UBYTE pos_y, UBYTE tile_num);
+extern void Draw_Map_Bank18(const GameMap* map);
+extern void Draw_Line_Bank18(const GameMap* map, UBYTE direction);
+extern UBYTE Check_Tile_Collision_Bank18(const GameMap* map, GameCharacter* character, INT8 move_x, INT8 move_y);
 
 /*  Bank 19  */
 extern void Load_Shop();
@@ -326,6 +357,11 @@ extern void Scene_Handler(UBYTE scene_id);
 /*--------------------------------------------*/
 
 /*  Scene Functions  */
+UBYTE inputup(UBYTE input)
+{
+    return !(joypad() & input);
+}
+
 void switch_bank(UBYTE bank)
 {
     SWITCH_ROM_MBC1(bank);
@@ -353,6 +389,12 @@ void set_faded()
 {
     BGP_REG = 0xFF;
     OBP0_REG = 0xFF;
+}
+
+void set_unfaded()
+{
+    BGP_REG = 0xE4;
+    OBP0_REG = 0xD0;
 }
 
 void fade_out()
@@ -520,6 +562,18 @@ void clear_sprites()
     } 
 }
 
+UBYTE check_walk_counter(GameCharacter* character)
+{
+    if (character->walk_count[0] == 0 && character->walk_count[1] == 0 && character->walk_count[2] == 0 && character->walk_count[3] == 0)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
 void set_bkg_map(UINT8 tile_x, UINT8 tile_y, UINT8 width, UINT8 height, unsigned char *map_1, unsigned char *map_0)
 {
     VBK_REG = 1;
@@ -562,16 +616,42 @@ void Init_Variables()
 {
     memset(inventory, 0, 99);
     memset(inv_amount, 0, 99);
-    memset(equipment, 0, 99);
-    memset(equipment_weapon, 0, 30);
-    memset(equipment_secondary, 0, 30);
-    memset(equipment_armor, 0, 30);
-    memset(equipment_accessory, 0, 30);
     memset(flag_switch, 0, 255);
+    memset(actor_hiro.skill_ap, 0, 120);
+
+    for(u_i = 0; u_i < 30; u_i++)
+    {
+        equipment_weapon[u_i] = &equip_null;
+    }
+
+    for(u_i = 0; u_i < 30; u_i++)
+    {
+        equipment_secondary[u_i] = &equip_null;
+    }
+
+    for(u_i = 0; u_i < 30; u_i++)
+    {
+        equipment_armor[u_i] = &equip_null;
+    }
+
+    for(u_i = 0; u_i < 30; u_i++)
+    {
+        equipment_accessory[u_i] = &equip_null;
+    }
 }
 
 void Set_Start_Variables(void)
 {
+    switch_bank(bank12);
+    Add_Equip(&equip_wooden_sword);
+    Add_Equip(&equip_wooden_staff);
+    Add_Equip(&equip_hoplon);
+    Add_Equip(&equip_hoplon);
+    Add_Equip(&equip_cotton_garb);
+    Add_Equip(&equip_cotton_garb);
+    Add_Equip(&equip_copper_bracelet);
+    Add_Equip(&equip_copper_bracelet);
+    switch_bank(bank2);
 }
 
 void Refresh_Inv_Amount(void)
@@ -594,12 +674,120 @@ void Save_Variables(void) //* Saves all "save" variables.
     saved_clock_time_minute = clock_time_minute;
     saved_clock_time_hour = clock_time_hour;
 
-    saved_map = CurrentMap;
-
     memcpy(saved_inventory, &inventory, sizeof(saved_inventory));
     memcpy(saved_inv_amount, &inv_amount, sizeof(saved_inv_amount));
 
     saved_game_start = true;
+}
+
+UBYTE Compare_String(char* string_1, char* string_2)
+{
+    if(strlen(string_1) == strlen(string_2))
+    {
+        for(u_i = 0; u_i < strlen(string_1); u_i++)
+        {
+            if(string_1[u_i] != string_2[u_i])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+GameCharacter* Get_Char_NPC(const char* name)
+{
+    if(strncmp(char_npc_1.name, name, 14) == 0)
+    {
+        return &char_npc_1;
+    }
+    else if(strncmp(char_npc_2.name, name, 14) == 0)
+    {
+        return &char_npc_2;
+    }
+    else if(strncmp(char_npc_3.name, name, 14) == 0)
+    {
+        return &char_npc_3;
+    }
+    else if(strncmp(char_npc_4.name, name, 14) == 0)
+    {
+        return &char_npc_4;
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+GameCharacter* Find_Free_Character()
+{
+    if(!char_npc_1.active)
+    {
+        return &char_npc_1;
+    }
+    else if(!char_npc_2.active)
+    {
+        return &char_npc_2;
+    }
+    else if(!char_npc_3.active)
+    {
+        return &char_npc_3;
+    }
+    else if(!char_npc_4.active)
+    {
+        return &char_npc_4;
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+void Load_Char_Sprite(GameCharacter* character, GameSprite* sprite)
+{
+    set_sprite_data(character->sprite_index, 4, sprite->tiles);
+}
+
+void Load_Player_Actor()
+{
+    char_player.sprites = party[0]->sprites;
+
+    switch_bank(char_player.sprites->actor_up->sprites[0]->bank);
+
+    if(char_player.facing == up)
+    {
+        Load_Char_Sprite(&char_player, char_player.sprites->actor_up->sprites[0]);
+    }
+    else if(char_player.facing == down)
+    {
+        Load_Char_Sprite(&char_player, char_player.sprites->actor_down->sprites[0]);
+    }
+    else if(char_player.facing == left)
+    {
+        Load_Char_Sprite(&char_player, char_player.sprites->actor_left->sprites[0]);
+    }
+    else if(char_player.facing == right)
+    {
+        Load_Char_Sprite(&char_player, char_player.sprites->actor_right->sprites[0]);
+    }
+}
+
+void Set_Char_Tile(GameCharacter* character, UBYTE tile, GameSprite* sprite)
+{
+    set_sprite_data(character->sprite_index + tile, 1, sprite->tiles);
+}
+
+void Set_Sprite_Packages(GameCharacter* character, GameSpritePackage* sprites_up, GameSpritePackage* sprites_down, GameSpritePackage* sprites_left, GameSpritePackage* sprites_right)
+{
+    character->sprites_up = sprites_up;
+    character->sprites_down = sprites_down;
+    character->sprites_left = sprites_left;
+    character->sprites_right = sprites_right;
 }
 
 /*--------------------------------------------*/
@@ -910,7 +1098,7 @@ UINT16 Get_Experience(UBYTE bank, UINT16 actor_level)
     return h;
 }
 
-UINT16 Get_Required_AP(UBYTE bank, GameSkill* skill)
+UINT16 Get_Required_AP(UBYTE bank, const GameSkill* skill)
 {
     switch_bank(bank17);
 
@@ -921,7 +1109,18 @@ UINT16 Get_Required_AP(UBYTE bank, GameSkill* skill)
     return h;
 }
 
-UINT16 Get_Skill_Useable(UBYTE bank, GameSkill* skill)
+UINT16 Get_Skill_AP(UBYTE bank, GameActor* actor, const GameSkill* skill)
+{
+    switch_bank(bank17);
+
+    h = actor->skill_ap[skill->skill_id];
+
+    switch_bank(bank);
+
+    return h;
+}
+
+UINT16 Get_Skill_Useable(UBYTE bank, const GameSkill* skill)
 {
     switch_bank(bank17);
 
@@ -932,25 +1131,25 @@ UINT16 Get_Skill_Useable(UBYTE bank, GameSkill* skill)
     return h;
 }
 
-UBYTE Get_Font_Value(UBYTE bank)
+UBYTE Get_Font_Value(UBYTE bank, UINT16 font_pos)
 {
     switch_bank(bank6);
 
-    font_value = Retrieve_Font_Value();
+    font_value = Retrieve_Font_Value(font_pos);
 
     switch_bank(bank);
 
     return font_value;
 }
 
-void Call_Draw_Message(UBYTE bank, GameMessage* message, unsigned char* insert_1, UBYTE length_1) //* Loads message box and draws specified message.
+void Call_Draw_Message(UBYTE bank, const GameMessage* message, unsigned char* insert_1, UBYTE length_1, UBYTE speedable) //* Loads message box and draws specified message.
 {
     switch_bank(message->bank);
 
     switch(message->bank)
     {
         case bank10:
-            Load_Message_Bank10(message, insert_1, length_1);
+            Load_Message_Bank10(message, insert_1, length_1, speedable);
             break;
         default:
             break;
@@ -968,7 +1167,7 @@ void Call_Load_Tileset(UBYTE bank, UBYTE tileset) //* Loads specified tileset.
     switch_bank(bank);
 }
 
-void Call_Draw_Map(UBYTE bank, GameMap* map)
+void Call_Draw_Map(UBYTE bank, const GameMap* map)
 {
     switch_bank(bank3);
 
@@ -977,7 +1176,7 @@ void Call_Draw_Map(UBYTE bank, GameMap* map)
     switch_bank(bank);
 }
 
-void Call_Draw_Map_Load(UBYTE bank, GameMap* map) //* Draws specified map.
+void Call_Draw_Map_Load(UBYTE bank, const GameMap* map) //* Draws specified map.
 {
     switch_bank(map->map_bank);
 
@@ -1000,7 +1199,7 @@ void Call_Draw_Map_Load(UBYTE bank, GameMap* map) //* Draws specified map.
     switch_bank(bank);
 }
 
-void Call_Draw_Map_Line(UBYTE bank, GameMap* map, UBYTE direction) //* Draws specified map's line.
+void Call_Draw_Map_Line(UBYTE bank, const GameMap* map, UBYTE direction) //* Draws specified map's line.
 {
     switch_bank(map->map_bank);
 
@@ -1023,7 +1222,30 @@ void Call_Draw_Map_Line(UBYTE bank, GameMap* map, UBYTE direction) //* Draws spe
     switch_bank(bank);
 }
 
-UBYTE Call_Check_Tile_Collision(UBYTE bank, GameMap* map, GameCharacter* character, INT8 move_x, INT8 move_y)
+void Call_Draw_Tile_At(UBYTE bank, UBYTE pos_x, UBYTE pos_y, UBYTE tile_num)
+{
+    switch_bank(current_map->map_bank);
+
+    switch(current_map->map_bank)
+    {
+        case 8:
+            Draw_Tile_At8(pos_x, pos_y, tile_num);
+            break;
+        case 9:
+            Draw_Tile_At9(pos_x, pos_y, tile_num);
+            break;
+        case 18:
+            Draw_Tile_At18(pos_x, pos_y, tile_num);
+            break;
+        default:
+            Draw_Tile_At8(pos_x, pos_y, tile_num);
+            break;
+    }
+
+    switch_bank(bank);
+}
+
+UBYTE Call_Check_Tile_Collision(UBYTE bank, const GameMap* map, GameCharacter* character, INT8 move_x, INT8 move_y)
 {
     switch(map->map_bank)
     {
@@ -1059,7 +1281,23 @@ void Call_Teleport(UBYTE bank, GameMap* map, UBYTE tile_x, UBYTE tile_y)
     switch_bank(bank);
 }
 
+void Call_Walk_Distance(UBYTE bank, GameCharacter* character, INT8 move_x, INT8 move_y)
+{
+    switch_bank(bank2);
 
+    walk_distance(character, move_x, move_y);
+
+    switch_bank(bank);
+}
+
+void Call_Jump_Character(UBYTE bank, GameCharacter* character)
+{
+    switch_bank(bank5);
+
+    Jump_Character(character);
+
+    switch_bank(bank);
+}
 
 void Call_Draw_Pointer(UBYTE bank)
 {
@@ -1097,19 +1335,8 @@ void Call_Move_Char(UBYTE bank, GameCharacter* character, UINT8 tile_x, UINT8 ti
     switch_bank(bank);
 }
 
-void Call_Set_Sprite_Packages(UBYTE bank, GameCharacter* character, GameSpritePackage* sprites_up, GameSpritePackage* sprites_down, GameSpritePackage* sprites_left, GameSpritePackage* sprites_right)
-{
-    switch_bank(bank4);
-
-    Set_Sprite_Packages(character, sprites_up, sprites_down, sprites_left, sprites_right);
-
-    switch_bank(bank);
-}
-
 void Call_Load_Player_Actor(UBYTE bank)
 {
-    switch_bank(bank4);
-
     Load_Player_Actor();
 
     switch_bank(bank);
@@ -1117,9 +1344,18 @@ void Call_Load_Player_Actor(UBYTE bank)
 
 void Call_Load_Char_Sprite(UBYTE bank, GameCharacter* character, GameSprite* sprite) //* Sets character to sprite specified.
 {
-    switch_bank(4);
+    switch_bank(sprite->bank);
 
     Load_Char_Sprite(character, sprite);
+
+    switch_bank(bank);
+}
+
+void Call_Set_Sprite_Packages(UBYTE bank, GameCharacter* character, GameSpritePackage* sprites_up, GameSpritePackage* sprites_down, GameSpritePackage* sprites_left, GameSpritePackage* sprites_right)
+{
+    switch_bank(sprites_up->sprites[0]->bank);
+
+    Set_Sprite_Packages(character, sprites_up, sprites_down, sprites_left, sprites_right);
 
     switch_bank(bank);
 }
@@ -1214,6 +1450,15 @@ void Call_Scroll_Message(UBYTE bank)
     switch_bank(bank);
 }
 
+void Call_Update_Chest(UBYTE bank)
+{
+    switch_bank(bank2);
+
+    Update_Chest();
+
+    switch_bank(bank);
+}
+
 void Call_Scene_Handler(UBYTE bank, UBYTE scene_id)
 {
     switch_bank(bank20);
@@ -1232,11 +1477,11 @@ void Call_Draw_Troop(UBYTE bank, unsigned char* tiles, unsigned char* data)
     switch_bank(bank);
 }
 
-void Call_Execute_Skill(UBYTE bank, UBYTE skill_id, UBYTE action_performer, UBYTE action_target)
+void Call_Execute_Skill(UBYTE bank, const GameSkill* skill, UBYTE action_performer, UBYTE action_target)
 {
     switch_bank(17);
 
-    Execute_Skill(skill_id, action_performer, action_target);
+    Execute_Skill(skill, action_performer, action_target);
 
     switch_bank(bank);
 }
@@ -1261,7 +1506,7 @@ void Call_Draw_Skill_Cost(UBYTE bank, GameSkill* skill)
     switch_bank(bank);
 }
 
-void Call_Draw_Skills_Name(UBYTE bank, GameSkill* skill, UBYTE tile_x, UBYTE tile_y)
+void Call_Draw_Skills_Name(UBYTE bank, const GameSkill* skill, UBYTE tile_x, UBYTE tile_y)
 {
     switch_bank(bank17);
 
@@ -1270,7 +1515,7 @@ void Call_Draw_Skills_Name(UBYTE bank, GameSkill* skill, UBYTE tile_x, UBYTE til
     switch_bank(bank);
 }
 
-void Call_Draw_Skill_Name(UBYTE bank, GameSkill* skill, UBYTE tile_x, UBYTE tile_y)
+void Call_Draw_Skill_Name(UBYTE bank, const GameSkill* skill, UBYTE tile_x, UBYTE tile_y)
 {
     switch_bank(bank17);
 
@@ -1287,7 +1532,7 @@ void Call_Draw_End_Message(UBYTE bank)
 
     switch_bank(bank);
 }
-
+ 
 void Call_Draw_Item_Description(UBYTE bank, GameItem* item)
 {
     switch_bank(bank13);
@@ -1333,11 +1578,42 @@ void Call_Add_Actor(UBYTE bank, GameActor* actor)
     switch_bank(bank);
 }
 
-void Call_Add_NPC(UBYTE bank, GameCharacter* character, GameNPC* npc)
+void Call_Add_NPC(UBYTE bank, const char* name, GameNPC* npc, UBYTE pos_x, UBYTE pos_y, UBYTE facing)
+{
+    strncpy(temp_string, name, 14);
+
+    switch_bank(5);
+
+    Add_NPC(temp_string, npc, pos_x, pos_y, facing);
+
+    switch_bank(bank);
+}
+
+void Call_Clear_Char(UBYTE bank, GameCharacter* character)
 {
     switch_bank(5);
 
-    Add_NPC(character, npc);
+    Clear_Char(character);
+
+    switch_bank(bank);
+}
+
+void Call_Remove_NPC(UBYTE bank, const char* name)
+{
+    strncpy(temp_string, name, 14);
+
+    switch_bank(bank5);
+
+    Remove_NPC(name);
+
+    switch_bank(bank);
+}
+
+void Call_Walk_Chars(UBYTE bank)
+{
+    switch_bank(bank2);
+
+    Walk_Chars();
 
     switch_bank(bank);
 }
@@ -1528,19 +1804,11 @@ void Overworld()
 
     Update_Anim_Walk();
 
-    if(camera_focus == false)
-    {
-        walk_char(&char_player);
-    }
-    else
-    {
-        walk_player();
-    }
+    Walk_Chars();
+    Update_Chest();
 
     hide_char(&char_npc_1);
     hide_char(&char_npc_2);
-    
-    walk_char(&char_npc_1);
 }
 
 void Gameplay()
@@ -1593,10 +1861,16 @@ void vbl_clock_isr(void)
     }
 }
 
-void vbl_seed_isr(void)
+void tim_seed_isr(void)
 {
     Seed += 1;
     if(Seed >= 255){Seed = 1;}
+
+    initrand(Seed);
+}
+
+void vbl_seed_isr(void)
+{
 }
 
 void interrupt_handler(void)
@@ -1614,6 +1888,9 @@ void interrupt_handler(void)
 
 void main()
 {
+    SHOW_BKG;
+    HIDE_WIN;
+
     ENABLE_RAM_MBC5;
 
     NR52_REG = 0x80;
@@ -1626,7 +1903,7 @@ void main()
 
     cpu_fast();
 
-    Call_Add_Item(bank2, &item_healing_brew, 1);
+    fade_out();
 
     if(saved_game_start == true)
     {
@@ -1705,6 +1982,10 @@ void main()
         Load_Window();
 
         switch_bank(bank20);
+
+        fill_bkg_rect(0, 0, 32, 32, 0xD3);
+
+        set_unfaded();
 
         waitpad(J_START);
 

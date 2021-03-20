@@ -8,9 +8,13 @@
 #include "Maps/Map_Plum_Item_Shop.c"
 #include "Maps/Map_Bud_House.c"
 
-extern UBYTE CurrentMap;
-
 extern UBYTE Tileset;
+
+extern UBYTE offset_pos_x, offset_pos_y;
+
+extern UBYTE tile_offset_x, tile_offset_y;
+
+extern UBYTE starting_x, starting_y;
 
 extern UINT16 grid_x, grid_y, tile;
 
@@ -34,6 +38,63 @@ extern const unsigned char Tileset_2_Map[60][4];
 
 extern const unsigned char Tileset_3_Map[60][4];
 
+void Draw_Tile_At9(UBYTE tile_x, UBYTE tile_y, UBYTE tile_num)
+{
+    if(starting_x <= 5)
+    {
+        offset_pos_x = 0;
+    }
+    else if(starting_x >= map_size_x - 5)
+    {
+        offset_pos_x = map_size_x - 10;
+    }
+    else
+    {
+        offset_pos_x = starting_x - 5;
+    }
+
+    if(starting_y <= 5)
+    {
+        offset_pos_y = 0;
+    }
+    else if(starting_y > map_size_y - 5)
+    {
+        offset_pos_y = map_size_y - 9;
+    }
+    else
+    {
+        offset_pos_y = starting_y - 5;
+    }
+
+    tile_x = tile_x * 2;
+    tile_y = tile_y * 2;
+
+    offset_pos_x = offset_pos_x * 2;
+    offset_pos_y = offset_pos_y * 2;
+
+    tile_offset_x = tile_x - offset_pos_x;
+    if(tile_offset_x >= 32){tile_offset_x = tile_offset_x % 32;}
+
+    tile_offset_y = tile_y - offset_pos_y;
+    if(tile_offset_y >= 32){tile_offset_y = tile_offset_y % 32;}
+
+    switch(Tileset)
+    {
+        case 1:
+            set_bkg_tiles(tile_offset_x, tile_offset_y, 2, 2, Tileset_1_Map[tile_num]);
+            break;
+        case 2:
+            set_bkg_tiles(tile_offset_x, tile_offset_y, 2, 2, Tileset_2_Map[tile_num]);
+            break;
+        case 3:
+            set_bkg_tiles(tile_offset_x, tile_offset_y, 2, 2, Tileset_3_Map[tile_num]);
+            break;
+        default:
+            set_bkg_tiles(tile_offset_x, tile_offset_y, 2, 2, Tileset_1_Map[tile_num]);
+            break;
+    }
+}
+
 void Draw_Tile9(UINT16 tile_x, UINT16 tile_y, UBYTE tile_num)
 {
     switch(Tileset)
@@ -53,7 +114,7 @@ void Draw_Tile9(UINT16 tile_x, UINT16 tile_y, UBYTE tile_num)
     }
 }
 
-void Draw_Map_Bank9(GameMap* map) //* Draws map tiles.
+void Draw_Map_Bank9(const GameMap* map) //* Draws map tiles.
 {
     if(char_player.pos_x <= 5)
     {
@@ -105,7 +166,7 @@ void Draw_Map_Bank9(GameMap* map) //* Draws map tiles.
     }
 }
 
-void Draw_Line_Bank9(GameMap* map, UBYTE direction) //* Draws verticle/horizontal line of map tiles.
+void Draw_Line_Bank9(const GameMap* map, UBYTE direction) //* Draws verticle/horizontal line of map tiles.
 {
     map_x = 0;
     map_y = 0;
@@ -324,7 +385,7 @@ void Draw_Line_Bank9(GameMap* map, UBYTE direction) //* Draws verticle/horizonta
     }
 }
 
-UBYTE Check_Tile_Collision_Bank9(GameMap* map, GameCharacter* character, INT8 move_x, INT8 move_y)
+UBYTE Check_Tile_Collision_Bank9(const GameMap* map, GameCharacter* character, INT8 move_x, INT8 move_y)
 {
     grid_x = character->pos_x + move_x;
     grid_y = character->pos_y + move_y;

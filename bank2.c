@@ -14,21 +14,25 @@
 
 extern UBYTE Playing, Joy;
 
-extern UBYTE CurrentMap, CurrentShop;
+extern UBYTE CurrentShop;
 
-extern UINT8 PlayerCharacter;
+extern const GameMap* current_map;
+
+extern UBYTE PlayerCharacter;
 
 extern UBYTE Tileset;
 
-extern UINT8 camera_x, camera_y;
+extern UBYTE camera_x, camera_y;
 
-extern UINT8 map_size_x, map_size_y;
+extern UBYTE map_size_x, map_size_y;
 
-extern UINT8 camera_focus;
+extern UBYTE camera_focus;
 
 extern UBYTE current_message, total_lines;
 
 extern INT8 i, j, k, l, m, n, r, x, y;
+
+extern UINT16 u16_move_x, u16_move_y;
 
 extern UBYTE u_x, u_y;
 
@@ -36,26 +40,35 @@ extern UBYTE PlayerControlFlag;
 
 extern UBYTE MessageBoxFlag;
 
-extern UINT8 clock_tick;
+extern UBYTE clock_tick;
 
 extern UBYTE game_scene;
 
+extern UBYTE ADownFlag;
+
 extern UBYTE event_x, event_y;
+
+extern const GameChest* tempChest;
+
+extern unsigned char flag_switch[255];
 
 extern void Save_Variables();
 
+extern UBYTE inputup(UBYTE input);
 extern void performant_delay(UBYTE num_loops);
 extern void fade_out();
 extern void fade_in();
 extern void toggle_control(UBYTE toggle);
+extern UBYTE check_walk_counter(GameCharacter* character);
 
+extern void Call_Draw_Tile_At(UBYTE bank, UBYTE pos_x, UBYTE pos_y, UBYTE tile_num);
 extern void Call_Reload_Map(UBYTE bank);
 extern void Call_Load_Combat_Main(UBYTE bank);
 extern void Call_Check_Step_Counter(UBYTE bank);
 extern void Call_Orient_Char(UBYTE bank, GameCharacter *character);
-extern void Call_Draw_Map(UBYTE bank, GameMap *map);
-extern void Call_Draw_Map_Line(UBYTE bank, GameMap *map, UBYTE directiony);
-extern void Call_Draw_Message(UBYTE bank, GameMessage *message, unsigned char *insert_1, UBYTE length_1);
+extern void Call_Draw_Map(UBYTE bank, const GameMap *map);
+extern void Call_Draw_Map_Line(UBYTE bank, const GameMap *map, UBYTE directiony);
+extern void Call_Draw_Message(UBYTE bank, const GameMessage *message, unsigned char *insert_1, UBYTE length_1);
 extern void Call_Load_Char_Sprite(UBYTE bank, GameCharacter *character, GameSprite *sprite);
 extern void Call_Add_Item(UBYTE bank, GameItem *item, UBYTE amount);
 extern void Call_Add_Equip(UBYTE bank, GameEquip *equip);
@@ -63,7 +76,7 @@ extern void Call_Scene_Handler(UBYTE bank, UBYTE scene_id);
 
 extern void Call_Shop(UBYTE bank);
 
-extern UBYTE Call_Check_Tile_Collision(UBYTE bank, GameMap *map, GameCharacter *character, INT8 move_x, INT8 move_y);
+extern UBYTE Call_Check_Tile_Collision(UBYTE bank, const GameMap *map, GameCharacter *character, INT8 move_x, INT8 move_y);
 
 extern void Menu();
 
@@ -83,6 +96,8 @@ void move_screen(INT16 move_x, INT16 move_y);
 
 void move_char(GameCharacter *character, UINT8 tile_x, UINT8 tile_y, UINT8 pixel_offset);
 
+void walk_distance(GameCharacter* character, INT8 move_x, INT8 move_y);
+
 UBYTE check_char_collision(GameCharacter *character, INT8 move_x, INT8 move_y)
 {
     if (char_npc_1.active && char_npc_1.visible && character->pos_x + move_x == char_npc_1.pos_x && character->pos_y + move_y == char_npc_1.pos_y)
@@ -96,18 +111,6 @@ UBYTE check_char_collision(GameCharacter *character, INT8 move_x, INT8 move_y)
     else
     {
         return false;
-    }
-}
-
-UBYTE check_walk_counter()
-{
-    if (char_player.walk_count[0] == 0 && char_player.walk_count[1] == 0 && char_player.walk_count[2] == 0 && char_player.walk_count[3] == 0)
-    {
-        return 0;
-    }
-    else
-    {
-        return 1;
     }
 }
 
@@ -146,7 +149,7 @@ void move_char(GameCharacter *character, UBYTE tile_x, UBYTE tile_y, UBYTE pixel
     move_sprite(character->sprite_id[0] + 3, tile_x + 8 - pixel_offset, tile_y + 16);
 }
 
-void read_message(GameMessage *message, unsigned char *insert_1, UBYTE length_1) //* Displays specified message.
+void read_message(const GameMessage *message, unsigned char *insert_1, UBYTE length_1) //* Displays specified message.
 {
     Call_Draw_Message(bank2, message, insert_1, length_1);
 }
@@ -160,7 +163,7 @@ void open_shop(GameShop *shop)
 
 void teleport_player(GameTele *event_tele) //* Teleports player to specified teleport.
 {
-    if (event_tele != &tele_null)
+    if(event_tele != &tele_null)
     {
         fade_out();
 
@@ -178,47 +181,47 @@ void teleport_player(GameTele *event_tele) //* Teleports player to specified tel
 
         Call_Draw_Map(bank2, Get_Map(event_tele->map_id));
 
-        if (event_tele->direction == up)
+        if(event_tele->direction == up)
         {
             Call_Load_Char_Sprite(bank2, &char_player, char_player.sprites->actor_up->sprites[0]);
         }
-        else if (event_tele->direction == down)
+        else if(event_tele->direction == down)
         {
             Call_Load_Char_Sprite(bank2, &char_player, char_player.sprites->actor_down->sprites[0]);
         }
 
         fade_in();
 
-        if (event_tele->direction == up)
+        if(event_tele->direction == up)
         {
             if (char_player.pos_y <= 5 || char_player.pos_y > map_size_y - 5)
             {
                 camera_focus = 0;
-                char_player.pos_y -= 1;
-                char_player.walk_count[0] = 16;
+                
+                walk_distance(&char_player, 0, -1);
             }
             else
             {
                 camera_focus = 1;
                 Call_Draw_Map_Line(bank2, Get_Map(event_tele->map_id), up);
-                char_player.pos_y -= 1;
-                char_player.walk_count[0] = 16;
+                
+                walk_distance(&char_player, 0, -1);
             }
         }
-        else if (event_tele->direction == down)
+        else if(event_tele->direction == down)
         {
             if (char_player.pos_y < 5 || char_player.pos_y >= map_size_y - 5)
             {
                 camera_focus = 0;
-                char_player.pos_y += 1;
-                char_player.walk_count[1] = 16;
+                
+                walk_distance(&char_player, 0, 1);
             }
             else
             {
                 camera_focus = 1;
                 Call_Draw_Map_Line(bank2, Get_Map(event_tele->map_id), down);
-                char_player.pos_y += 1;
-                char_player.walk_count[1] = 16;
+                
+                walk_distance(&char_player, 0, 1);
             }
         }
     }
@@ -247,22 +250,21 @@ void Teleport(GameMap *map, UBYTE tile_x, UBYTE tile_y)
 
 void open_chest(UBYTE chest_id)
 {
-    switch (chest_id)
+    switch(chest_id)
     {
-    case 0: //* Chest 0
-        Call_Add_Item(bank2, &item_healing_brew, 2);
-        Call_Add_Item(bank2, &item_mana_brew, 1);
-        break;
-    case 1: //* Chest 1
-        Call_Add_Item(bank2, &item_life_leaf, 1);
-        break;
-    default: //* Chest 0 - Default
-        Call_Add_Item(bank2, &item_healing_brew, 1);
-        break;
+        case 0: //* Chest 0
+            Call_Add_Equip(bank2, &equip_wooden_sword);
+            break;
+        case 1: //* Chest 1
+            Call_Add_Item(bank2, &item_healing_brew, 2);
+            break;
+        default: //* Chest Default
+            Call_Add_Item(bank2, &item_healing_brew, 1);
+            break;
     }
 }
 
-void Check_NPC_Messenger(void)
+void Check_NPC_Messenger()
 {
     if (char_player.facing == up)
     {
@@ -374,7 +376,7 @@ void Check_NPC_Messenger(void)
     }
 }
 
-void Check_NPC_Shopkeeper(void)
+void Check_NPC_Shopkeeper()
 {
     if (char_player.facing == up)
     {
@@ -486,7 +488,7 @@ void Check_NPC_Shopkeeper(void)
     }
 }
 
-void Check_NPC_Trigger(void)
+void Check_NPC_Trigger()
 {
     if (char_player.facing == up)
     {
@@ -562,7 +564,7 @@ void Check_NPC_Trigger(void)
     }
 }
 
-void Check_Event_Shopkeeper(void)
+void Check_Event_Shopkeeper()
 {
     x = 0;
     y = 0;
@@ -588,102 +590,106 @@ void Check_Event_Shopkeeper(void)
 
     for (i = 0; i < 5; i++)
     {
-        if (char_player.pos_x + x == Get_Map(CurrentMap)->event_shopkeeper[i]->pos_x && char_player.pos_y + y == Get_Map(CurrentMap)->event_shopkeeper[i]->pos_y)
+        if (char_player.pos_x + x == current_map->event_shopkeeper[i]->pos_x && char_player.pos_y + y == current_map->event_shopkeeper[i]->pos_y)
         {
-            open_shop(Get_Map(CurrentMap)->event_shopkeeper[i]->shop);
+            open_shop(current_map->event_shopkeeper[i]->shop);
         }
     }
 }
 
-void Check_Event_Chest(void)
+void Check_Event_Chest()
 {
-    for (i = 0; i < 100; i++)
+    if(char_player.facing == up)
     {
-        if (char_player.pos_x == event_chest.pos_x[i] && char_player.pos_y - 2 == event_chest.pos_y[i] && CurrentMap == event_chest.map_id[i])
+        for(i = 0; i < 10; i++)
         {
-            if (!event_chest.used[i])
-            {
-                event_chest.used[i] = true;
-                open_chest(event_chest.content_id[i]);
-            }
+            tempChest = current_map->event_chest[i];
 
-            return;
-        }
+            if(flag_switch[tempChest->flag_switch] == false && tempChest != NULL && char_player.pos_x == tempChest->pos_x && char_player.pos_y - 1 == tempChest->pos_y)
+            {
+                Call_Draw_Tile_At(bank2, tempChest->pos_x, tempChest->pos_y, 59);
+                r = tempChest->chest_id;
+                read_message(current_map->event_chest[i]->message, NULL, 0);
+                open_chest(r);
+                flag_switch[tempChest->flag_switch] = true;
+                return;
+            }
+        }    
     }
 }
 
-void Check_Event_Sign(void)
+void Check_Event_Sign()
 {
     x = 0;
     y = 0;
 
     switch (char_player.facing)
     {
-    case up:
-        y = -1;
-        break;
-    case down:
-        y = 1;
-        break;
-    case left:
-        x = -1;
-        break;
-    case right:
-        x = 1;
-        break;
-    default:
-        y = -1;
-        break;
+        case up:
+            y = -1;
+            break;
+        case down:
+            y = 1;
+            break;
+        case left:
+            x = -1;
+            break;
+        case right:
+            x = 1;
+            break;
+        default:
+            y = -1;
+            break;
     }
 
     for (i = 0; i < 10; i++)
     {
-        if (char_player.pos_x + x == Get_Sign(Get_Map(CurrentMap)->event_sign[i])->pos_x && char_player.pos_y + y == Get_Sign(Get_Map(CurrentMap)->event_sign[i])->pos_y)
+        if (char_player.pos_x + x == Get_Sign(current_map->event_sign[i])->pos_x && char_player.pos_y + y == Get_Sign(current_map->event_sign[i])->pos_y)
         {
-            r = Get_Sign(Get_Map(CurrentMap)->event_sign[i])->message_id;
+            r = Get_Sign(current_map->event_sign[i])->message_id;
             read_message(Get_Message(r), NULL, 0);
             return;
         }
     }
 }
 
-void Check_Event_Tele(void)
+void Check_Event_Tele()
 {
     for (i = 0; i < 10; i++)
     {
-        if (char_player.pos_x == Get_Tele(Get_Map(CurrentMap)->event_tele[i])->pos_x && char_player.pos_y == Get_Tele(Get_Map(CurrentMap)->event_tele[i])->pos_y)
+        if (char_player.pos_x == Get_Tele(current_map->event_tele[i])->pos_x && char_player.pos_y == Get_Tele(current_map->event_tele[i])->pos_y)
         {
-            r = Get_Tele(Get_Map(CurrentMap)->event_tele[i])->tele_id;
+            r = Get_Tele(current_map->event_tele[i])->tele_id;
             teleport_player(Get_Tele(r));
             return;
         }
     }
 }
 
-void Check_Event_Trigger(void)
+void Check_Event_Trigger()
 {
     for (i = 0; i < 10; i++)
     {
-        if (char_player.pos_x >= Get_Map(CurrentMap)->event_trigger[i]->pos_1[0] && char_player.pos_y >= Get_Map(CurrentMap)->event_trigger[i]->pos_1[1] && char_player.pos_x <= Get_Map(CurrentMap)->event_trigger[i]->pos_2[0] && char_player.pos_y <= Get_Map(CurrentMap)->event_trigger[i]->pos_2[1])
+        if (char_player.pos_x >= current_map->event_trigger[i]->pos_1[0] && char_player.pos_y >= current_map->event_trigger[i]->pos_1[1] && char_player.pos_x <= current_map->event_trigger[i]->pos_2[0] && char_player.pos_y <= current_map->event_trigger[i]->pos_2[1])
         {
-            Call_Scene_Handler(bank2, Get_Map(CurrentMap)->event_trigger[i]->scene_id);
+            Call_Scene_Handler(bank2, current_map->event_trigger[i]->scene_id);
         }
     }
 }
 
 void hide_char(GameCharacter *character)
 {
-    if (character->active)
+    if(character->active)
     {
-        if (character->pos_x < char_player.pos_x - 6 || character->pos_y < char_player.pos_y - 6 || character->pos_x > char_player.pos_x + 5 || character->pos_y > char_player.pos_y + 5)
+        if(character->pos_x < char_player.pos_x - 6 || character->pos_y < char_player.pos_y - 6 || character->pos_x > char_player.pos_x + 5 || character->pos_y > char_player.pos_y + 5)
         {
-            if (character->visible)
+            if(character->visible)
             {
                 Call_Load_Char_Sprite(bank2, character, &sprite_clear);
                 character->visible = false;
             }
         }
-        else if (!character->visible)
+        else if(!character->visible)
         {
             Call_Load_Char_Sprite(bank2, character, character->sprites_down->sprites[0]);
             character->visible = true;
@@ -691,52 +697,53 @@ void hide_char(GameCharacter *character)
     }
 }
 
-void walk_counter(INT8 move_x, INT8 move_y)
+void walk_distance(GameCharacter* character, INT8 move_x, INT8 move_y)
 {
-    if (move_x > 0)
-    {
-        char_player.pos_x += 1;
-        char_player.walk_count[3] += 16;
+    u16_move_x = 16 * move_x;
+    u16_move_y = 16 * move_y;
 
-        Check_Event_Tele();
+    if(move_x < 0)
+    {
+        u16_move_x = u16_move_x * -1;
     }
-    else if (move_x < 0)
-    {
-        char_player.pos_x -= 1;
-        char_player.walk_count[2] += 16;
 
-        Check_Event_Tele();
+    if(move_y < 0)
+    {
+        u16_move_y = u16_move_y * -1;
     }
-    else if (move_y > 0)
-    {
-        char_player.pos_y += 1;
-        char_player.walk_count[1] += 16;
 
-        Check_Event_Tele();
+    if(move_x > 0)
+    {
+        character->walk_count[3] += u16_move_x;
     }
-    else if (move_y < 0)
+    else if(move_x < 0)
     {
-        char_player.pos_y -= 1;
-        char_player.walk_count[0] += 16;
-
-        Check_Event_Tele();
+        character->walk_count[2] += u16_move_x;
+    }
+    else if(move_y > 0)
+    {
+        character->walk_count[1] += u16_move_y;
+    }
+    else if(move_y < 0)
+    {
+        character->walk_count[0] += u16_move_y;
     }
 }
 
 void walk_player()
 {
-    if (char_player.walk_count[0] > 0)
+    if(char_player.walk_count[0] > 0)
     {
         scroll_bkg(0, -1);
 
-        if (char_npc_1.active)
+        if(char_npc_1.active)
         {
             scroll_sprite(char_npc_1.sprite_id[0], 0, 1);
             scroll_sprite(char_npc_1.sprite_id[0] + 1, 0, 1);
             scroll_sprite(char_npc_1.sprite_id[0] + 2, 0, 1);
             scroll_sprite(char_npc_1.sprite_id[0] + 3, 0, 1);
         }
-        if (char_npc_2.active)
+        if(char_npc_2.active)
         {
             scroll_sprite(char_npc_2.sprite_id[0], 0, 1);
             scroll_sprite(char_npc_2.sprite_id[0] + 1, 0, 1);
@@ -744,36 +751,46 @@ void walk_player()
             scroll_sprite(char_npc_2.sprite_id[0] + 3, 0, 1);
         }
 
-        char_player.walk_count[0] = char_player.walk_count[0] - 1;
+        char_player.walk_count[0]--;
 
-        if (char_player.walk_count[0] == 0)
+        char_player.walk_length[0]++;
+
+        if(char_player.walk_length[0] == 16)
         {
+            char_player.walk_length[0] = 0;
+        }
+
+        if(char_player.walk_length[0] == 0)
+        {
+            char_player.pos_y--;
+
             camera_y = camera_y - 2;
             if (camera_y == 254)
             {
                 camera_y = 30;
             }
 
-            Check_Event_Trigger();
+            Check_Event_Trigger(); 
+            Check_Event_Tele();
 
-            if (Get_Map(CurrentMap)->combat)
+            if(current_map->combat)
             {
                 Call_Check_Step_Counter(bank2);
             }
         }
     }
-    else if (char_player.walk_count[1] > 0)
+    else if(char_player.walk_count[1] > 0)
     {
         scroll_bkg(0, 1);
 
-        if (char_npc_1.active)
+        if(char_npc_1.active)
         {
             scroll_sprite(char_npc_1.sprite_id[0], 0, -1);
             scroll_sprite(char_npc_1.sprite_id[0] + 1, 0, -1);
             scroll_sprite(char_npc_1.sprite_id[0] + 2, 0, -1);
             scroll_sprite(char_npc_1.sprite_id[0] + 3, 0, -1);
         }
-        if (char_npc_2.active)
+        if(char_npc_2.active)
         {
             scroll_sprite(char_npc_2.sprite_id[0], 0, -1);
             scroll_sprite(char_npc_2.sprite_id[0] + 1, 0, -1);
@@ -781,10 +798,19 @@ void walk_player()
             scroll_sprite(char_npc_2.sprite_id[0] + 3, 0, -1);
         }
 
-        char_player.walk_count[1] = char_player.walk_count[1] - 1;
+        char_player.walk_count[1]--;
 
-        if (char_player.walk_count[1] == 0)
+        char_player.walk_length[1]++;
+
+        if(char_player.walk_length[1] == 16)
         {
+            char_player.walk_length[1] = 0;
+        }
+
+        if(char_player.walk_length[1] == 0)
+        {
+            char_player.pos_y++;
+
             camera_y = camera_y + 2;
             if (camera_y == 32)
             {
@@ -792,25 +818,26 @@ void walk_player()
             }
 
             Check_Event_Trigger();
+            Check_Event_Tele();
 
-            if (Get_Map(CurrentMap)->combat)
+            if(current_map->combat)
             {
                 Call_Check_Step_Counter(bank2);
             }
         }
     }
-    else if (char_player.walk_count[2] > 0)
+    else if(char_player.walk_count[2] > 0)
     {
         scroll_bkg(-1, 0);
 
-        if (char_npc_1.active)
+        if(char_npc_1.active)
         {
             scroll_sprite(char_npc_1.sprite_id[0], 1, 0);
             scroll_sprite(char_npc_1.sprite_id[0] + 1, 1, 0);
             scroll_sprite(char_npc_1.sprite_id[0] + 2, 1, 0);
             scroll_sprite(char_npc_1.sprite_id[0] + 3, 1, 0);
         }
-        if (char_npc_2.active)
+        if(char_npc_2.active)
         {
             scroll_sprite(char_npc_2.sprite_id[0], 1, 0);
             scroll_sprite(char_npc_2.sprite_id[0] + 1, 1, 0);
@@ -818,19 +845,29 @@ void walk_player()
             scroll_sprite(char_npc_2.sprite_id[0] + 3, 1, 0);
         }
 
-        char_player.walk_count[2] = char_player.walk_count[2] - 1;
+        char_player.walk_count[2]--;
 
-        Check_Event_Trigger();
+        char_player.walk_length[2]++;
 
-        if (char_player.walk_count[2] == 0)
+        if(char_player.walk_length[2] == 16)
         {
+            char_player.walk_length[2] = 0;
+        }
+
+        if(char_player.walk_length[2] == 0)
+        {
+            char_player.pos_x--;
+
             camera_x = camera_x - 2;
-            if (camera_x == 254)
+            if(camera_x == 254)
             {
                 camera_x = 30;
             }
 
-            if (Get_Map(CurrentMap)->combat)
+            Check_Event_Trigger();
+            Check_Event_Tele();
+
+            if(current_map->combat)
             {
                 Call_Check_Step_Counter(bank2);
             }
@@ -855,19 +892,29 @@ void walk_player()
             scroll_sprite(char_npc_2.sprite_id[0] + 3, -1, 0);
         }
 
-        char_player.walk_count[3] = char_player.walk_count[3] - 1;
+        char_player.walk_count[3]--;
 
-        Check_Event_Trigger();
+        char_player.walk_length[3]++;
 
-        if (char_player.walk_count[3] == 0)
+        if(char_player.walk_length[3] == 16)
         {
+            char_player.walk_length[3] = 0;
+        }
+
+        if(char_player.walk_length[3] == 0)
+        {
+            char_player.pos_x++;
+
             camera_x = camera_x + 2;
             if (camera_x == 32)
             {
                 camera_x = 0;
             }
 
-            if (Get_Map(CurrentMap)->combat)
+            Check_Event_Trigger();
+            Check_Event_Tele();
+
+            if(current_map->combat)
             {
                 Call_Check_Step_Counter(bank2);
             }
@@ -884,7 +931,25 @@ void walk_char(GameCharacter *character)
         scroll_sprite(character->sprite_id[0] + 2, 0, -1);
         scroll_sprite(character->sprite_id[0] + 3, 0, -1);
 
-        character->walk_count[0] -= 1;
+        character->walk_count[0]--;
+
+        character->walk_length[0]++;
+
+        if(character->walk_length[0] == 16)
+        {
+            character->walk_length[0] = 0;
+        }
+
+        if(character->walk_length[0] == 0)
+        {
+            character->pos_y--;
+
+            if(character == &char_player)
+            {
+                Check_Event_Trigger(); 
+                Check_Event_Tele();
+            }
+        }
     }
     else if (character->walk_count[1] > 0)
     {
@@ -893,7 +958,25 @@ void walk_char(GameCharacter *character)
         scroll_sprite(character->sprite_id[0] + 2, 0, 1);
         scroll_sprite(character->sprite_id[0] + 3, 0, 1);
 
-        character->walk_count[1] -= 1;
+        character->walk_count[1]--;
+
+        character->walk_length[1]++;
+
+        if(character->walk_length[1] == 16)
+        {
+            character->walk_length[1] = 0;
+        }
+
+        if(character->walk_length[1] == 0)
+        {
+            character->pos_y++;
+
+            if(character == &char_player)
+            {
+                Check_Event_Trigger(); 
+                Check_Event_Tele();
+            }
+        }
     }
     else if (character->walk_count[2] > 0)
     {
@@ -902,7 +985,25 @@ void walk_char(GameCharacter *character)
         scroll_sprite(character->sprite_id[0] + 2, -1, 0);
         scroll_sprite(character->sprite_id[0] + 3, -1, 0);
 
-        character->walk_count[2] -= 1;
+        character->walk_count[2]--;
+
+        character->walk_length[2]++;
+
+        if(character->walk_length[2] == 16)
+        {
+            character->walk_length[2] = 0;
+        }
+
+        if(character->walk_length[2] == 0)
+        {
+            character->pos_x--;
+            
+            if(character == &char_player)
+            {
+                Check_Event_Trigger(); 
+                Check_Event_Tele();
+            }
+        }
     }
     else if (character->walk_count[3] > 0)
     {
@@ -911,15 +1012,65 @@ void walk_char(GameCharacter *character)
         scroll_sprite(character->sprite_id[0] + 2, 1, 0);
         scroll_sprite(character->sprite_id[0] + 3, 1, 0);
 
-        character->walk_count[3] -= 1;
+        character->walk_count[3]--;
+
+        character->walk_length[3]++;
+
+        if(character->walk_length[3] == 16)
+        {
+            character->walk_length[3] = 0;
+        }
+
+        if(character->walk_length[3] == 0)
+        {
+            character->pos_x++;
+
+            if(character == &char_player)
+            {
+                Check_Event_Trigger(); 
+                Check_Event_Tele();
+            }
+        }
     }
 }
 
-void Update_Joypad(void) //* Updates player action using button presses
+void Walk_Chars()
+{
+    if(char_npc_1.active == true)
+    {
+        walk_char(&char_npc_1);
+    }
+
+    if(char_npc_2.active == true)
+    {
+        walk_char(&char_npc_2);
+    }
+
+    if(char_npc_3.active == true)
+    {
+        walk_char(&char_npc_3);
+    }
+
+    if(char_npc_4.active == true)
+    {
+        walk_char(&char_npc_4);
+    }
+
+    if(camera_focus == false)
+    {
+        walk_char(&char_player);
+    }
+    else
+    {
+        walk_player();
+    }
+}
+
+void Update_Joypad() //* Updates player action using button presses
 {
     Joy = joypad();
 
-    if (Joy & J_A && !check_walk_counter())
+    if(Joy & J_A && !check_walk_counter(&char_player) && !ADownFlag)
     {
         Check_Event_Sign();
         Check_NPC_Messenger();
@@ -927,34 +1078,41 @@ void Update_Joypad(void) //* Updates player action using button presses
         Check_Event_Chest();
         Check_Event_Shopkeeper();
         Check_Event_Trigger();
+
+        ADownFlag = true;
     }
 
-    if (Joy & J_B && !check_walk_counter())
+    if(inputup(J_A))
     {
-        Call_Load_Combat_Main(bank2);
+        ADownFlag = false;
     }
 
-    if (Joy & J_SELECT)
+    if(Joy & J_B && !check_walk_counter(&char_player))
+    {
+
+    }
+
+    if(Joy & J_SELECT)
     {
     }
 
-    if (Joy & J_START && !check_walk_counter())
+    if(Joy & J_START && !check_walk_counter(&char_player))
     {
         Menu();
     }
 
-    if (Joy & J_UP && PlayerControlFlag && !check_walk_counter())
+    if(Joy & J_UP && PlayerControlFlag && !check_walk_counter(&char_player))
     {
         if (char_player.pos_y > 0)
         {
             if (char_player.pos_y <= 5 || char_player.pos_y > map_size_y - 4)
             {
-                if (PlayerControlFlag && !Call_Check_Tile_Collision(bank2, Get_Map(CurrentMap), &char_player, 0, -1) && !check_char_collision(&char_player, 0, -1))
+                if (PlayerControlFlag && !Call_Check_Tile_Collision(bank2, current_map, &char_player, 0, -1) && !check_char_collision(&char_player, 0, -1))
                 {
                     camera_focus = false;
                     char_player.facing = up;
 
-                    walk_counter(0, -1);
+                    walk_distance(&char_player, 0, -1);
                 }
                 else
                 {
@@ -964,13 +1122,13 @@ void Update_Joypad(void) //* Updates player action using button presses
             }
             else
             {
-                if (PlayerControlFlag && !Call_Check_Tile_Collision(bank2, Get_Map(CurrentMap), &char_player, 0, -1) && !check_char_collision(&char_player, 0, -1))
+                if (PlayerControlFlag && !Call_Check_Tile_Collision(bank2, current_map, &char_player, 0, -1) && !check_char_collision(&char_player, 0, -1))
                 {
                     camera_focus = true;
 
-                    Call_Draw_Map_Line(bank2, Get_Map(CurrentMap), up);
+                    Call_Draw_Map_Line(bank2, current_map, up);
 
-                    walk_counter(0, -1);
+                    walk_distance(&char_player, 0, -1);
 
                     char_player.facing = up;
                 }
@@ -983,18 +1141,18 @@ void Update_Joypad(void) //* Updates player action using button presses
         }
     }
 
-    else if (Joy & J_DOWN && PlayerControlFlag && !check_walk_counter())
+    else if(Joy & J_DOWN && PlayerControlFlag && !check_walk_counter(&char_player))
     {
         if (char_player.pos_y < map_size_y - 1)
         {
             if (char_player.pos_y <= 4 || char_player.pos_y >= map_size_y - 4)
             {
-                if (PlayerControlFlag && !Call_Check_Tile_Collision(bank2, Get_Map(CurrentMap), &char_player, 0, 1) && !check_char_collision(&char_player, 0, 1))
+                if (PlayerControlFlag && !Call_Check_Tile_Collision(bank2, current_map, &char_player, 0, 1) && !check_char_collision(&char_player, 0, 1))
                 {
                     camera_focus = false;
 
                     char_player.facing = down;
-                    walk_counter(0, 1);
+                    walk_distance(&char_player, 0, 1);
                 }
                 else
                 {
@@ -1004,13 +1162,13 @@ void Update_Joypad(void) //* Updates player action using button presses
             }
             else
             {
-                if (PlayerControlFlag && !Call_Check_Tile_Collision(bank2, Get_Map(CurrentMap), &char_player, 0, 1) && !check_char_collision(&char_player, 0, 1))
+                if (PlayerControlFlag && !Call_Check_Tile_Collision(bank2, current_map, &char_player, 0, 1) && !check_char_collision(&char_player, 0, 1))
                 {
                     camera_focus = true;
 
-                    Call_Draw_Map_Line(bank2, Get_Map(CurrentMap), down);
+                    Call_Draw_Map_Line(bank2, current_map, down);
 
-                    walk_counter(0, 1);
+                    walk_distance(&char_player, 0, 1);
 
                     char_player.facing = down;
                 }
@@ -1023,18 +1181,18 @@ void Update_Joypad(void) //* Updates player action using button presses
         }
     }
 
-    else if (Joy & J_LEFT && PlayerControlFlag && !check_walk_counter())
+    else if(Joy & J_LEFT && PlayerControlFlag && !check_walk_counter(&char_player))
     {
         if (char_player.pos_x > 0)
         {
             if (char_player.pos_x <= 5 || char_player.pos_x > map_size_x - 5)
             {
-                if (PlayerControlFlag && !Call_Check_Tile_Collision(bank2, Get_Map(CurrentMap), &char_player, -1, 0) && !check_char_collision(&char_player, -1, 0))
+                if (PlayerControlFlag && !Call_Check_Tile_Collision(bank2, current_map, &char_player, -1, 0) && !check_char_collision(&char_player, -1, 0))
                 {
                     camera_focus = false;
 
                     char_player.facing = left;
-                    walk_counter(-1, 0);
+                    walk_distance(&char_player, -1, 0);
                 }
                 else
                 {
@@ -1044,13 +1202,13 @@ void Update_Joypad(void) //* Updates player action using button presses
             }
             else
             {
-                if (PlayerControlFlag && !Call_Check_Tile_Collision(bank2, Get_Map(CurrentMap), &char_player, -1, 0) && !check_char_collision(&char_player, -1, 0))
+                if (PlayerControlFlag && !Call_Check_Tile_Collision(bank2, current_map, &char_player, -1, 0) && !check_char_collision(&char_player, -1, 0))
                 {
                     camera_focus = true;
 
-                    Call_Draw_Map_Line(bank2, Get_Map(CurrentMap), left);
+                    Call_Draw_Map_Line(bank2, current_map, left);
 
-                    walk_counter(-1, 0);
+                    walk_distance(&char_player, -1, 0);
 
                     char_player.facing = left;
                 }
@@ -1063,18 +1221,18 @@ void Update_Joypad(void) //* Updates player action using button presses
         }
     }
 
-    else if (Joy & J_RIGHT && PlayerControlFlag && !check_walk_counter())
+    else if (Joy & J_RIGHT && PlayerControlFlag && !check_walk_counter(&char_player))
     {
         if (char_player.pos_x < map_size_x - 1)
         {
             if (char_player.pos_x < 5 || char_player.pos_x >= map_size_x - 5)
             {
-                if (PlayerControlFlag && !Call_Check_Tile_Collision(bank2, Get_Map(CurrentMap), &char_player, 1, 0) && !check_char_collision(&char_player, 1, 0))
+                if (PlayerControlFlag && !Call_Check_Tile_Collision(bank2, current_map, &char_player, 1, 0) && !check_char_collision(&char_player, 1, 0))
                 {
                     camera_focus = false;
 
                     char_player.facing = right;
-                    walk_counter(1, 0);
+                    walk_distance(&char_player, 1, 0);
                 }
                 else
                 {
@@ -1084,13 +1242,13 @@ void Update_Joypad(void) //* Updates player action using button presses
             }
             else
             {
-                if (PlayerControlFlag && !Call_Check_Tile_Collision(bank2, Get_Map(CurrentMap), &char_player, 1, 0) && !check_char_collision(&char_player, 1, 0))
+                if (PlayerControlFlag && !Call_Check_Tile_Collision(bank2, current_map, &char_player, 1, 0) && !check_char_collision(&char_player, 1, 0))
                 {
                     camera_focus = true;
 
-                    Call_Draw_Map_Line(bank2, Get_Map(CurrentMap), right);
+                    Call_Draw_Map_Line(bank2, current_map, right);
 
-                    walk_counter(1, 0);
+                    walk_distance(&char_player, 1, 0);
 
                     char_player.facing = right;
                 }
@@ -1104,7 +1262,7 @@ void Update_Joypad(void) //* Updates player action using button presses
     }
 }
 
-void test_update_npc(void)
+void test_update_npc()
 {
     j = rand();
     if (j >= 0 && j <= 20)
@@ -1171,6 +1329,19 @@ void Update_Anim_Walk()
     }
 }
 
-void Update_NPC(void)
+void Update_Chest()
+{
+    for(i = 0; i < 10; i++)
+    {
+        tempChest = current_map->event_chest[i];
+
+        if(tempChest != NULL && flag_switch[tempChest->flag_switch] == true && ((char_player.pos_x <= tempChest->pos_x + 5 && char_player.pos_x + 5 >= tempChest->pos_x) && (char_player.pos_y <= tempChest->pos_y + 5 && char_player.pos_y + 5 >= tempChest->pos_y)))
+        {
+            Call_Draw_Tile_At(bank2, tempChest->pos_x, tempChest->pos_y, 59);
+        }
+    }
+}
+
+void Update_NPC()
 {
 }

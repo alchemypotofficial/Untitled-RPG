@@ -26,17 +26,19 @@ extern INT8 i, j, k, l, m, n;
 
 extern GameActor* party[4];
 
+extern const GameEquip* temp_equip;
+
 extern unsigned char inventory[99];
 
 extern unsigned char inv_amount[99];
 
-extern unsigned char equipment_weapon[30];
+extern const GameEquip* equipment_weapon[30];
 
-extern unsigned char equipment_secondary[30];
+extern const GameEquip* equipment_secondary[30];
 
-extern unsigned char equipment_armor[30];
+extern const GameEquip* equipment_armor[30];
 
-extern unsigned char equipment_accessory[30];
+extern const GameEquip* equipment_accessory[30];
 
 extern unsigned char parsed_decimal[4];
 
@@ -96,51 +98,270 @@ const unsigned char armor_title[8] = {0x01, 0x3B, 0x27, 0x22, 0x24, 0x27, 0x01, 
 
 const unsigned char accessory_title[8] = {0x3B, 0x18, 0x18, 0x1A, 0x29, 0x29, 0x24, 0x55};
 
-void Add_Equip(GameEquip* equip) //* Adds equip into equipment inventory.
+void Add_Equip(const GameEquip* equip) //* Adds equip into equipment inventory.
 {
-    if(equip->equip_type == weapon)
+    if(equip != &equip_null)
     {
-        for(i = 0; i < 30; i++)
+        if(equip->equip_type == weapon)
         {
-            if(equipment_weapon[i] == 0)
+            for(i = 0; i < 30; i++)
             {
-                equipment_weapon[i] = equip->equip_id;
-                return;
+                if(equipment_weapon[i] == &equip_null)
+                {
+                    equipment_weapon[i] = equip;
+                    return;
+                }
+            }
+        }
+        else if(equip->equip_type == secondary)
+        {
+            for(i = 0; i < 30; i++)
+            {
+                if(equipment_secondary[i] == &equip_null)
+                {
+                    equipment_secondary[i] = equip;
+                    return;
+                }
+            }
+        }
+        else if(equip->equip_type == armor)
+        {
+            for(i = 0; i < 30; i++)
+            {
+                if(equipment_armor[i] == &equip_null)
+                {
+                    equipment_armor[i] = equip;
+                    return;
+                }
+            }
+        }
+        else if(equip->equip_type == accessory)
+        {
+            for(i = 0; i < 30; i++)
+            {
+                if(equipment_accessory[i] == &equip_null)
+                {
+                    equipment_accessory[i] = equip;
+                    return;
+                }
             }
         }
     }
-    else if(equip->equip_type == secondary)
+}
+
+void Unequip_Equipment(GameActor* actor, UBYTE equipment_slot)
+{
+    switch(equipment_slot)
     {
-        for(i = 0; i < 30; i++)
-        {
-            if(equipment_secondary[i] == 0)
-            {
-                equipment_secondary[i] = equip->equip_id;
-                return;
-            }
-        }
+        case weapon_slot:
+            Add_Equip(actor->equipment[weapon_slot]);
+
+            actor->strength -= actor->equipment[weapon_slot]->strength;
+            actor->wisdom -= actor->equipment[weapon_slot]->wisdom;
+            actor->will -= actor->equipment[weapon_slot]->will;
+            actor->agility -= actor->equipment[weapon_slot]->agility;
+            actor->phys_def -= actor->equipment[weapon_slot]->phys_def;
+            actor->magic_def -= actor->equipment[weapon_slot]->magic_def;
+
+            actor->equipment[weapon_slot] = &equip_null;
+            actor->class = traveler;
+            break;
+        case secondary_slot:
+            Add_Equip(actor->equipment[secondary_slot]);
+
+            actor->strength -= actor->equipment[secondary_slot]->strength;
+            actor->wisdom -= actor->equipment[secondary_slot]->wisdom;
+            actor->will -= actor->equipment[secondary_slot]->will;
+            actor->agility -= actor->equipment[secondary_slot]->agility;
+            actor->phys_def -= actor->equipment[secondary_slot]->phys_def;
+            actor->magic_def -= actor->equipment[secondary_slot]->magic_def;
+
+            actor->equipment[secondary_slot] = &equip_null;
+            break;
+        case armor_slot:
+            Add_Equip(actor->equipment[armor_slot]);
+
+            actor->strength -= actor->equipment[armor_slot]->strength;
+            actor->wisdom -= actor->equipment[armor_slot]->wisdom;
+            actor->will -= actor->equipment[armor_slot]->will;
+            actor->agility -= actor->equipment[armor_slot]->agility;
+            actor->phys_def -= actor->equipment[armor_slot]->phys_def;
+            actor->magic_def -= actor->equipment[armor_slot]->magic_def;
+
+            actor->equipment[armor_slot] = &equip_null;
+            break;
+        case accessory_slot:
+            Add_Equip(actor->equipment[accessory_slot]);
+
+            actor->strength -= actor->equipment[accessory_slot]->strength;
+            actor->wisdom -= actor->equipment[accessory_slot]->wisdom;
+            actor->will -= actor->equipment[accessory_slot]->will;
+            actor->agility -= actor->equipment[accessory_slot]->agility;
+            actor->phys_def -= actor->equipment[accessory_slot]->phys_def;
+            actor->magic_def -= actor->equipment[accessory_slot]->magic_def;
+
+            actor->equipment[accessory_slot] = &equip_null;
+            break;
+        default:
+            break;
     }
-    else if(equip->equip_type == armor)
+}
+
+void Equip_Equipment(GameActor* actor, const GameEquip* equip) //* Equips specified actor with specified equip
+{
+    switch(equip->equip_type)
     {
-        for(i = 0; i < 30; i++)
-        {
-            if(equipment_armor[i] == 0)
-            {
-                equipment_armor[i] = equip->equip_id;
-                return;
-            }
-        }
+        case weapon:
+            actor->strength -= actor->equipment[weapon_slot]->strength;
+            actor->wisdom -= actor->equipment[weapon_slot]->wisdom;
+            actor->will -= actor->equipment[weapon_slot]->will;
+            actor->agility -= actor->equipment[weapon_slot]->agility;
+            actor->phys_def -= actor->equipment[weapon_slot]->phys_def;
+            actor->magic_def -= actor->equipment[weapon_slot]->magic_def;
+
+            actor->equipment[weapon_slot] = equip;
+
+            actor->strength += equip->strength;
+            actor->wisdom += equip->wisdom;
+            actor->will += equip->will;
+            actor->agility += equip->agility;
+            actor->phys_def += equip->phys_def;
+            actor->magic_def += equip->magic_def;
+
+            actor->class = equip->class_type;
+            break;
+        case secondary:
+            actor->strength -= actor->equipment[secondary_slot]->strength;
+            actor->wisdom -= actor->equipment[secondary_slot]->wisdom;
+            actor->will -= actor->equipment[secondary_slot]->will;
+            actor->agility -= actor->equipment[secondary_slot]->agility;
+            actor->phys_def -= actor->equipment[secondary_slot]->phys_def;
+            actor->magic_def -= actor->equipment[secondary_slot]->magic_def;
+
+            actor->equipment[secondary_slot] = equip;
+
+            actor->strength += equip->strength;
+            actor->wisdom += equip->wisdom;
+            actor->will += equip->will;
+            actor->agility += equip->agility;
+            actor->phys_def += equip->phys_def;
+            actor->magic_def += equip->magic_def;
+            break;
+        case armor:
+            actor->strength -= actor->equipment[armor_slot]->strength;
+            actor->wisdom -= actor->equipment[armor_slot]->wisdom;
+            actor->will -= actor->equipment[armor_slot]->will;
+            actor->agility -= actor->equipment[armor_slot]->agility;
+            actor->phys_def -= actor->equipment[armor_slot]->phys_def;
+            actor->magic_def -= actor->equipment[armor_slot]->magic_def;
+
+            actor->equipment[armor_slot] = equip;
+
+            actor->strength += equip->strength;
+            actor->wisdom += equip->wisdom;
+            actor->will += equip->will;
+            actor->agility += equip->agility;
+            actor->phys_def += equip->phys_def;
+            actor->magic_def += equip->magic_def;
+            break;
+        case accessory:
+            actor->strength -= actor->equipment[accessory_slot]->strength;
+            actor->wisdom -= actor->equipment[accessory_slot]->wisdom;
+            actor->will -= actor->equipment[accessory_slot]->will;
+            actor->agility -= actor->equipment[accessory_slot]->agility;
+            actor->phys_def -= actor->equipment[accessory_slot]->phys_def;
+            actor->magic_def -= actor->equipment[accessory_slot]->magic_def;
+
+            actor->equipment[accessory_slot] = equip;
+
+            actor->strength += equip->strength;
+            actor->wisdom += equip->wisdom;
+            actor->will += equip->will;
+            actor->agility += equip->agility;
+            actor->phys_def += equip->phys_def;
+            actor->magic_def += equip->magic_def;
+            break;
+        default:
+            break;
     }
-    else if(equip->equip_type == accessory)
+}
+
+void Equip_Equipment_To_Slot(GameActor* actor, const GameEquip* equip, UBYTE equipment_slot) //* Equips specified actor with specified equip to specified slot.
+{
+    switch(equipment_slot)
     {
-        for(i = 0; i < 30; i++)
-        {
-            if(equipment_accessory[i] == 0)
-            {
-                equipment_accessory[i] = equip->equip_id;
-                return;
-            }
-        }
+        case weapon_slot:
+            actor->strength -= actor->equipment[weapon_slot]->strength;
+            actor->wisdom -= actor->equipment[weapon_slot]->wisdom;
+            actor->will -= actor->equipment[weapon_slot]->will;
+            actor->agility -= actor->equipment[weapon_slot]->agility;
+            actor->phys_def -= actor->equipment[weapon_slot]->phys_def;
+            actor->magic_def -= actor->equipment[weapon_slot]->magic_def;
+
+            actor->equipment[weapon_slot] = equip;
+
+            actor->strength += equip->strength;
+            actor->wisdom += equip->wisdom;
+            actor->will += equip->will;
+            actor->agility += equip->agility;
+            actor->phys_def += equip->phys_def;
+            actor->magic_def += equip->magic_def;
+
+            actor->class = equip->class_type;
+            break;
+        case secondary_slot:
+            actor->strength -= actor->equipment[secondary_slot]->strength;
+            actor->wisdom -= actor->equipment[secondary_slot]->wisdom;
+            actor->will -= actor->equipment[secondary_slot]->will;
+            actor->agility -= actor->equipment[secondary_slot]->agility;
+            actor->phys_def -= actor->equipment[secondary_slot]->phys_def;
+            actor->magic_def -= actor->equipment[secondary_slot]->magic_def;
+
+            actor->equipment[secondary_slot] = equip;
+
+            actor->strength += equip->strength;
+            actor->wisdom += equip->wisdom;
+            actor->will += equip->will;
+            actor->agility += equip->agility;
+            actor->phys_def += equip->phys_def;
+            actor->magic_def += equip->magic_def;
+            break;
+        case armor_slot:
+            actor->strength -= actor->equipment[armor_slot]->strength;
+            actor->wisdom -= actor->equipment[armor_slot]->wisdom;
+            actor->will -= actor->equipment[armor_slot]->will;
+            actor->agility -= actor->equipment[armor_slot]->agility;
+            actor->phys_def -= actor->equipment[armor_slot]->phys_def;
+            actor->magic_def -= actor->equipment[armor_slot]->magic_def;
+
+            actor->equipment[armor_slot] = equip;
+
+            actor->strength += equip->strength;
+            actor->wisdom += equip->wisdom;
+            actor->will += equip->will;
+            actor->agility += equip->agility;
+            actor->phys_def += equip->phys_def;
+            actor->magic_def += equip->magic_def;
+            break;
+        case accessory_slot:
+            actor->strength -= actor->equipment[accessory_slot]->strength;
+            actor->wisdom -= actor->equipment[accessory_slot]->wisdom;
+            actor->will -= actor->equipment[accessory_slot]->will;
+            actor->agility -= actor->equipment[accessory_slot]->agility;
+            actor->phys_def -= actor->equipment[accessory_slot]->phys_def;
+            actor->magic_def -= actor->equipment[accessory_slot]->magic_def;
+
+            actor->equipment[accessory_slot] = equip;
+
+            actor->strength += equip->strength;
+            actor->wisdom += equip->wisdom;
+            actor->will += equip->will;
+            actor->agility += equip->agility;
+            actor->phys_def += equip->phys_def;
+            actor->magic_def += equip->magic_def;
+            break;
+        default:
+            break;
     }
 }
 
@@ -171,22 +392,22 @@ void Draw_Equip_Class(unsigned char* name, unsigned char* icon, UBYTE tile_x, UB
 
 void Draw_Weapon_Slot(UBYTE equipment_slot, UBYTE equip_slot) //* Draws equip of "equipment_weapon" in specified equip slot.
 {
-    Draw_Equip(equip_slot, Get_Equip(equipment_weapon[equipment_slot])->name);
+    Draw_Equip(equip_slot, equipment_weapon[equipment_slot]->name);
 }
 
 void Draw_Secondary_Slot(UBYTE equipment_slot, UBYTE equip_slot) //* Draws equip of "equipment_secondary" in specified equip slot.
 {
-    Draw_Equip(equip_slot, Get_Equip(equipment_secondary[equipment_slot])->name);
+    Draw_Equip(equip_slot, equipment_secondary[equipment_slot]->name);
 }
 
 void Draw_Armor_Slot(UBYTE equipment_slot, UBYTE equip_slot) //* Draws equip of "equipment_armor" in specified equip slot.
 {
-    Draw_Equip(equip_slot, Get_Equip(equipment_armor[equipment_slot])->name);
+    Draw_Equip(equip_slot, equipment_armor[equipment_slot]->name);
 }
 
 void Draw_Accessory_Slot(UBYTE equipment_slot, UBYTE equip_slot) //* Draws equip of "equipment_accesory" in specified equip slot.
 {
-    Draw_Equip(equip_slot, Get_Equip(equipment_accessory[equipment_slot])->name);
+    Draw_Equip(equip_slot, equipment_accessory[equipment_slot]->name);
 }
 
 void Refresh_Actor_Stats(GameActor* actor) //* Draws actor's stats.
@@ -196,11 +417,11 @@ void Refresh_Actor_Stats(GameActor* actor) //* Draws actor's stats.
 
     Draw_Equip_Class(Get_Class(actor->class)->name, Get_Class(actor->class)->icon, 14, 1);
 
-    Call_Draw_Number(bank12, actor->strength + Get_Equip(actor->equipped[0])->strength + Get_Equip(actor->equipped[1])->strength + Get_Equip(actor->equipped[2])->strength + Get_Equip(actor->equipped[3])->strength, 5, 4);
-    Call_Draw_Number(bank12, actor->wisdom + Get_Equip(actor->equipped[0])->wisdom + Get_Equip(actor->equipped[1])->wisdom + Get_Equip(actor->equipped[2])->wisdom + Get_Equip(actor->equipped[3])->wisdom, 5, 6);
-    Call_Draw_Number(bank12, actor->will + Get_Equip(actor->equipped[0])->will + Get_Equip(actor->equipped[1])->will + Get_Equip(actor->equipped[2])->will + Get_Equip(actor->equipped[3])->will, 5, 8);
-    Call_Draw_Number(bank12, actor->phys_def + Get_Equip(actor->equipped[0])->phys_def + Get_Equip(actor->equipped[1])->phys_def + Get_Equip(actor->equipped[2])->phys_def + Get_Equip(actor->equipped[3])->phys_def, 5, 10);
-    Call_Draw_Number(bank12, actor->magic_def + Get_Equip(actor->equipped[0])->magic_def + Get_Equip(actor->equipped[1])->magic_def + Get_Equip(actor->equipped[2])->magic_def + Get_Equip(actor->equipped[3])->magic_def, 5, 12);
+    Call_Draw_Number(bank12, actor->strength, 5, 4);
+    Call_Draw_Number(bank12, actor->wisdom, 5, 6);
+    Call_Draw_Number(bank12, actor->will, 5, 8);
+    Call_Draw_Number(bank12, actor->phys_def, 5, 10);
+    Call_Draw_Number(bank12, actor->magic_def, 5, 12);
 }
 
 void Draw_Actor_Equip(UBYTE party_slot) //* Draws actor's name and stats.
@@ -233,33 +454,33 @@ void Draw_Actor_Equip(UBYTE party_slot) //* Draws actor's name and stats.
     }
 }
 
-void Draw_Equip_Description(GameEquip* equip) //* Draws description of specified equip.
+void Draw_Equip_Description(const GameEquip* equip) //* Draws description of specified equip.
 {
     set_win_tiles(1, 15, 18, 2, equip->description);
 }
 
-void Draw_Equip_Description_Large(GameEquip* equip)
+void Draw_Equip_Description_Large(const GameEquip* equip)
 {
     set_win_tiles(1, 14, 18, 2, equip->description);
 }
 
 void Draw_Equipped(GameActor* actor) //* Draws actor's equipped equip.
 {
-    set_win_tiles(12, 4, 7, 1, Get_Equip(actor->equipped[weapon_slot])->name);
-    set_win_tiles(11, 4, 1, 1, Get_Equip(actor->equipped[weapon_slot])->icon);
-    if(actor->equipped[weapon_slot] == 0){set_win_tiles(12, 4, 7, 1, none_name);}
+    set_win_tiles(12, 4, 7, 1, actor->equipment[weapon_slot]->name);
+    set_win_tiles(11, 4, 1, 1, actor->equipment[weapon_slot]->icon);
+    if(actor->equipment[weapon_slot] == &equip_null){set_win_tiles(12, 4, 7, 1, none_name);}
 
-    set_win_tiles(12, 6, 7, 1, Get_Equip(actor->equipped[secondary_slot])->name);
-    set_win_tiles(11, 6, 1, 1, Get_Equip(actor->equipped[secondary_slot])->icon);
-    if(actor->equipped[secondary_slot] == 0){set_win_tiles(12, 6, 7, 1, none_name);}
+    set_win_tiles(12, 6, 7, 1, actor->equipment[secondary_slot]->name);
+    set_win_tiles(11, 6, 1, 1, actor->equipment[secondary_slot]->icon);
+    if(actor->equipment[secondary_slot] == &equip_null){set_win_tiles(12, 6, 7, 1, none_name);}
 
-    set_win_tiles(12, 8, 7, 1, Get_Equip(actor->equipped[armor_slot])->name);
-    set_win_tiles(11, 8, 1, 1, Get_Equip(actor->equipped[armor_slot])->icon);
-    if(actor->equipped[armor_slot] == 0){set_win_tiles(12, 8, 7, 1, none_name);}
+    set_win_tiles(12, 8, 7, 1, actor->equipment[armor_slot]->name);
+    set_win_tiles(11, 8, 1, 1, actor->equipment[armor_slot]->icon);
+    if(actor->equipment[armor_slot] == &equip_null){set_win_tiles(12, 8, 7, 1, none_name);}
     
-    set_win_tiles(12, 10, 7, 1, Get_Equip(actor->equipped[accessory_slot])->name);
-    set_win_tiles(11, 10, 1, 1, Get_Equip(actor->equipped[accessory_slot])->icon);
-    if(actor->equipped[accessory_slot] == 0){set_win_tiles(12, 10, 7, 1, none_name);}
+    set_win_tiles(12, 10, 7, 1, actor->equipment[accessory_slot]->name);
+    set_win_tiles(11, 10, 1, 1, actor->equipment[accessory_slot]->icon);
+    if(actor->equipment[accessory_slot] == &equip_null){set_win_tiles(12, 10, 7, 1, none_name);}
 }
 
 void Draw_Equip_Slots() //* Draws slot for equipment list.
@@ -318,12 +539,12 @@ void Draw_Equip_Menu() //* Draws equip menu for "actor_y".
 
     set_win_tiles(10, 4, 1, 1, Equip_Pointer);
 
-    Draw_Equip_Description(Get_Equip(party[actor_y]->equipped[0]));
+    Draw_Equip_Description(party[actor_y]->equipment[0]);
 
     fade_in();
 }
 
-void Draw_List_Slot(GameEquip* equip, UBYTE slot) //* Draws slots of equipment list.
+void Draw_List_Slot(const GameEquip* equip, UBYTE slot) //* Draws slots of equipment list.
 {
     switch(slot)
     {
@@ -378,34 +599,34 @@ void Draw_Equip_List(UBYTE equip_type) //* Draws specified equipment list.
         case 0:
             set_win_tiles(10, 4, 8, 1, weapon_title);
 
-            Draw_List_Slot(Get_Equip(equipment_weapon[0]), 0);
-            Draw_List_Slot(Get_Equip(equipment_weapon[1]), 1);
-            Draw_List_Slot(Get_Equip(equipment_weapon[2]), 2);
-            Draw_List_Slot(Get_Equip(equipment_weapon[3]), 3);
+            Draw_List_Slot(equipment_weapon[0], 0);
+            Draw_List_Slot(equipment_weapon[1], 1);
+            Draw_List_Slot(equipment_weapon[2], 2);
+            Draw_List_Slot(equipment_weapon[3], 3);
             break;
         case 1:
             set_win_tiles(11, 4, 8, 1, secondary_title);
 
-            Draw_List_Slot(Get_Equip(equipment_secondary[0]), 0);
-            Draw_List_Slot(Get_Equip(equipment_secondary[1]), 1);
-            Draw_List_Slot(Get_Equip(equipment_secondary[2]), 2);
-            Draw_List_Slot(Get_Equip(equipment_secondary[3]), 3);
+            Draw_List_Slot(equipment_secondary[0], 0);
+            Draw_List_Slot(equipment_secondary[1], 1);
+            Draw_List_Slot(equipment_secondary[2], 2);
+            Draw_List_Slot(equipment_secondary[3], 3);
             break;
         case 2:
             set_win_tiles(10, 4, 8, 1, armor_title);
 
-            Draw_List_Slot(Get_Equip(equipment_armor[0]), 0);
-            Draw_List_Slot(Get_Equip(equipment_armor[1]), 1);
-            Draw_List_Slot(Get_Equip(equipment_armor[2]), 2);
-            Draw_List_Slot(Get_Equip(equipment_armor[3]), 3);
+            Draw_List_Slot(equipment_armor[0], 0);
+            Draw_List_Slot(equipment_armor[1], 1);
+            Draw_List_Slot(equipment_armor[2], 2);
+            Draw_List_Slot(equipment_armor[3], 3);
             break;
         case 3:
             set_win_tiles(11, 4, 8, 1, accessory_title);
 
-            Draw_List_Slot(Get_Equip(equipment_accessory[0]), 0);
-            Draw_List_Slot(Get_Equip(equipment_accessory[1]), 1);
-            Draw_List_Slot(Get_Equip(equipment_accessory[2]), 2);
-            Draw_List_Slot(Get_Equip(equipment_accessory[3]), 3);
+            Draw_List_Slot(equipment_accessory[0], 0);
+            Draw_List_Slot(equipment_accessory[1], 1);
+            Draw_List_Slot(equipment_accessory[2], 2);
+            Draw_List_Slot(equipment_accessory[3], 3);
             break;
         default:
             break;
@@ -418,23 +639,7 @@ void Draw_Equip_List(UBYTE equip_type) //* Draws specified equipment list.
 
 void Draw_Equip_Pointer() //* Draws pointer for selected actor's equipped.
 {
-    switch(equip_y)
-    {
-        case 0:
-            set_win_tiles(10, 4, 1, 1, Equip_Pointer);
-            break;
-        case 1:
-            set_win_tiles(10, 6, 1, 1, Equip_Pointer);
-            break;
-        case 2:
-            set_win_tiles(10, 8, 1, 1, Equip_Pointer);
-            break;
-        case 3:
-            set_win_tiles(10, 10, 1, 1, Equip_Pointer);
-            break;
-        default:
-            break;
-    }
+    set_win_tiles(10, 4 + equip_y * 2, 1, 1, Equip_Pointer);
 }
 
 void Refresh_Equip_List() //* Draws equipment list using "CurrentEquipSelection".
@@ -442,72 +647,44 @@ void Refresh_Equip_List() //* Draws equipment list using "CurrentEquipSelection"
     switch(equip_y)
     {
         case 0:
-            Draw_List_Slot(Get_Equip(equipment_weapon[0 + CurrentEquipSelection]), 0);
-            Draw_List_Slot(Get_Equip(equipment_weapon[1 + CurrentEquipSelection]), 1);
-            Draw_List_Slot(Get_Equip(equipment_weapon[2 + CurrentEquipSelection]), 2);
-            Draw_List_Slot(Get_Equip(equipment_weapon[3 + CurrentEquipSelection]), 3);
+            Draw_List_Slot(equipment_weapon[CurrentEquipSelection], 0);
+            Draw_List_Slot(equipment_weapon[1 + CurrentEquipSelection], 1);
+            Draw_List_Slot(equipment_weapon[2 + CurrentEquipSelection], 2);
+            Draw_List_Slot(equipment_weapon[3 + CurrentEquipSelection], 3);
             break;
         case 1:
-            Draw_List_Slot(Get_Equip(equipment_secondary[0 + CurrentEquipSelection]), 0);
-            Draw_List_Slot(Get_Equip(equipment_secondary[1 + CurrentEquipSelection]), 1);
-            Draw_List_Slot(Get_Equip(equipment_secondary[2 + CurrentEquipSelection]), 2);
-            Draw_List_Slot(Get_Equip(equipment_secondary[3 + CurrentEquipSelection]), 3);
+            Draw_List_Slot(equipment_secondary[CurrentEquipSelection], 0);
+            Draw_List_Slot(equipment_secondary[1 + CurrentEquipSelection], 1);
+            Draw_List_Slot(equipment_secondary[2 + CurrentEquipSelection], 2);
+            Draw_List_Slot(equipment_secondary[3 + CurrentEquipSelection], 3);
             break;
         case 2:
-            Draw_List_Slot(Get_Equip(equipment_armor[0 + CurrentEquipSelection]), 0);
-            Draw_List_Slot(Get_Equip(equipment_armor[1 + CurrentEquipSelection]), 1);
-            Draw_List_Slot(Get_Equip(equipment_armor[2 + CurrentEquipSelection]), 2);
-            Draw_List_Slot(Get_Equip(equipment_armor[3 + CurrentEquipSelection]), 3);
+            Draw_List_Slot(equipment_armor[CurrentEquipSelection], 0);
+            Draw_List_Slot(equipment_armor[1 + CurrentEquipSelection], 1);
+            Draw_List_Slot(equipment_armor[2 + CurrentEquipSelection], 2);
+            Draw_List_Slot(equipment_armor[3 + CurrentEquipSelection], 3);
             break;
         case 3:
-            Draw_List_Slot(Get_Equip(equipment_accessory[0 + CurrentEquipSelection]), 0);
-            Draw_List_Slot(Get_Equip(equipment_accessory[1 + CurrentEquipSelection]), 1);
-            Draw_List_Slot(Get_Equip(equipment_accessory[2 + CurrentEquipSelection]), 2);
-            Draw_List_Slot(Get_Equip(equipment_accessory[3 + CurrentEquipSelection]), 3);
+            Draw_List_Slot(equipment_accessory[CurrentEquipSelection], 0);
+            Draw_List_Slot(equipment_accessory[1 + CurrentEquipSelection], 1);
+            Draw_List_Slot(equipment_accessory[2 + CurrentEquipSelection], 2);
+            Draw_List_Slot(equipment_accessory[3 + CurrentEquipSelection], 3);
             break;
         default:
             break;
     }
 }
 
-void Draw_Equip_Stats(GameActor* actor, GameEquip* equip, UBYTE equipment_slot) //* Draws stat differences between currently equipped equip and selected equip.
+void Draw_Stat_Differences(GameActor* actor, const GameEquip* equip, UBYTE equipment_slot) //* Draws stat differences between currently equipped equip and selected equip.
 {
-    switch(equipment_slot)
-    {
-        case weapon_slot:
-            Call_Draw_Number(bank12, actor->strength + Get_Equip(actor->equipped[1])->strength + Get_Equip(actor->equipped[2])->strength + Get_Equip(actor->equipped[3])->strength + equip->strength, 5, 4);
-            Call_Draw_Number(bank12, actor->wisdom + Get_Equip(actor->equipped[1])->wisdom + Get_Equip(actor->equipped[2])->wisdom + Get_Equip(actor->equipped[3])->wisdom + equip->wisdom, 5, 6);
-            Call_Draw_Number(bank12, actor->will + Get_Equip(actor->equipped[1])->will + Get_Equip(actor->equipped[2])->will + Get_Equip(actor->equipped[3])->will + equip->will, 5, 8);
-            Call_Draw_Number(bank12, actor->phys_def + Get_Equip(actor->equipped[1])->phys_def + Get_Equip(actor->equipped[2])->phys_def + Get_Equip(actor->equipped[3])->phys_def + equip->phys_def, 5, 10);
-            Call_Draw_Number(bank12, actor->magic_def + Get_Equip(actor->equipped[1])->magic_def + Get_Equip(actor->equipped[2])->magic_def + Get_Equip(actor->equipped[3])->magic_def + equip->magic_def, 5, 12);
-            break;
-        case secondary_slot:
-            Call_Draw_Number(bank12, actor->strength + Get_Equip(actor->equipped[0])->strength + Get_Equip(actor->equipped[2])->strength + Get_Equip(actor->equipped[3])->strength + equip->strength, 5, 4);
-            Call_Draw_Number(bank12, actor->wisdom + Get_Equip(actor->equipped[0])->wisdom + Get_Equip(actor->equipped[2])->wisdom + Get_Equip(actor->equipped[3])->wisdom + equip->wisdom, 5, 6);
-            Call_Draw_Number(bank12, actor->will + Get_Equip(actor->equipped[0])->will + Get_Equip(actor->equipped[2])->will + Get_Equip(actor->equipped[3])->will + equip->will, 5, 8);
-            Call_Draw_Number(bank12, actor->phys_def + Get_Equip(actor->equipped[0])->phys_def + Get_Equip(actor->equipped[2])->phys_def + Get_Equip(actor->equipped[3])->phys_def + equip->phys_def, 5, 10);
-            Call_Draw_Number(bank12, actor->magic_def + Get_Equip(actor->equipped[0])->magic_def + Get_Equip(actor->equipped[2])->magic_def + Get_Equip(actor->equipped[3])->magic_def + equip->magic_def, 5, 12);
-            break;
-        case armor_slot:
-            Call_Draw_Number(bank12, actor->strength + Get_Equip(actor->equipped[0])->strength + Get_Equip(actor->equipped[1])->strength + Get_Equip(actor->equipped[3])->strength + equip->strength, 5, 4);
-            Call_Draw_Number(bank12, actor->wisdom + Get_Equip(actor->equipped[0])->wisdom + Get_Equip(actor->equipped[1])->wisdom + Get_Equip(actor->equipped[3])->wisdom + equip->wisdom, 5, 6);
-            Call_Draw_Number(bank12, actor->will + Get_Equip(actor->equipped[0])->will + Get_Equip(actor->equipped[1])->will + Get_Equip(actor->equipped[3])->will + equip->will, 5, 8);
-            Call_Draw_Number(bank12, actor->phys_def + Get_Equip(actor->equipped[0])->phys_def + Get_Equip(actor->equipped[1])->phys_def + Get_Equip(actor->equipped[3])->phys_def + equip->phys_def, 5, 10);
-            Call_Draw_Number(bank12, actor->magic_def + Get_Equip(actor->equipped[0])->magic_def + Get_Equip(actor->equipped[1])->magic_def + Get_Equip(actor->equipped[3])->magic_def + equip->magic_def, 5, 12);
-            break;
-        case accessory_slot:
-            Call_Draw_Number(bank12, actor->strength + Get_Equip(actor->equipped[0])->strength + Get_Equip(actor->equipped[1])->strength + Get_Equip(actor->equipped[2])->strength + equip->strength, 5, 4);
-            Call_Draw_Number(bank12, actor->wisdom + Get_Equip(actor->equipped[0])->wisdom + Get_Equip(actor->equipped[1])->wisdom + Get_Equip(actor->equipped[2])->wisdom + equip->wisdom, 5, 6);
-            Call_Draw_Number(bank12, actor->will + Get_Equip(actor->equipped[0])->will + Get_Equip(actor->equipped[1])->will + Get_Equip(actor->equipped[2])->will + equip->will, 5, 8);
-            Call_Draw_Number(bank12, actor->phys_def + Get_Equip(actor->equipped[0])->phys_def + Get_Equip(actor->equipped[1])->phys_def + Get_Equip(actor->equipped[2])->phys_def + equip->phys_def, 5, 10);
-            Call_Draw_Number(bank12, actor->magic_def + Get_Equip(actor->equipped[0])->magic_def + Get_Equip(actor->equipped[1])->magic_def + Get_Equip(actor->equipped[2])->magic_def + equip->magic_def, 5, 12);
-            break;
-        default:
-            break;
-    }
+    Call_Draw_Number(bank12, actor->strength - actor->equipment[equipment_slot]->strength + equip->strength, 5, 4);
+    Call_Draw_Number(bank12, actor->wisdom - actor->equipment[equipment_slot]->wisdom + equip->wisdom, 5, 6);
+    Call_Draw_Number(bank12, actor->will - actor->equipment[equipment_slot]->will + equip->will, 5, 8);
+    Call_Draw_Number(bank12, actor->phys_def - actor->equipment[equipment_slot]->phys_def + equip->phys_def, 5, 10);
+    Call_Draw_Number(bank12, actor->magic_def - actor->equipment[equipment_slot]->magic_def + equip->magic_def, 5, 12);
 }
 
-void Compare_Stats(GameEquip* equip_1, GameEquip* equip_2) //* Compares stat differences between currently equipped equip and selected equip.
+void Compare_Stats(const GameEquip* equip_1, const GameEquip* equip_2) //* Compares stat differences between currently equipped equip and selected equip.
 {
     if(equip_1->strength > equip_2->strength)
     {
@@ -580,24 +757,24 @@ void Refresh_Stat_Changes() //* Refreshes actor stats to display stat changes an
     switch(equip_y)
     {
         case weapon_slot:
-            Draw_Equip_Stats(party[actor_y], Get_Equip(equipment_weapon[list_y + CurrentEquipSelection]), weapon_slot);
+            Draw_Stat_Differences(party[actor_y], equipment_weapon[list_y + CurrentEquipSelection], weapon_slot);
 
-            Compare_Stats(Get_Equip(equipment_weapon[list_y + CurrentEquipSelection]), Get_Equip(party[actor_y]->equipped[weapon_slot]));
+            Compare_Stats(equipment_weapon[list_y + CurrentEquipSelection], party[actor_y]->equipment[weapon_slot]);
             break;
         case secondary_slot:
-            Draw_Equip_Stats(party[actor_y], Get_Equip(equipment_secondary[list_y + CurrentEquipSelection]), secondary_slot);
+            Draw_Stat_Differences(party[actor_y], equipment_secondary[list_y + CurrentEquipSelection], secondary_slot);
 
-            Compare_Stats(Get_Equip(equipment_secondary[list_y + CurrentEquipSelection]), Get_Equip(party[actor_y]->equipped[secondary_slot]));
+            Compare_Stats(equipment_secondary[list_y + CurrentEquipSelection], party[actor_y]->equipment[secondary_slot]);
             break;
         case armor_slot:
-            Draw_Equip_Stats(party[actor_y], Get_Equip(equipment_armor[list_y + CurrentEquipSelection]), armor_slot);
+            Draw_Stat_Differences(party[actor_y], equipment_armor[list_y + CurrentEquipSelection], armor_slot);
 
-            Compare_Stats(Get_Equip(equipment_armor[list_y + CurrentEquipSelection]), Get_Equip(party[actor_y]->equipped[armor_slot]));
+            Compare_Stats(equipment_armor[list_y + CurrentEquipSelection], party[actor_y]->equipment[armor_slot]);
             break;
         case accessory_slot:
-            Draw_Equip_Stats(party[actor_y], Get_Equip(equipment_accessory[list_y + CurrentEquipSelection]), accessory_slot);
+            Draw_Stat_Differences(party[actor_y], equipment_accessory[list_y + CurrentEquipSelection], accessory_slot);
 
-            Compare_Stats(Get_Equip(equipment_accessory[list_y + CurrentEquipSelection]), Get_Equip(party[actor_y]->equipped[accessory_slot]));
+            Compare_Stats(equipment_accessory[list_y + CurrentEquipSelection], party[actor_y]->equipment[accessory_slot]);
             break;
         default:
             break;
@@ -613,69 +790,33 @@ void Refresh_Equip_Menu() //* Redraws actor's equipped equip and pointer.
     Draw_Equip_Pointer();
 }
 
-void Equip_Equipment(GameActor* actor, GameEquip* equip) //* Equips specified actor with specified equip.
-{
-    switch(equip->equip_type)
-    {
-        case weapon:
-            Add_Equip(Get_Equip(actor->equipped[weapon_slot]));
-
-            actor->equipped[weapon_slot] = equip->equip_id;
-            actor->class = equip->class_type;
-            break;
-        case secondary:
-            Add_Equip(Get_Equip(actor->equipped[secondary_slot]));
-
-            actor->equipped[secondary_slot] = equip->equip_id;
-            break;
-        case armor:
-            Add_Equip(Get_Equip(actor->equipped[armor_slot]));
-
-            actor->equipped[armor_slot] = equip->equip_id;
-            break;
-        case accessory:
-            Add_Equip(Get_Equip(actor->equipped[accessory_slot]));
-
-            actor->equipped[accessory_slot] = equip->equip_id;
-            break;
-        default:
-            break;
-    }
-}
-
 void Equip_Actor(GameActor* actor) //* Equips specified actor with equip selected with "list_y + CurrentEquipSelection".
 {
     switch(equip_y)
     {
         case weapon_slot:
-            held_equip = actor->equipped[weapon_slot];
-
-            actor->equipped[weapon_slot] = Get_Equip(equipment_weapon[list_y + CurrentEquipSelection])->equip_id;
-
-            actor->class = Get_Equip(equipment_weapon[list_y + CurrentEquipSelection])->class_type;
-
-            equipment_weapon[list_y + CurrentEquipSelection] = held_equip;
+            temp_equip = equipment_weapon[list_y + CurrentEquipSelection];
+            equipment_weapon[list_y + CurrentEquipSelection] = actor->equipment[weapon_slot];
+            
+            Equip_Equipment_To_Slot(actor, temp_equip, weapon_slot);
             break;
         case secondary_slot:
-            held_equip = actor->equipped[secondary_slot];
+            temp_equip = equipment_secondary[list_y + CurrentEquipSelection];
+            equipment_secondary[list_y + CurrentEquipSelection] = actor->equipment[secondary_slot];
 
-            actor->equipped[secondary_slot] = Get_Equip(equipment_secondary[list_y + CurrentEquipSelection])->equip_id;
-
-            equipment_secondary[list_y + CurrentEquipSelection] = held_equip;
+            Equip_Equipment_To_Slot(actor, temp_equip, secondary_slot);
             break;
         case armor_slot:
-            held_equip = actor->equipped[armor_slot];
+            temp_equip = equipment_armor[list_y + CurrentEquipSelection];
+            equipment_armor[list_y + CurrentEquipSelection] = actor->equipment[armor_slot];
 
-            actor->equipped[armor_slot] = Get_Equip(equipment_armor[list_y + CurrentEquipSelection])->equip_id;
-
-            equipment_armor[list_y + CurrentEquipSelection] = held_equip;
+            Equip_Equipment_To_Slot(actor, temp_equip, armor_slot);
             break;
         case accessory_slot:
-            held_equip = actor->equipped[accessory_slot];
+            temp_equip = equipment_accessory[list_y + CurrentEquipSelection];
+            equipment_accessory[list_y + CurrentEquipSelection] = actor->equipment[accessory_slot];
 
-            actor->equipped[accessory_slot] = Get_Equip(equipment_accessory[list_y + CurrentEquipSelection])->equip_id;
-            
-            equipment_accessory[list_y + CurrentEquipSelection] = held_equip;
+            Equip_Equipment_To_Slot(actor, temp_equip, accessory_slot);
             break;
         default:
             break;
@@ -701,7 +842,7 @@ void Menu_Equip_Joypad() //* Joypad handler for equip menu.
                 set_win_tiles(10, 4 + 2 * equip_y, 1, 1, Equip_Pointer);
             }
 
-            Draw_Equip_Description(Get_Equip(party[actor_y]->equipped[equip_y]));
+            Draw_Equip_Description(party[actor_y]->equipment[equip_y]);
 
             while(joypad() & J_UP)
             {
@@ -732,16 +873,16 @@ void Menu_Equip_Joypad() //* Joypad handler for equip menu.
             switch(equip_y)
             {
                 case weapon_slot:
-                    Draw_Equip_Description(Get_Equip(equipment_weapon[list_y + CurrentEquipSelection]));
+                    Draw_Equip_Description(equipment_weapon[list_y + CurrentEquipSelection]);
                     break;
                 case secondary_slot:
-                    Draw_Equip_Description(Get_Equip(equipment_secondary[list_y + CurrentEquipSelection]));
+                    Draw_Equip_Description(equipment_secondary[list_y + CurrentEquipSelection]);
                     break;
                 case armor_slot:
-                    Draw_Equip_Description(Get_Equip(equipment_armor[list_y + CurrentEquipSelection]));
+                    Draw_Equip_Description(equipment_armor[list_y + CurrentEquipSelection]);
                     break;
                 case accessory_slot:
-                    Draw_Equip_Description(Get_Equip(equipment_accessory[list_y + CurrentEquipSelection]));
+                    Draw_Equip_Description(equipment_accessory[list_y + CurrentEquipSelection]);
                     break;
                 default:
                     break;
@@ -787,7 +928,7 @@ void Menu_Equip_Joypad() //* Joypad handler for equip menu.
                 set_win_tiles(10, 4 + 2 * equip_y, 1, 1, Equip_Pointer);
             }
 
-            Draw_Equip_Description(Get_Equip(party[actor_y]->equipped[equip_y]));
+            Draw_Equip_Description(party[actor_y]->equipment[equip_y]);
 
             while(joypad() & J_DOWN)
             {
@@ -818,16 +959,16 @@ void Menu_Equip_Joypad() //* Joypad handler for equip menu.
             switch(equip_y)
             {
                 case weapon_slot:
-                    Draw_Equip_Description(Get_Equip(equipment_weapon[list_y + CurrentEquipSelection]));
+                    Draw_Equip_Description(equipment_weapon[list_y + CurrentEquipSelection]);
                     break;
                 case secondary_slot:
-                    Draw_Equip_Description(Get_Equip(equipment_secondary[list_y + CurrentEquipSelection]));
+                    Draw_Equip_Description(equipment_secondary[list_y + CurrentEquipSelection]);
                     break;
                 case armor_slot:
-                    Draw_Equip_Description(Get_Equip(equipment_armor[list_y + CurrentEquipSelection]));
+                    Draw_Equip_Description(equipment_armor[list_y + CurrentEquipSelection]);
                     break;
                 case accessory_slot:
-                    Draw_Equip_Description(Get_Equip(equipment_accessory[list_y + CurrentEquipSelection]));
+                    Draw_Equip_Description(equipment_accessory[list_y + CurrentEquipSelection]);
                     break;
                 default:
                     break;
@@ -870,16 +1011,16 @@ void Menu_Equip_Joypad() //* Joypad handler for equip menu.
             switch(equip_y)
             {
                 case weapon_slot:
-                    Draw_Equip_Description(Get_Equip(equipment_weapon[list_y + CurrentEquipSelection]));
+                    Draw_Equip_Description(equipment_weapon[list_y + CurrentEquipSelection]);
                     break;
                 case secondary_slot:
-                    Draw_Equip_Description(Get_Equip(equipment_secondary[list_y + CurrentEquipSelection]));
+                    Draw_Equip_Description(equipment_secondary[list_y + CurrentEquipSelection]);
                     break;
                 case armor_slot:
-                    Draw_Equip_Description(Get_Equip(equipment_armor[list_y + CurrentEquipSelection]));
+                    Draw_Equip_Description(equipment_armor[list_y + CurrentEquipSelection]);
                     break;
                 case accessory_slot:
-                    Draw_Equip_Description(Get_Equip(equipment_accessory[list_y + CurrentEquipSelection]));
+                    Draw_Equip_Description(equipment_accessory[list_y + CurrentEquipSelection]);
                     break;
                 default:
                     break;
@@ -905,7 +1046,7 @@ void Menu_Equip_Joypad() //* Joypad handler for equip menu.
             CurrentMenu = menu_equip;
 
             Refresh_Equip_Menu();
-            Draw_Equip_Description(Get_Equip(party[actor_y]->equipped[equip_y]));
+            Draw_Equip_Description(party[actor_y]->equipment[equip_y]);
 
             Refresh_Actor_Stats(party[actor_y]);
 
@@ -947,7 +1088,7 @@ void Menu_Equip_Joypad() //* Joypad handler for equip menu.
             Call_Play_Confirm(bank12);
 
             Refresh_Equip_Menu();
-            Draw_Equip_Description(Get_Equip(party[actor_y]->equipped[equip_y]));
+            Draw_Equip_Description(party[actor_y]->equipment[equip_y]);
 
             Refresh_Actor_Stats(party[actor_y]);
 

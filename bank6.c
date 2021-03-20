@@ -15,16 +15,6 @@ extern UBYTE Joy;
 
 extern UBYTE current_message, current_line, total_lines, current_row;
 
-extern UBYTE CurrentMap;
-
-extern UINT8 camera_x, camera_y;
-
-extern UINT8 map_size_x, map_size_y;
-
-extern UINT16 map_x, map_y;
-
-extern UINT16 load_pos_x, load_pos_y;
-
 extern INT8 i, j, k, l, m, n;
 
 extern UINT16 e, f, g, h;
@@ -56,9 +46,9 @@ extern const unsigned char Message_Pointer[1];
 
 extern const unsigned char Message_Background[1];
 
-UBYTE Retrieve_Font_Value()
+UBYTE Retrieve_Font_Value(UINT16 font_pos)
 {
-    return Font_1[g + i];
+    return Font_1[font_pos];
 }
 
 void Load_Window()

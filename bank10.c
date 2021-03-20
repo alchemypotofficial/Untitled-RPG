@@ -8,12 +8,17 @@
 #include "Messages/Message_Health_Brew.c"
 #include "Messages/Message_TestText.c"
 #include "Messages/Message_Intro_1.c"
+#include "Messages/Message_Intro_2.c"
+#include "Messages/Message_Intro_3.c"
+#include "Messages/Message_Intro_4.c"
+#include "Messages/Message_Intro_5.c"
+#include "Messages/Message_Intro_6.c"
+#include "Messages/Message_Intro_7.c"
+#include "Messages/Message_Test.c"
 
 extern UBYTE Joy;
 
 extern UBYTE current_message, current_line, total_lines, current_row, font_value, pointer_tick;
-
-extern UBYTE CurrentMap;
 
 extern UINT8 camera_x, camera_y;
 
@@ -45,36 +50,37 @@ extern void Call_Scroll_Message(UBYTE bank);
 extern void Call_Draw_Pointer(UBYTE bank);
 extern void Call_Reset_Char_Sprites(UBYTE bank);
 
-extern UBYTE Get_Font_Value(UBYTE bank);
+extern UBYTE Get_Font_Value(UBYTE bank, UINT16 font_pos);
 
-void Load_Message_Bank10(GameMessage* message, unsigned char* insert_1, UBYTE length_1)
+void Load_Message_Bank10(const GameMessage* message, unsigned char* insert_1, UBYTE length_1, UBYTE speedable)
 {
     Call_Draw_Message_Box(bank10);
 
     current_line = 0;
+    f = 0;
 
     while(current_line < message->length)
     {
         u_x = 220;
 
-        for(current_row = 0; current_row < 2; current_row += 1)
+        for(current_row = 0; current_row < 2; current_row++)
         {
             for(h = 0; h < 18; h++)
             {
                 e = 18 * current_line;
-                e += h;
+                e += f;
 
-                if(message->message[e] == 180 && message->message[e + 1] == 214 && insert_1 != NULL)
+                if(h < 17 && message->message[e] == 0xFC && message->message[e + 1] == 0xD6 && insert_1 != NULL)
                 {
                     for(u_y = 0; u_y < length_1; u_y++)
                     {
-                        if(joypad() & J_A)
+                        if(joypad() & J_A && speedable)
                         {
                             performant_delay(1);
                         }
                         else
                         {
-                            performant_delay(2);
+                            performant_delay(3);
                         }
 
                         g = insert_1[u_y] - 16;
@@ -83,25 +89,63 @@ void Load_Message_Bank10(GameMessage* message, unsigned char* insert_1, UBYTE le
 
                         for(i = 0; i < 16; i++)
                         {
-                            message_base[i] = Get_Font_Value(bank10);
+                            message_base[i] = Get_Font_Value(bank10, g + i);
                         }
 
                         set_bkg_tileset(u_x, 1, message_base);
 
-                        u_x += 1;
+                        u_x++;
+                        
+                        if(u_y < length_1 - 1)
+                        {
+                            h++;
+                        }
                     }
 
-                    h += 1;
+                    f++;
+                }
+                else if(h < 17 && message->message[e] == 0xF9 && message->message[e + 1] == 0xF9 && message->message[e + 2] == 0xF9)
+                {
+                    for(u_y = 0; u_y < 3; u_y++)
+                    {
+                        if(joypad() & J_A && speedable)
+                        {
+                            performant_delay(5);
+                        }
+                        else
+                        {
+                            performant_delay(15);
+                        }
+
+                        g = 69;
+
+                        g = g * 16;
+
+                        for(i = 0; i < 16; i++)
+                        {
+                            message_base[i] = Get_Font_Value(bank10, g + i);
+                        }
+
+                        set_bkg_tileset(u_x, 1, message_base);
+
+                        u_x++;
+                        
+                        if(u_y < 2)
+                        {
+                            h++;
+                            f++;
+                        }
+                    }
                 }
                 else
                 {
-                    if(joypad() & J_A)
+                    if(joypad() & J_A && speedable)
                     {
                         performant_delay(1);
                     }
                     else
                     {
-                        performant_delay(2);
+                        performant_delay(3);
                     }
 
                     g = message->message[e] - 180;
@@ -110,16 +154,19 @@ void Load_Message_Bank10(GameMessage* message, unsigned char* insert_1, UBYTE le
 
                     for(i = 0; i < 16; i++)
                     {
-                        message_base[i] = Get_Font_Value(bank10);
+                        message_base[i] = Get_Font_Value(bank10, g + i);
                     }
 
                     set_bkg_tileset(u_x, 1, message_base);
 
-                    u_x += 1;
+                    u_x++;
                 }
+
+                f++;
             }
 
-            current_line += 1;
+            current_line++;
+            f = 0;
         }
 
         set_win_tiles(18, 3, 1, 1, Message_Pointer);
@@ -135,11 +182,9 @@ void Load_Message_Bank10(GameMessage* message, unsigned char* insert_1, UBYTE le
         {
             performant_delay(1);
 
-            Joy = joypad();
-
             Call_Draw_Pointer(bank10);
 
-            if(Joy & J_A)
+            if(joypad() & J_A)
             {
                 set_win_tiles(18, 3, 1, 1, Message_Background);
 
@@ -157,9 +202,4 @@ void Load_Message_Bank10(GameMessage* message, unsigned char* insert_1, UBYTE le
     Call_Reset_Char_Sprites(bank10);
 
     Call_Close_Message_Box(bank10);
-
-    while(joypad() & J_A)
-    {
-        performant_delay(1);
-    }
 }

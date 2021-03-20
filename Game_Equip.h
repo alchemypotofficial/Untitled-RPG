@@ -1,4 +1,5 @@
 #include <gb/gb.h>
+#include "Game_Skill.h"
 
 #ifndef GAME_EQUIP
 #define GAME_EQUIP
@@ -18,12 +19,13 @@ typedef struct GameEquip
     UBYTE luck;
     UBYTE phys_def;
     UBYTE magic_def;
+    const GameSkill* skill;
     UBYTE skill_id;
     UINT16 price;
 
 } GameEquip;
 
-extern const GameEquip equip_null_equip;
+extern const GameEquip equip_null;
 
 extern const GameEquip equip_wooden_sword;
 

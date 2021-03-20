@@ -1,18 +1,12 @@
 #include <gb/gb.h>
 #include "Game_Definitions.h"
+#include "Game_Event.h"
+#include "Game_Message.h"
 
 /*  Game Events:  */
-GameEvent event_chest = //* Chest events
-{
-    {0, 1}, //* Chest ID
-    {1, 3}, //* Map ID
-    {11, 15}, //* Pos "X"
-    {11, 11}, //* Pos "Y"
-    {up, up}, //* Read Direction
-    {false, false}, //* Chest used
-    {0, 0}, //* Content ID
-    {3, 3} //* Message ID
-};
+const GameChest chest_null = {0, 0, 0, 0, &message_test, 0};
+const GameChest chest_hiro_house = {1, 5, 5, 0, &message_obtain_health_brew, 1};
+const GameChest chest_plum_village = {2, 26, 5, 1, &message_obtain_health_brew, 2};
 
 const GameSign sign_null = {0, 0, 0, 0};
 const GameSign sign_plum_gravestone = {1, 2, 3, 1};

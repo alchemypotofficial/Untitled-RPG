@@ -1,6 +1,7 @@
 #include <gb/gb.h>
 #include <string.h>
 #include "Game_Definitions.h"
+#include "Game_Functions.h"
 #include "Game_Character.h"
 #include "Game_Map.h"
 #include "Game_Tilemap.h"
@@ -9,15 +10,19 @@
 #include "Tiles/Tileset_2.c"
 #include "Tiles/Tileset_3.c"
 
-UBYTE offset_pos_x = 0, offset_pos_y = 0;
+extern UBYTE offset_pos_x, offset_pos_y;
 
 extern UBYTE Tileset;
 
-extern UBYTE CurrentMap, CurrentMapBank;
+extern UBYTE CurrentMapBank;
+
+extern const GameMap* current_map;
 
 extern UINT8 camera_x, camera_y;
 
 extern UINT8 map_size_x, map_size_y;
+
+extern UINT16 starting_x, starting_y;
 
 extern UINT16 map_x, map_y, map_y2, load_pos_x, load_pos_y, char_pos_x, char_pos_y;
 
@@ -29,13 +34,14 @@ extern void set_bkg_map(UINT8 tile_x, UINT8 tile_y, UINT8 width, UINT8 height, u
 extern void set_win_map(UINT8 tile_x, UINT8 tile_y, UINT8 width, UINT8 height, unsigned char *map_1, unsigned char *map_0);
 extern void set_bkg_tileset(UBYTE first_tile, UBYTE num_tile, unsigned char *tileset);
 
-extern void Call_Draw_Map_Load(UBYTE bank, GameMap* map);
+extern void Call_Draw_Map_Load(UBYTE bank, const GameMap* map);
 extern void Call_Load_Char_Sprite(UBYTE bank, GameCharacter* character, GameSprite* sprite);
-extern void Call_Draw_Map(UBYTE bank, GameMap* map);
-extern void Call_Add_NPC(UBYTE bank, GameCharacter* character, GameNPC* npc);
+extern void Call_Draw_Map(UBYTE bank, const GameMap* map);
+extern void Call_Add_NPC(UBYTE bank, unsigned char name[15], GameNPC* npc, UBYTE pos_x, UBYTE pos_y, UBYTE facing);
 extern void Call_Reset_NPC(UBYTE bank);
 extern void Call_Move_Char(UBYTE bank, GameCharacter* character, UINT8 tile_x, UINT8 tile_y, UINT8 pixel_offset);
 extern void Call_Hide_Char(UBYTE bank, GameCharacter* character);
+extern void Call_Update_Chest(UBYTE bank);
 
 extern GameMap* Get_Map(UBYTE map_id);
 
@@ -73,11 +79,11 @@ void Load_Tileset(UBYTE tileset)
 
     if(tileset == 1)
     {
-        set_bkg_tileset(0, 196, Tileset_1);
+        set_bkg_tileset(0, 204, Tileset_1);
     }
     else if(tileset == 2)
     {
-        set_bkg_tileset(0, 144, Tileset_2);
+        set_bkg_tileset(0, 148, Tileset_2);
     }
     else if(tileset == 3)
     {
@@ -95,8 +101,8 @@ void Load_Map(UINT8 map_id) //* Loads map data into "map" based on the ID given.
         Load_Tileset(1);
         set_bkg_palette(0, 4, Palette_BKG);
 
-        Call_Add_NPC(bank3, &char_npc_1, &npc_test_1);
-        Call_Add_NPC(bank3, &char_npc_2, &npc_test_2);
+        Call_Add_NPC(bank3, "npc_test_1", &npc_test_1, 13, 6, down);
+        Call_Add_NPC(bank3, "npc_test_2", &npc_test_2, 0, 0, down);
     }
     else if(map_id == 1) //* Hiro's House
     {
@@ -114,7 +120,7 @@ void Load_Map(UINT8 map_id) //* Loads map data into "map" based on the ID given.
         Load_Tileset(2);
         set_bkg_palette(0, 4, Palette_BKG);
 
-        Call_Add_NPC(bank3, &char_npc_1, &npc_plum_shop);
+        Call_Add_NPC(bank3, "npc_plum_shop", &npc_plum_shop, 0, 0, down);
     }
     else if(map_id == 3) //* Bud's House
     {
@@ -207,7 +213,7 @@ void Orient_Char(GameCharacter* character)
     }
     else if(char_player.pos_x >= map_size_x - 5)
     {
-        offset_pos_x = map_size_x - 5;
+        offset_pos_x = map_size_x - 10;
     }
     else
     {
@@ -243,12 +249,20 @@ void Draw_Map(GameMap* map) //* Sets player position relative to the screen, dra
 {
     Clear_Map();
 
+    Call_Clear_Char(bank3, &char_npc_1);
+    Call_Clear_Char(bank3, &char_npc_2);
+    Call_Clear_Char(bank3, &char_npc_3);
+    Call_Clear_Char(bank3, &char_npc_4);
+
     map_x = 0;
     map_y = 0;
     load_pos_x = 0;
     load_pos_y = 0;
 
-    CurrentMap = map->map_id;
+    starting_x = char_player.pos_x;
+    starting_y = char_player.pos_y;
+
+    current_map = map;
     CurrentMapBank = map->map_bank;
 
     Call_Reset_NPC(bank3);
@@ -256,16 +270,14 @@ void Draw_Map(GameMap* map) //* Sets player position relative to the screen, dra
 
     Call_Draw_Map_Load(bank3, map);
 
-    Orient_Char(&char_npc_1);
-    Orient_Char(&char_npc_2);
-
     Call_Hide_Char(bank3, &char_npc_1);
     Call_Hide_Char(bank3, &char_npc_2);
+    Call_Update_Chest(bank3);
     
     Orient_Player();
 }
 
-void Reload_Map() //* Reloads map based on "CurrentMap".
+void Reload_Map() //* Reloads map based on "current_map".
 {
     move_bkg(0, 0);
 
@@ -277,10 +289,14 @@ void Reload_Map() //* Reloads map based on "CurrentMap".
     load_pos_x = 0;
     load_pos_y = 0;
 
-    Call_Draw_Map_Load(bank3, Get_Map(CurrentMap));
+    starting_x = char_player.pos_x;
+    starting_y = char_player.pos_y;
+
+    Call_Draw_Map_Load(bank3, current_map);
 
     Orient_Char(&char_npc_1);
     Orient_Char(&char_npc_2);
+    Call_Update_Chest(bank3);
 
     Orient_Player();
 }

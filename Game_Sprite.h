@@ -6,7 +6,7 @@
 typedef struct GameSprite
 {
     unsigned char* tiles;
-
+    UBYTE bank;
 } GameSprite;
 
 typedef struct GameSpritePackage
@@ -47,6 +47,13 @@ extern const GameSprite sprite_soran_down_2;
 extern const GameSprite sprite_soran_left_0;
 extern const GameSprite sprite_soran_right_0;
 
+extern const GameSprite sprite_sashi_up_0;
+extern const GameSprite sprite_sashi_down_0;
+extern const GameSprite sprite_sashi_down_1;
+extern const GameSprite sprite_sashi_down_2;
+extern const GameSprite sprite_sashi_left_0;
+extern const GameSprite sprite_sashi_right_0;
+
 extern const GameSprite sprite_man_up_0;
 extern const GameSprite sprite_man_down_0;
 extern const GameSprite sprite_man_down_1;
@@ -68,6 +75,11 @@ extern const GameSpritePackage sprite_soran_up;
 extern const GameSpritePackage sprite_soran_down;
 extern const GameSpritePackage sprite_soran_left;
 extern const GameSpritePackage sprite_soran_right;
+
+extern const GameSpritePackage sprite_sashi_up;
+extern const GameSpritePackage sprite_sashi_down;
+extern const GameSpritePackage sprite_sashi_left;
+extern const GameSpritePackage sprite_sashi_up;
 
 extern const GameCharSprite sprite_hiro;
 extern const GameCharSprite sprite_bud;

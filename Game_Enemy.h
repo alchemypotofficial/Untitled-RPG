@@ -4,6 +4,13 @@
 #ifndef GAME_ENEMIES
 #define GAME_ENEMIES
 
+typedef struct GameDrop
+{
+    UBYTE drop;
+    UBYTE percentage;
+    
+} GameDrop;
+
 typedef struct GameEnemy
 {
     unsigned char *name;
@@ -11,7 +18,7 @@ typedef struct GameEnemy
     unsigned char *description;
     UBYTE enemy_id;
     UBYTE size[2];
-    UBYTE skill[3];
+    const GameSkill* skill[3];
     UBYTE drop[5];
     UBYTE gold;
     UBYTE experience;
@@ -25,13 +32,14 @@ typedef struct GameEnemy
     UBYTE luck;
     UBYTE phys_def;
     UBYTE magic_def;
+    UBYTE enemy_type;
 
 } GameEnemy;
 
 typedef struct GameEnemyDummy
 {
     UBYTE enemy_id;
-    UBYTE skill[3];
+    const GameSkill* skill[3];
     UBYTE gold;
     UBYTE experience;
     UBYTE ability_point;
@@ -48,6 +56,7 @@ typedef struct GameEnemyDummy
     UBYTE magic_def;
     UBYTE can_attack;
     UBYTE is_killed;
+    UBYTE enemy_type;
 
 } GameEnemyDummy;
 

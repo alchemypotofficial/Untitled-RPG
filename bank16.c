@@ -23,7 +23,7 @@
 
 extern UBYTE Joy, Seed;
 
-extern UBYTE CurrentMap;
+extern const GameMap* current_map;
 
 extern UBYTE clock_tick;
 
@@ -39,7 +39,9 @@ extern UBYTE Tileset;
 
 extern UINT16 party_gold;
 
-extern UBYTE CurrentCombat, CurrentTroop, combat_main_y, combat_selection_y, CurrentTurn, turn_number, total_actors, selected_enemy, enemy_selection[4], action_selection[4], target_selection[7], skill_selection[7], action_order[7], enemy_x, actor_action[4], enemy_action[3];
+extern UBYTE CurrentCombat, CurrentTroop, combat_main_y, combat_selection_y, CurrentTurn, turn_number, total_actors, selected_enemy, enemy_selection[4], action_selection[4], target_selection[7], action_order[7], enemy_x, actor_action[4], enemy_action[3];
+
+extern const GameSkill* skill_selection[7];
 
 extern UBYTE agility[7], turn_order[7], agility_temp, turn_order_temp;
 
@@ -54,6 +56,8 @@ extern INT8 i, j, k, l, m, n, x, y;
 extern UBYTE u_x, u_y;
 
 extern GameActor* party[4];
+
+extern const GameSkill* temp_skill;
 
 extern unsigned char enemy[3];
 
@@ -112,17 +116,17 @@ extern GameSkill* Get_Skill(UBYTE skill_id);
 
 extern void Call_Reload_Map(UBYTE bank);
 
-extern void Call_Execute_Skill(UBYTE bank, UBYTE skill_id, UBYTE action_performer, UBYTE action_target);
+extern void Call_Execute_Skill(UBYTE bank, const GameSkill* skill, UBYTE action_performer, UBYTE action_target);
 extern void Call_Draw_Troop(UBYTE bank, unsigned char* tiles, unsigned char* data);
 extern void Call_Clear_Map(UBYTE bank);
 extern void Call_Move_Char(UBYTE bank, GameCharacter* character, UINT8 tile_x, UINT8 tile_y, UINT8 pixel_offset);
 extern void Call_Load_Font_Menu(UBYTE bank);
 extern void Call_Draw_Number(UBYTE bank, UINT16 number, UBYTE tile_x, UBYTE tile_y);
 extern void Call_Draw_Name(UBYTE bank, UBYTE tile_x, UBYTE tile_y, unsigned char* name, BOOLEAN full_name);
-extern void Call_Draw_Skill_Name(UBYTE bank, GameSkill* skill, UBYTE tile_x, UBYTE tile_y);
+extern void Call_Draw_Skill_Name(UBYTE bank, const GameSkill* skill, UBYTE tile_x, UBYTE tile_y);
 extern void Call_Load_Tileset(UBYTE bank, UBYTE tileset);
-extern void Call_Draw_Skill_Cost(UBYTE bank, GameSkill* skill);
-extern UBYTE Call_Get_Skill_Cost(UBYTE bank, GameSkill* skill);
+extern void Call_Draw_Skill_Cost(UBYTE bank, const GameSkill* skill);
+extern UBYTE Call_Get_Skill_Cost(UBYTE bank, const GameSkill* skill);
 extern void Call_Draw_End_Message(UBYTE bank);
 extern void Call_Set_Actor_Skills(UBYTE bank, GameActor* actor);
 
@@ -141,6 +145,12 @@ const unsigned char Combat_Background[1] = {0x01};
 const unsigned char Combat_Zeros[4] = {0x31, 0x31, 0x31, 0x31};
 
 void Close_Combat();
+void Load_Combat_Main();
+void Update_Combat_Main_Joypad();
+void Update_Combat_Fight_Joypad();
+void Update_Combat_Select_Joypad();
+void Update_Combat_Skill_Joypad();
+void Update_Combat_Skill_Select_Joypad();
 
 GameEnemyDummy* Get_Enemy_Dummy_Combat(UBYTE enemy_dummy_id)
 {
@@ -170,6 +180,28 @@ UBYTE Get_Party_Slot_Filled(UBYTE party_slot)
     else
     {
         return false;
+    }
+}
+
+void Load_Step_Counter()
+{
+    step_counter = rand() % 5 + 5;
+}
+
+void Check_Step_Counter()
+{
+    step_counter -= 1;
+
+    if(step_counter == 0)
+    {
+        Load_Step_Counter();
+
+        encounter_value = rand() % 100 + 1;
+
+        if(encounter_value <= encounter_rate)
+        {
+            Load_Combat_Main();
+        }
     }
 }
 
@@ -373,6 +405,7 @@ void Copy_Dummy_Stats(GameEnemy* enemy, GameEnemyDummy* dummy) //* Copies specif
     dummy->skill[0] = enemy->skill[0];
     dummy->skill[1] = enemy->skill[1];
     dummy->skill[2] = enemy->skill[2];
+    dummy->enemy_type = enemy->enemy_type;
 
     dummy->can_attack = true;
     dummy->is_killed = false;
@@ -401,7 +434,7 @@ void Load_Enemy_Dummy() //* Loads all three enemy dummies based "enemy[]".
 {
     for(i = 0; i < 3; i++)
     {
-        enemy[i] = Get_Troop(Get_Map(CurrentMap)->troops[CurrentTroop])->enemy_slot[i];
+        enemy[i] = Get_Troop(current_map->troops[CurrentTroop])->enemy_slot[i];
     }
 
     if(enemy[0] != 0)
@@ -628,6 +661,22 @@ void Load_Enemy_Pointer()
     {
         Move_Pointer(16, 9, Get_Enemy(enemy[selected_enemy])->size[0], Get_Enemy(enemy[selected_enemy])->size[1]);
     }
+    else if(enemy_selection[CurrentTurn] == 0)
+    {
+        set_bkg_tiles(8, 13, 1, 1, Combat_Pointer);
+    }
+    else if(enemy_selection[CurrentTurn] == 1)
+    {
+        set_bkg_tiles(8, 14, 1, 1, Combat_Pointer);
+    }
+    else if(enemy_selection[CurrentTurn] == 2)
+    {
+        set_bkg_tiles(8, 15, 1, 1, Combat_Pointer);
+    }
+    else if(enemy_selection[CurrentTurn] == 3)
+    {
+        set_bkg_tiles(8, 16, 1, 1, Combat_Pointer);
+    }
 
     set_sprite_data(122, 6, Tiles_Pointer);
     set_sprite_tile(34, 122);
@@ -710,7 +759,7 @@ void Draw_Combat_Main()
 
     Load_Random_Troop();
 
-    Call_Draw_Troop(bank16, Get_Troop(Get_Map(CurrentMap)->troops[CurrentTroop])->tiles, Get_Troop(Get_Map(CurrentMap)->troops[CurrentTroop])->data);
+    Call_Draw_Troop(bank16, Get_Troop(current_map->troops[CurrentTroop])->tiles, Get_Troop(current_map->troops[CurrentTroop])->data);
 
     Load_Enemy_Dummy();
 
@@ -735,9 +784,9 @@ void Draw_Combat_Main()
 
 void Draw_Current_Skills(GameActor* actor)
 {
-    Call_Draw_Skill_Name(bank16, Get_Skill(actor->skills[CurrentSkillSelection[CurrentTurn]]), 11, 13);
-    Call_Draw_Skill_Name(bank16, Get_Skill(actor->skills[CurrentSkillSelection[CurrentTurn] + 1]), 11, 14);
-    Call_Draw_Skill_Name(bank16, Get_Skill(actor->skills[CurrentSkillSelection[CurrentTurn] + 2]), 11, 15);
+    Call_Draw_Skill_Name(bank16, actor->skills[CurrentSkillSelection[CurrentTurn]], 11, 13);
+    Call_Draw_Skill_Name(bank16, actor->skills[CurrentSkillSelection[CurrentTurn] + 1], 11, 14);
+    Call_Draw_Skill_Name(bank16, actor->skills[CurrentSkillSelection[CurrentTurn] + 2], 11, 15);
 }
 
 void Draw_Selection_Skill()
@@ -750,7 +799,7 @@ void Draw_Selection_Skill()
 
     Draw_Combat_Name(4, 13, party[CurrentTurn]->name, false);
 
-    Call_Draw_Skill_Cost(bank16, Get_Skill(party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]]));
+    Call_Draw_Skill_Cost(bank16, party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]]);
 
     Draw_Combat_Number(party[CurrentTurn]->mana, 5, 15);
 }
@@ -807,7 +856,7 @@ void Refresh_Order()
             {
                 turn_order[j] = 0;
                 target_selection[x] = 0;
-                skill_selection[x] = 0;
+                skill_selection[x] = &skill_null;
             }
         }
         else if(turn_order[j] > 4)
@@ -818,7 +867,7 @@ void Refresh_Order()
             {
                 turn_order[j] = 0;
                 target_selection[x] = 0;
-                skill_selection[x] = 0;
+                skill_selection[x] = &skill_null;
             }
         }
     }
@@ -865,9 +914,9 @@ void Execute_Combat()
 
         Load_Battle_Message_Box();
 
-        Check_Enemies_Killed();
+        Check_Enemies_Killed() ;
 
-        if(party[0]->health == 0 && party[1]->health == 0 && party[2]->health == 0 && party[3]->health == 0)
+        if((party[0]->health == 0 || party[0] == 0) && (party[1]->health == 0 || party[1] == 0) && (party[2]->health == 0 || party[2] == 0) && (party[3]->health == 0 || party[3] == 0))
         {
             Close_Combat();
         }
@@ -982,7 +1031,7 @@ void Confirm_Target_Selection()
 
             combat_main_y = action_selection[CurrentTurn];
 
-            CurrentCombat = combat_fight;
+            Update_Combat_Fight_Joypad();
         }
         else if(party[CurrentTurn + 3] != NULL && party[CurrentTurn + 3]->health != 0 && CurrentTurn + 3 <= total_actors)
         {
@@ -999,7 +1048,7 @@ void Confirm_Target_Selection()
 
             combat_main_y = action_selection[CurrentTurn];
 
-            CurrentCombat = combat_fight;
+            Update_Combat_Fight_Joypad();
         }
         else
         {
@@ -1017,7 +1066,7 @@ void Confirm_Target_Selection()
 
             CurrentTurn = 0;
 
-            CurrentCombat = combat_main;
+            Update_Combat_Main_Joypad();
         }
         
     }
@@ -1036,7 +1085,7 @@ void Confirm_Target_Selection()
 
         combat_main_y = action_selection[CurrentTurn];
 
-        CurrentCombat = combat_fight;
+        Update_Combat_Fight_Joypad();
     }
     else
     {
@@ -1056,7 +1105,7 @@ void Confirm_Target_Selection()
 
         CurrentTurn = 0;
 
-        CurrentCombat = combat_main;
+        Update_Combat_Main_Joypad();
     }
 }
 
@@ -1102,295 +1151,37 @@ void Move_Pointer_Right()
     }
 }
 
-void Update_Combat_Joypad()
+void Update_Combat_Skill_Select_Joypad()
 {
-    Joy = joypad();
-
-    if(Joy & J_A)
+    while(joypad() & J_A)
     {
-        if(CurrentCombat == combat_main)
-        {
-            if(combat_main_y == 0)
-            {
-                if(party[CurrentTurn] != NULL && party[CurrentTurn]->health == 0)
-                {
-                    if(party[CurrentTurn + 1] != NULL && party[CurrentTurn + 1]->health != 0)
-                    {
-                        Call_Play_Confirm(bank16);
-
-                        CurrentTurn = 1;
-
-                        Load_Actor_Info();
-
-                        Draw_Selection_Fight();
-
-                        combat_main_y = action_selection[CurrentTurn];
-
-                        CurrentCombat = combat_fight;
-                    }
-                    else if(party[CurrentTurn + 2] != NULL && party[CurrentTurn + 2]->health != 0)
-                    {
-                        Call_Play_Confirm(bank16);
-
-                        CurrentTurn = 2;
-
-                        Load_Actor_Info();
-
-                        Draw_Selection_Fight();
-
-                        combat_main_y = action_selection[CurrentTurn];
-
-                        CurrentCombat = combat_fight;
-                    }
-                    else if(party[CurrentTurn + 3] != NULL && party[CurrentTurn + 3]->health != 0)
-                    {
-                        Call_Play_Confirm(bank16);
-
-                        CurrentTurn = 3;
-
-                        Load_Actor_Info();
-
-                        Draw_Selection_Fight();
-
-                        combat_main_y = action_selection[CurrentTurn];
-
-                        CurrentCombat = combat_fight;
-                    }
-                }
-                else
-                {
-                    Call_Play_Confirm(bank16);
-                    Load_Actor_Info();
-
-                    Draw_Selection_Fight();
-
-                    combat_main_y = action_selection[CurrentTurn];
-
-                    CurrentCombat = combat_fight;
-                }
-
-                while(joypad() & J_A)
-                {
-                    performant_delay(1);
-                }
-            }
-            else if(combat_main_y == 1)
-            {
-                Call_Play_Confirm(bank16);
-                Close_Combat();
-            }
-        }
-        else if(CurrentCombat == combat_fight)
-        {
-            if(combat_main_y == 0)
-            {
-                Call_Play_Confirm(bank16);
-
-                skill_selection[CurrentTurn] = 1;
-
-                Select_Target();
-                
-                Load_Enemy_Pointer();
-
-                CurrentCombat = combat_select;
-            }
-            if(combat_main_y == 1)
-            {
-                Call_Play_Confirm(bank16);
-
-                Draw_Selection_Skill();
-
-                CurrentCombat = combat_skill;
-            }
-
-            while(joypad() & J_A)
-            {
-                performant_delay(1);
-            }
-        }
-        else if(CurrentCombat == combat_select)
-        {
-            Confirm_Target_Selection();
-
-            while(joypad() & J_A)
-            {
-                performant_delay(1);
-            }
-        }
-        else if(CurrentCombat == combat_skill)
-        {
-            u_x = party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]];
-
-            if(party[CurrentTurn]->mana >= Call_Get_Skill_Cost(bank16, Get_Skill(u_x)) && Call_Get_Skill_Cost(bank16, Get_Skill(u_x)) > 0)
-            {
-                Call_Play_Confirm(bank16);
-
-                skill_selection[CurrentTurn] = party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]];
-
-                Draw_Selection_Fight();
-                set_bkg_tiles(8, 12, 12, 6, Map_Combat_Actor_BoxPLN0);
-                Draw_Combat_Actors();
-
-                Select_Target();
-                    
-                Load_Enemy_Pointer();
-
-                CurrentCombat = combat_skill_select;
-            }
-            else
-            {
-                Call_Play_Buzz(bank16);
-            }
-
-            while(joypad() & J_A)
-            {
-                performant_delay(1);
-            }
-        }
-        else if(CurrentCombat == combat_skill_select)
-        {
-            u_x = party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]];
-
-            party[CurrentTurn]->mana -= Call_Get_Skill_Cost(bank16, Get_Skill(u_x));
-
-            Confirm_Target_Selection();
-
-            while(joypad() & J_A)
-            {
-                performant_delay(1);
-            }
-        }
+        performant_delay(1);
     }
 
-    if(Joy & J_B)
+    while(joypad() & J_B)
     {
-        if(CurrentCombat == combat_fight)
+        performant_delay(1);
+    }
+
+    while(1)
+    {
+        Joy = joypad();
+
+        if(Joy & J_A)
         {
-            if(CurrentTurn == 0)
-            {
-                Call_Play_Confirm(bank16);
+            temp_skill = party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]];
 
-                set_bkg_tiles(0, 0, 20, 6, Map_Combat_MainPLN0);
+            party[CurrentTurn]->mana -= Call_Get_Skill_Cost(bank16, temp_skill);
 
-                set_bkg_tiles(0, 12, 8, 6, Map_Combat_Selection_MainPLN0);
-                set_bkg_tiles(1, 13, 1, 1, Combat_Pointer);
+            Confirm_Target_Selection();
 
-                combat_main_y = 0;
-
-                CurrentCombat = combat_main;
-            }
-            else
-            {
-                if(party[CurrentTurn - 1] != NULL && party[CurrentTurn - 1]->health == 0 && CurrentTurn - 1 >= 0)
-                {
-                    if(party[CurrentTurn - 2] != NULL && party[CurrentTurn - 2]->health != 0 && CurrentTurn - 2 >= 0)
-                    {
-                        Call_Play_Confirm(bank16);
-                        Clear_Pointer();
-
-                        CurrentTurn -= 2;
-
-                        Load_Actor_Info();
-
-                        Draw_Selection_Fight();
-
-                        combat_main_y = action_selection[CurrentTurn];
-
-                        CurrentCombat = combat_fight;
-                    }
-                    else if(party[CurrentTurn - 3] != NULL && party[CurrentTurn - 3]->health != 0 && CurrentTurn - 3 >= 0)
-                    {
-                        Call_Play_Confirm(bank16);
-                        Clear_Pointer();
-
-                        CurrentTurn -= 3;
-
-                        Load_Actor_Info();
-
-                        Draw_Selection_Fight();
-
-                        combat_main_y = action_selection[CurrentTurn];
-
-                        CurrentCombat = combat_fight;
-                    }
-                    else
-                    {
-                        Call_Play_Confirm(bank16);
-
-                        set_bkg_tiles(0, 0, 20, 6, Map_Combat_MainPLN0);
-
-                        set_bkg_tiles(0, 12, 8, 6, Map_Combat_Selection_MainPLN0);
-                        set_bkg_tiles(1, 13, 1, 1, Combat_Pointer);
-
-                        combat_main_y = 0;
-
-                        CurrentCombat = combat_main;
-                    }
-                    
-                }
-                else if(CurrentTurn > 0)
-                {
-                    Call_Play_Confirm(bank16);
-                    Clear_Pointer();
-
-                    CurrentTurn -= 1;
-
-                    Load_Actor_Info();
-
-                    Draw_Selection_Fight();
-
-                    combat_main_y = action_selection[CurrentTurn];
-
-                    CurrentCombat = combat_fight;
-                }
-                else
-                {
-                    Call_Play_Confirm(bank16);
-
-                    CurrentTurn -= 1;
-
-                    Load_Actor_Info();
-
-                    Draw_Selection_Fight();
-
-                    combat_main_y = action_selection[CurrentTurn];
-                }
-            }
-            
-
-            while(joypad() & J_B)
+            while(joypad() & J_A)
             {
                 performant_delay(1);
             }
         }
-        else if(CurrentCombat == combat_select)
-        {
-            Call_Play_Confirm(bank16);
-            Clear_Pointer();
 
-            CurrentCombat = combat_fight;
-
-            while(joypad() & J_B)
-            {
-                performant_delay(1);
-            }
-        }
-        else if(CurrentCombat == combat_skill)
-        {
-            Call_Play_Confirm(bank16);
-
-            Draw_Selection_Fight();
-            set_bkg_tiles(8, 12, 12, 6, Map_Combat_Actor_BoxPLN0);
-            Draw_Combat_Actors();
-
-            CurrentCombat = combat_fight;
-
-            while(joypad() & J_B)
-            {
-                performant_delay(1);
-            }
-        }
-        else if(CurrentCombat == combat_skill_select)
+        if(Joy & J_B)
         {
             Call_Play_Confirm(bank16);
 
@@ -1405,43 +1196,186 @@ void Update_Combat_Joypad()
                 performant_delay(1);
             }
         }
+
+        if(Joy & J_LEFT)
+        {
+            Move_Pointer_Left();
+
+            while(joypad() & J_LEFT)
+            {
+                performant_delay(1);
+            }
+        }
+
+        if(Joy & J_RIGHT)
+        {
+            Move_Pointer_Right();
+
+            while(joypad() & J_RIGHT)
+            {
+                performant_delay(1);
+            }
+        }
+    }
+}
+
+void Update_Combat_Skill_Joypad()
+{
+    while(joypad() & J_A)
+    {
+        performant_delay(1);
     }
 
-    if(Joy & J_UP)
+    while(joypad() & J_B)
     {
-        if(CurrentCombat == combat_main)
+        performant_delay(1);
+    }
+
+    while(1)
+    {
+        Joy = joypad();
+
+        if(Joy & J_A)
         {
-            if(combat_main_y > 0)
+            temp_skill = party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]];
+
+            if(party[CurrentTurn]->mana >= Call_Get_Skill_Cost(bank16, temp_skill) && Call_Get_Skill_Cost(bank16, temp_skill) > 0)
             {
-                set_bkg_tiles(1, 13 + combat_main_y * 2, 1, 1, Combat_Background);
-                combat_main_y -= 1;
-                set_bkg_tiles(1, 13 + combat_main_y * 2, 1, 1, Combat_Pointer);
+                Call_Play_Confirm(bank16);
+
+                skill_selection[CurrentTurn] = party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]];
+
+                Draw_Selection_Fight();
+                set_bkg_tiles(8, 12, 12, 6, Map_Combat_Actor_BoxPLN0);
+                Draw_Combat_Actors();
+
+                Select_Target();
+                    
+                Load_Enemy_Pointer();
+
+                Update_Combat_Skill_Select_Joypad();
             }
+            else
+            {
+                Call_Play_Buzz(bank16);
+            }
+
+            while(joypad() & J_A)
+            {
+                performant_delay(1);
+            }
+        }
+
+        if(Joy & J_B)
+        {
+            Call_Play_Confirm(bank16);
+
+            Draw_Selection_Fight();
+            set_bkg_tiles(8, 12, 12, 6, Map_Combat_Actor_BoxPLN0);
+            Draw_Combat_Actors();
+
+            Update_Combat_Fight_Joypad();
+
+            while(joypad() & J_B)
+            {
+                performant_delay(1);
+            }
+        }
+
+        if(Joy & J_UP)
+        {
+            if(skill_y[CurrentTurn] > 0)
+            {
+                set_bkg_tiles(10, 13 + skill_y[CurrentTurn], 1, 1, Combat_Background);
+
+                skill_y[CurrentTurn] -= 1;
+
+                set_bkg_tiles(10, 13 + skill_y[CurrentTurn], 1, 1, Combat_Pointer);
+            }
+            else if(skill_y[CurrentTurn] == 0 && CurrentSkillSelection[CurrentTurn] > 0 && party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn] + 1] != 0)
+            {
+                CurrentSkillSelection[CurrentTurn] -= 1;
+
+                Draw_Current_Skills(party[CurrentTurn]);
+            }
+
+            Call_Draw_Skill_Cost(bank16, party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]]);
 
             while(joypad() & J_UP)
             {
                 wait_vbl_done();
             }
         }
-        else if(CurrentCombat == combat_fight)
-        {
-            if(combat_main_y > 0)
-            {
-                set_bkg_tiles(1, 13 + combat_main_y, 1, 1, Combat_Background);
-                combat_main_y -= 1;
-                set_bkg_tiles(1, 13 + combat_main_y, 1, 1, Combat_Pointer);
 
-                action_selection[CurrentTurn] -= 1;
+        if(Joy & J_DOWN)
+        {
+            if(skill_y[CurrentTurn] < 2 && party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn] + 1] != 0)
+            {
+                set_bkg_tiles(10, 13 + skill_y[CurrentTurn], 1, 1, Combat_Background);
+
+                skill_y[CurrentTurn] += 1;
+
+                set_bkg_tiles(10, 13 + skill_y[CurrentTurn], 1, 1, Combat_Pointer);
+            }
+            else if(skill_y[CurrentTurn] == 2 && CurrentSkillSelection[CurrentTurn] < 7 && party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn] + 1] != 0)
+            {
+                CurrentSkillSelection[CurrentTurn] += 1;
+
+                Draw_Current_Skills(party[CurrentTurn]);
             }
 
-            while(joypad() & J_UP)
+            Call_Draw_Skill_Cost(bank16, party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]]);
+
+            while(joypad() & J_DOWN)
             {
                 wait_vbl_done();
             }
         }
-        else if(CurrentCombat == combat_select)
+    }
+}
+
+void Update_Combat_Select_Joypad()
+{
+    while(joypad() & J_A)
+    {
+        performant_delay(1);
+    }
+
+    while(joypad() & J_B)
+    {
+        performant_delay(1);
+    }
+
+    while(1)
+    {
+        Joy = joypad();
+
+        if(Joy & J_A)
         {
-            if(enemy_selection[CurrentTurn] > 0)
+            Confirm_Target_Selection();
+
+            while(joypad() & J_A)
+            {
+                performant_delay(1);
+            }
+        }
+
+        if(Joy & J_B)
+        {
+            Call_Play_Confirm(bank16);
+            Clear_Pointer();
+
+            Update_Combat_Fight_Joypad();
+
+            while(joypad() & J_B)
+            {
+                performant_delay(1);
+            }
+        }
+
+        if(Joy & J_UP)
+        {
+            if(enemy_selection[CurrentTurn] > 0 && enemy_selection[CurrentTurn] < 4)
             {
                 set_bkg_tiles(8, 13 + enemy_selection[CurrentTurn], 1, 1, Combat_Background);
 
@@ -1464,65 +1398,8 @@ void Update_Combat_Joypad()
                 wait_vbl_done();
             }
         }
-        else if(CurrentCombat == combat_skill)
-        {
-            if(skill_y[CurrentTurn] > 0)
-            {
-                set_bkg_tiles(10, 13 + skill_y[CurrentTurn], 1, 1, Combat_Background);
 
-                skill_y[CurrentTurn] -= 1;
-
-                set_bkg_tiles(10, 13 + skill_y[CurrentTurn], 1, 1, Combat_Pointer);
-            }
-            else if(skill_y[CurrentTurn] == 0 && CurrentSkillSelection[CurrentTurn] > 0 && party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn] + 1] != 0)
-            {
-                CurrentSkillSelection[CurrentTurn] -= 1;
-
-                Draw_Current_Skills(party[CurrentTurn]);
-            }
-
-            Call_Draw_Skill_Cost(bank16, Get_Skill(party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]]));
-
-            while(joypad() & J_UP)
-            {
-                wait_vbl_done();
-            }
-        }
-    }
-
-    if(Joy & J_DOWN)
-    {
-        if(CurrentCombat == combat_main)
-        {
-            if(combat_main_y < 1)
-            {
-                set_bkg_tiles(1, 13 + combat_main_y * 2, 1, 1, Combat_Background);
-                combat_main_y += 1;
-                set_bkg_tiles(1, 13 + combat_main_y * 2, 1, 1, Combat_Pointer);
-            }
-
-            while(joypad() & J_DOWN)
-            {
-                wait_vbl_done();
-            }
-        }
-        else if(CurrentCombat == combat_fight)
-        {
-            if(combat_main_y < 2)
-            {
-                set_bkg_tiles(1, 13 + combat_main_y, 1, 1, Combat_Background);
-                combat_main_y += 1;
-                set_bkg_tiles(1, 13 + combat_main_y, 1, 1, Combat_Pointer);
-
-                action_selection[CurrentTurn] += 1;
-            }
-
-            while(joypad() & J_DOWN)
-            {
-                wait_vbl_done();
-            }
-        }
-        else if(CurrentCombat == combat_select)
+        if(Joy & J_DOWN)
         {
             if(enemy_selection[CurrentTurn] > 3)
             {
@@ -1545,68 +1422,26 @@ void Update_Combat_Joypad()
                 wait_vbl_done();
             }
         }
-        else if(CurrentCombat == combat_skill)
+
+        if(Joy & J_LEFT)
         {
-            if(skill_y[CurrentTurn] < 2 && party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn] + 1] != 0)
+            if(enemy_selection[CurrentTurn] > 3)
             {
-                set_bkg_tiles(10, 13 + skill_y[CurrentTurn], 1, 1, Combat_Background);
-
-                skill_y[CurrentTurn] += 1;
-
-                set_bkg_tiles(10, 13 + skill_y[CurrentTurn], 1, 1, Combat_Pointer);
+                Move_Pointer_Left();
             }
-            else if(skill_y[CurrentTurn] == 2 && CurrentSkillSelection[CurrentTurn] < 7 && party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn] + 1] != 0)
-            {
-                CurrentSkillSelection[CurrentTurn] += 1;
-
-                Draw_Current_Skills(party[CurrentTurn]);
-            }
-
-            Call_Draw_Skill_Cost(bank16, Get_Skill(party[CurrentTurn]->skills[CurrentSkillSelection[CurrentTurn] + skill_y[CurrentTurn]]));
-
-            while(joypad() & J_DOWN)
-            {
-                wait_vbl_done();
-            }
-        }
-    }
-
-    if(Joy & J_LEFT)
-    {
-        if(CurrentCombat == combat_select)
-        {
-            Move_Pointer_Left();
 
             while(joypad() & J_LEFT)
             {
                 performant_delay(1);
             }
         }
-        else if(CurrentCombat == combat_skill_select)
-        {
-            Move_Pointer_Left();
 
-            while(joypad() & J_LEFT)
+        if(Joy & J_RIGHT)
+        {
+            if(enemy_selection[CurrentTurn] > 3)
             {
-                performant_delay(1);
+                Move_Pointer_Right();
             }
-        }
-    }
-
-    if(Joy & J_RIGHT)
-    {
-        if(CurrentCombat == combat_select)
-        {
-            Move_Pointer_Right();
-
-            while(joypad() & J_RIGHT)
-            {
-                performant_delay(1);
-            }
-        }
-        else if(CurrentCombat == combat_skill_select)
-        {
-            Move_Pointer_Right();
 
             while(joypad() & J_RIGHT)
             {
@@ -1616,15 +1451,300 @@ void Update_Combat_Joypad()
     }
 }
 
-void Combat()
+void Update_Combat_Fight_Joypad()
 {
+    while(joypad() & J_A)
+    {
+        performant_delay(1);
+    }
+
+    while(joypad() & J_B)
+    {
+        performant_delay(1);
+    }
+
     while(1)
     {
-        wait_vbl_done();
-        initrand(clock_tick);
+        Joy = joypad();
 
-        Update_Combat_Joypad();
+        if(Joy & J_A)
+        {
+            if(combat_main_y == 0)
+            {
+                Call_Play_Confirm(bank16);
+
+                skill_selection[CurrentTurn] = &skill_hit;
+
+                Select_Target();
+                
+                Load_Enemy_Pointer();
+
+                Update_Combat_Select_Joypad();
+            }
+            if(combat_main_y == 1)
+            {
+                Call_Play_Confirm(bank16);
+
+                Draw_Selection_Skill();
+
+                Update_Combat_Skill_Joypad();
+            }
+
+            while(joypad() & J_A)
+            {
+                performant_delay(1);
+            }
+        }
+
+        if(Joy & J_B)
+        {
+            if(CurrentTurn == 0)
+            {
+                Call_Play_Confirm(bank16);
+
+                set_bkg_tiles(0, 0, 20, 6, Map_Combat_MainPLN0);
+
+                set_bkg_tiles(0, 12, 8, 6, Map_Combat_Selection_MainPLN0);
+                set_bkg_tiles(1, 13, 1, 1, Combat_Pointer);
+
+                combat_main_y = 0;
+
+                Update_Combat_Main_Joypad();
+            }
+            else
+            {
+                if(party[CurrentTurn - 1] != NULL && party[CurrentTurn - 1]->health == 0 && CurrentTurn - 1 >= 0)
+                {
+                    if(party[CurrentTurn - 2] != NULL && party[CurrentTurn - 2]->health != 0 && CurrentTurn - 2 >= 0)
+                    {
+                        Call_Play_Confirm(bank16);
+                        Clear_Pointer();
+
+                        CurrentTurn -= 2;
+
+                        Load_Actor_Info();
+
+                        Draw_Selection_Fight();
+
+                        combat_main_y = action_selection[CurrentTurn];
+                    }
+                    else if(party[CurrentTurn - 3] != NULL && party[CurrentTurn - 3]->health != 0 && CurrentTurn - 3 >= 0)
+                    {
+                        Call_Play_Confirm(bank16);
+                        Clear_Pointer();
+
+                        CurrentTurn -= 3;
+
+                        Load_Actor_Info();
+
+                        Draw_Selection_Fight();
+
+                        combat_main_y = action_selection[CurrentTurn];
+                    }
+                    else
+                    {
+                        Call_Play_Confirm(bank16);
+
+                        set_bkg_tiles(0, 0, 20, 6, Map_Combat_MainPLN0);
+
+                        set_bkg_tiles(0, 12, 8, 6, Map_Combat_Selection_MainPLN0);
+                        set_bkg_tiles(1, 13, 1, 1, Combat_Pointer);
+
+                        combat_main_y = 0;
+
+                        Update_Combat_Main_Joypad();
+                    }
+                    
+                }
+                else if(CurrentTurn > 0)
+                {
+                    Call_Play_Confirm(bank16);
+                    Clear_Pointer();
+
+                    CurrentTurn -= 1;
+
+                    Load_Actor_Info();
+
+                    Draw_Selection_Fight();
+
+                    combat_main_y = action_selection[CurrentTurn];
+                }
+                else
+                {
+                    Call_Play_Confirm(bank16);
+
+                    CurrentTurn -= 1;
+
+                    Load_Actor_Info();
+
+                    Draw_Selection_Fight();
+
+                    combat_main_y = action_selection[CurrentTurn];
+                }
+            }
+            
+            while(joypad() & J_B)
+            {
+                performant_delay(1);
+            }
+        }
+
+        if(Joy & J_UP)
+        {
+            if(combat_main_y > 0)
+            {
+                set_bkg_tiles(1, 13 + combat_main_y, 1, 1, Combat_Background);
+                combat_main_y -= 1;
+                set_bkg_tiles(1, 13 + combat_main_y, 1, 1, Combat_Pointer);
+
+                action_selection[CurrentTurn] -= 1;
+            }
+
+            while(joypad() & J_UP)
+            {
+                wait_vbl_done();
+            }
+        }
+
+        if(Joy & J_DOWN)
+        {
+            if(combat_main_y < 2)
+            {
+                set_bkg_tiles(1, 13 + combat_main_y, 1, 1, Combat_Background);
+                combat_main_y += 1;
+                set_bkg_tiles(1, 13 + combat_main_y, 1, 1, Combat_Pointer);
+
+                action_selection[CurrentTurn] += 1;
+            }
+
+            while(joypad() & J_DOWN)
+            {
+                wait_vbl_done();
+            }
+        }
     }
+    
+}
+
+void Update_Combat_Main_Joypad()
+{
+    while(joypad() & J_A)
+    {
+        performant_delay(1);
+    }
+
+    while(joypad() & J_B)
+    {
+        performant_delay(1);
+    }
+
+    while(1)
+    {
+        Joy = joypad();
+
+        if(Joy & J_A)
+        {
+            if(combat_main_y == 0)
+            {
+                if(party[CurrentTurn] != NULL && party[CurrentTurn]->health == 0)
+                {
+                    if(party[CurrentTurn + 1] != NULL && party[CurrentTurn + 1]->health != 0)
+                    {
+                        Call_Play_Confirm(bank16);
+
+                        CurrentTurn = 1;
+
+                        Load_Actor_Info();
+
+                        Draw_Selection_Fight();
+
+                        combat_main_y = action_selection[CurrentTurn];
+
+                        Update_Combat_Fight_Joypad();
+                    }
+                    else if(party[CurrentTurn + 2] != NULL && party[CurrentTurn + 2]->health != 0)
+                    {
+                        Call_Play_Confirm(bank16);
+
+                        CurrentTurn = 2;
+
+                        Load_Actor_Info();
+
+                        Draw_Selection_Fight();
+
+                        combat_main_y = action_selection[CurrentTurn];
+
+                        Update_Combat_Fight_Joypad();
+                    }
+                    else if(party[CurrentTurn + 3] != NULL && party[CurrentTurn + 3]->health != 0)
+                    {
+                        Call_Play_Confirm(bank16);
+
+                        CurrentTurn = 3;
+
+                        Load_Actor_Info();
+
+                        Draw_Selection_Fight();
+
+                        combat_main_y = action_selection[CurrentTurn];
+
+                        Update_Combat_Fight_Joypad();
+                    }
+                }
+                else
+                {
+                    Call_Play_Confirm(bank16);
+                    Load_Actor_Info();
+
+                    Draw_Selection_Fight();
+
+                    combat_main_y = action_selection[CurrentTurn];
+
+                    Update_Combat_Fight_Joypad();
+                }
+
+                while(joypad() & J_A)
+                {
+                    performant_delay(1);
+                }
+            }
+            else if(combat_main_y == 1)
+            {
+                Call_Play_Confirm(bank16);
+                Close_Combat();
+            }
+        }
+
+        if(Joy & J_UP)
+        {
+            if(combat_main_y > 0)
+            {
+                set_bkg_tiles(1, 13 + combat_main_y * 2, 1, 1, Combat_Background);
+                combat_main_y -= 1;
+                set_bkg_tiles(1, 13 + combat_main_y * 2, 1, 1, Combat_Pointer);
+            }
+
+            while(joypad() & J_UP)
+            {
+                wait_vbl_done();
+            }
+        }
+
+        if(Joy & J_DOWN)
+        {
+            if(combat_main_y < 1)
+            {
+                set_bkg_tiles(1, 13 + combat_main_y * 2, 1, 1, Combat_Background);
+                combat_main_y += 1;
+                set_bkg_tiles(1, 13 + combat_main_y * 2, 1, 1, Combat_Pointer);
+            }
+
+            while(joypad() & J_DOWN)
+            {
+                wait_vbl_done();
+            }
+        }
+    }    
 }
 
 void Load_Combat_Main()
@@ -1636,31 +1756,5 @@ void Load_Combat_Main()
         wait_vbl_done();
     }
 
-    Combat();
-}
-
-void Load_Step_Counter()
-{
-    initrand(Seed);
-
-    step_counter = rand() % 5 + 5;
-}
-
-void Check_Step_Counter()
-{
-    step_counter -= 1;
-
-    if(step_counter == 0)
-    {
-        Load_Step_Counter();
-        
-        initrand(Seed);
-
-        encounter_value = rand() % 100 + 1;
-
-        if(encounter_value <= encounter_rate)
-        {
-            Load_Combat_Main();
-        }
-    }
+    Update_Combat_Main_Joypad();
 }

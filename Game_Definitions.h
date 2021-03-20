@@ -19,10 +19,11 @@
 #define impassable 1
 
 /*  NPC Tags:  */
-#define messenger 0
-#define giver 1
-#define shopkeeper 2
-#define trigger 3
+#define nothing 0
+#define messenger 1
+#define giver 2
+#define shopkeeper 3
+#define trigger 4
 
 /*  Menu Tags:  */
 #define menu_main 0
@@ -49,6 +50,9 @@
 #define status 2
 #define item_use 3
 
+#define target_enemy 0
+#define target_actor 1
+
 #define physical 0
 #define fire 1
 #define lightning 2
@@ -57,6 +61,9 @@
 #define wind 5
 #define light 6
 #define dark 7
+
+#define normal 0
+#define undead 7
 
 /*  Shop Tags:  */
 #define shop_main 0
@@ -120,5 +127,9 @@
 #define bank19 19
 #define bank20 20
 #define bank21 21
+#define bank22 22
+#define bank23 23
+#define bank24 24
+#define bank25 25
 
 #endif

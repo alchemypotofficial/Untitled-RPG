@@ -14,6 +14,7 @@ typedef struct GameSkill
     UBYTE skill_type;
     UBYTE skill_element;
     UBYTE is_ability;
+    UBYTE main_target;
     UBYTE required_ap;
     UBYTE menu_use;
     UBYTE class;

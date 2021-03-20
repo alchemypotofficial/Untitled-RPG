@@ -18,8 +18,6 @@
 
 extern UBYTE Joy;
 
-extern UBYTE CurrentMap;
-
 extern UBYTE clock_tick;
 
 extern UBYTE CurrentMenu, CurrentSelection, CurrentItemSlot, CurrentItemSelection, CurrentEquipSelection;
@@ -47,6 +45,8 @@ extern INT8 i, j, k, l, m, n, x, y;
 extern UBYTE u_i, u_j, u_y, u_x;
 
 extern GameActor *party[4];
+
+extern const GameSkill* temp_skill;
 
 extern unsigned char enemy[3];
 
@@ -147,6 +147,18 @@ GameEnemyDummy *Get_Enemy_Dummy(UBYTE enemy_dummy_id)
     }
 }
 
+UBYTE Is_Actor(UBYTE target)
+{
+    if(target < 4)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 unsigned char *Get_Name(UBYTE target_id)
 {
     switch (target_id)
@@ -209,30 +221,32 @@ UBYTE Get_Name_Length(UBYTE target_id)
     }
 }
 
-UBYTE Get_Skill_Cost(GameSkill *skill)
+UBYTE Get_Skill_Cost(const GameSkill* skill)
 {
     return skill->mana_cost;
 }
 
-void Set_Actor_Skills(GameActor *actor)
+void Set_Actor_Skills(GameActor* actor)
 {
     u_y = 0;
 
     for (u_x = 0; u_x < 10; u_x++)
     {
-        actor->skills[u_x] = 0;
+        actor->skills[u_x] = &skill_null;
     }
 
-    if (actor->skill_ap[Get_Equip(actor->equipped[0])->skill_id] < Get_Skill(Get_Equip(actor->equipped[0])->skill_id)->required_ap)
+    temp_skill = actor->equipment[weapon_slot]->skill;
+
+    if (actor->skill_ap[temp_skill->skill_id] < temp_skill->required_ap)
     {
-        actor->skills[0] = Get_Equip(actor->equipped[0])->skill_id;
+        actor->skills[0] = temp_skill;
     }
 
     for (u_x = 0; u_x < 119; u_x++)
     {
         if (actor->skill_ap[u_x] == Get_Skill(u_x)->required_ap && Get_Skill(u_x)->required_ap > 0 && Get_Skill(u_x)->class == actor->class)
         {
-            actor->skills[1 + u_y] = u_x;
+            actor->skills[1 + u_y] = Get_Skill(u_x);
             u_y += 1;
 
             if (u_y > 9)
@@ -246,11 +260,11 @@ void Set_Actor_Skills(GameActor *actor)
     {
         for (u_x = 0; u_x < 10; u_x++)
         {
-            if (actor->skills[u_x] < actor->skills[u_y])
+            if (actor->skills[u_x]->skill_id < actor->skills[u_y]->skill_id)
             {
-                u_i = actor->skills[u_y];
+                temp_skill = actor->skills[u_y];
                 actor->skills[u_y] = actor->skills[u_x];
-                actor->skills[u_x] = u_i;
+                actor->skills[u_x] = temp_skill;
             }
         }
     }
@@ -260,17 +274,17 @@ void Add_Ability_Points(GameActor *actor, UBYTE points)
 {
     for (u_x = 0; u_x < 10; u_x++)
     {
-        u_y = actor->skills[u_x];
+        temp_skill = actor->skills[u_x];
 
-        if (u_y > 0 && actor->skill_ap[u_y] < Get_Skill(u_y)->required_ap)
+        if (temp_skill != &skill_null && actor->skill_ap[temp_skill->skill_id] < temp_skill->required_ap)
         {
-            if ((actor->skill_ap[u_y] + points) < Get_Skill(u_y)->required_ap)
+            if ((actor->skill_ap[temp_skill->skill_id] + points) < temp_skill->required_ap)
             {
-                actor->skill_ap[u_y] += points;
+                actor->skill_ap[temp_skill->skill_id] += points;
             }
             else
             {
-                actor->skill_ap[u_y] = Get_Skill(u_y)->required_ap;
+                actor->skill_ap[temp_skill->skill_id] = temp_skill->required_ap;
             }
         }
     }
@@ -340,7 +354,7 @@ void Draw_Skill_Number(UINT16 number, UBYTE tile_x, UBYTE tile_y)
     }
 }
 
-void Draw_Skill_Cost(GameSkill *skill)
+void Draw_Skill_Cost(const GameSkill* skill)
 {
     Draw_Skill_Number(skill->mana_cost, 4, 14);
 }
@@ -532,7 +546,7 @@ void Draw_Skill_Damage(UINT16 number)
     }
 }
 
-void Draw_Skill_Message(GameSkill *skill, UBYTE action_performer, UBYTE action_target)
+void Draw_Skill_Message(const GameSkill *skill, UBYTE action_performer, UBYTE action_target)
 {
     message_x = 0;
     message_y = 0;
@@ -1148,39 +1162,39 @@ void Load_Damage_Sprite(UBYTE action_target)
     Clear_Damage();
 }
 
-void Draw_Skill_Name(GameSkill *skill, UBYTE tile_x, UBYTE tile_y)
+void Draw_Skill_Name(const GameSkill* skill, UBYTE tile_x, UBYTE tile_y)
 {
     set_bkg_tiles(tile_x, tile_y, 8, 1, skill->name);
 }
 
-void Draw_Skills_Name(GameSkill *skill, UBYTE tile_x, UBYTE tile_y)
+void Draw_Skills_Name(const GameSkill* skill, UBYTE tile_x, UBYTE tile_y)
 {
     set_win_tiles(tile_x, tile_y, 8, 1, skill->name);
 }
 
 void Get_Next_Target()
 {
-    if (CurrentTarget > 3)
+    if(CurrentTarget > 3)
     {
-        if (Get_Enemy_Dummy(CurrentTarget - 4)->health == 0)
+        if(Get_Enemy_Dummy(CurrentTarget - 4)->health == 0)
         {
-            if (Get_Enemy_Dummy(0)->health != 0 && Get_Enemy(enemy[0]) != &enemy_null)
+            if(Get_Enemy_Dummy(0)->health != 0 && Get_Enemy(enemy[0]) != &enemy_null)
             {
                 CurrentTarget = 4;
             }
-            else if (Get_Enemy_Dummy(1)->health != 0 && Get_Enemy(enemy[1]) != &enemy_null)
+            else if(Get_Enemy_Dummy(1)->health != 0 && Get_Enemy(enemy[1]) != &enemy_null)
             {
                 CurrentTarget = 5;
             }
-            else if (Get_Enemy_Dummy(2)->health != 0 && Get_Enemy(enemy[2]) != &enemy_null)
+            else if(Get_Enemy_Dummy(2)->health != 0 && Get_Enemy(enemy[2]) != &enemy_null)
             {
                 CurrentTarget = 6;
             }
         }
     }
-    else if (CurrentTarget < 4)
+    else if(CurrentTarget < 4)
     {
-        if (party[CurrentTarget]->health == 0)
+        if(party[CurrentTarget]->health == 0)
         {
             if (party[0]->health != 0 && party[0] != NULL)
             {
@@ -1204,9 +1218,9 @@ void Get_Next_Target()
 
 void Execute_Skill_Hit(UBYTE action_performer, UBYTE action_target)
 {
-    if (action_performer < 4)
+    if(Is_Actor(action_performer) == true)
     {
-        damage_modifier = party[action_performer]->strength + Get_Equip(party[action_performer]->equipped[weapon_slot])->strength + Get_Equip(party[action_performer]->equipped[secondary_slot])->strength + Get_Equip(party[action_performer]->equipped[armor_slot])->strength + Get_Equip(party[action_performer]->equipped[accessory_slot])->strength;
+        damage_modifier = party[action_performer]->strength;
 
         skill_damage = 4 + ((rand() % ((damage_modifier + 1) * 2)));
     }
@@ -1215,9 +1229,9 @@ void Execute_Skill_Hit(UBYTE action_performer, UBYTE action_target)
         skill_damage = 2 + (rand() % ((Get_Enemy_Dummy(action_performer - 4)->strength + 1) * 2));
     }
 
-    if (action_target > 3)
+    if(Is_Actor(action_target) == false)
     {
-        if (Get_Enemy_Dummy(action_target - 4)->health <= skill_damage)
+        if(Get_Enemy_Dummy(action_target - 4)->health <= skill_damage)
         {
             Get_Enemy_Dummy(action_target - 4)->health = 0;
         }
@@ -1230,7 +1244,7 @@ void Execute_Skill_Hit(UBYTE action_performer, UBYTE action_target)
     }
     else
     {
-        if (party[action_target]->health <= skill_damage)
+        if(party[action_target]->health <= skill_damage)
         {
             party[action_target]->health = 0;
         }
@@ -1283,28 +1297,85 @@ void Execute_Skill_Fireball(UBYTE action_performer, UBYTE action_target)
     }
 }
 
-void Execute_Skill(UBYTE skill_id, UBYTE action_performer, UBYTE action_target)
+void Execute_Skill_Cure(UBYTE action_performer, UBYTE action_target)
+{
+    if(Is_Actor(action_performer) == true)
+    {
+        damage_modifier = party[action_performer]->wisdom;
+        skill_damage = 3 + ((rand() % ((damage_modifier + 1) * 2)));
+    }
+    else
+    {
+        skill_damage = 4 + (rand() % ((Get_Enemy_Dummy(action_performer - 4)->wisdom + 1) * 2));
+    }
+
+    if(Is_Actor(action_target) == false)
+    {
+        if(Get_Enemy_Dummy(action_target - 4)->enemy_type == undead)
+        {
+            if(Get_Enemy_Dummy(action_target - 4)->health <= skill_damage)
+            {
+                Get_Enemy_Dummy(action_target - 4)->health = 0;
+            }
+            else
+            {
+                Get_Enemy_Dummy(action_target - 4)->health -= skill_damage;
+            }
+        }
+        else
+        {
+            if(Get_Enemy_Dummy(action_target - 4)->max_health <= Get_Enemy_Dummy(action_target - 4)->health + skill_damage)
+            {
+                Get_Enemy_Dummy(action_target - 4)->health = Get_Enemy_Dummy(action_target - 4)->max_health;
+            }
+            else
+            {
+                Get_Enemy_Dummy(action_target - 4)->health += skill_damage;
+            }
+        }
+
+        Load_Damage_Sprite(action_target);
+    }
+    else
+    {
+        if (party[action_target]->max_health <= party[action_target]->health + skill_damage)
+        {
+            party[action_target]->health = party[action_target]->max_health;
+        }
+        else
+        {
+            party[action_target]->health += skill_damage;
+        }
+
+        shake_screen();
+    }
+}
+
+void Execute_Skill(const GameSkill* skill, UBYTE action_performer, UBYTE action_target)
 {
     CurrentTarget = action_target;
 
     Get_Next_Target();
 
-    switch (skill_id)
+    switch (skill->skill_id)
     {
-    case 0:
-        break;
-    case 1:
-        Execute_Skill_Hit(action_performer, CurrentTarget);
-        break;
-    case 3:
-        Execute_Skill_Fireball(action_performer, CurrentTarget);
-        break;
-    default:
-        Execute_Skill_Hit(action_performer, CurrentTarget);
-        break;
+        case 0:
+            break;
+        case 1:
+            Execute_Skill_Hit(action_performer, CurrentTarget);
+            break;
+        case 3:
+            Execute_Skill_Fireball(action_performer, CurrentTarget);
+            break;
+        case 23:
+            Execute_Skill_Cure(action_performer, CurrentTarget);
+            break;
+        default:
+            Execute_Skill_Hit(action_performer, CurrentTarget);
+            break;
     }
 
-    Draw_Skill_Message(Get_Skill(skill_id), action_performer, CurrentTarget);
+    Draw_Skill_Message(skill, action_performer, CurrentTarget);
 }
 
 void Draw_Troop(unsigned char *tiles, unsigned char *data) //* Draws troop tiles.

@@ -15,6 +15,7 @@ typedef struct GameMap
     UBYTE troops[6];
     UBYTE event_tele[20];
     UBYTE event_sign[10];
+    GameChest* event_chest[10];
     GameTrigger* event_trigger[10];
     GameShopkeeper* event_shopkeeper[5];
     

@@ -6,6 +6,7 @@
 
 typedef struct GameCharacter
 {
+    unsigned char name[15];
     UBYTE active;
     UBYTE npc_type;
     UBYTE action_id;
@@ -13,11 +14,13 @@ typedef struct GameCharacter
     UBYTE sprite_id[2];
     UBYTE pos_x;
     UBYTE pos_y;
-    UBYTE walk_count[4];
+    UINT16 walk_count[4];
+    UBYTE walk_length[4];
     UBYTE facing;
     UBYTE visible;
     UBYTE anim_tick;
-    const GameCharSprite *sprites;
+    UBYTE char_npc_id;
+    const GameCharSprite* sprites; // Deprecated
     GameSpritePackage *sprites_up;
     GameSpritePackage *sprites_down;
     GameSpritePackage *sprites_left;

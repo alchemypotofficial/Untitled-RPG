@@ -1,5 +1,7 @@
 #include <gb/gb.h>
 #include "Game_Sprite.h"
+#include "Game_Equip.h"
+#include "Game_Skill.h"
 
 #ifndef GAME_ACTOR
 #define GAME_ACTOR
@@ -25,9 +27,10 @@ typedef struct GameActor
     UINT16 experience;
     UBYTE party_slot;
     UBYTE equipped[4];
+    const GameEquip* equipment[4];
     UBYTE active_member;
     UBYTE can_attack;
-    UBYTE skills[10];
+    const GameSkill* skills[10];
     UBYTE skill_ap[120];
 
 } GameActor;
