@@ -1,5 +1,6 @@
 #include <gb/gb.h>
 #include "Game_Event.h"
+#include "Game_Troop.h"
 
 #ifndef GAME_MAP
 #define GAME_MAP
@@ -12,7 +13,7 @@ typedef struct GameMap
     UBYTE size_y;
     unsigned char* data;
     UBYTE combat;
-    UBYTE troops[6];
+    const GameBattle battles[6];
     UBYTE event_tele[20];
     UBYTE event_sign[10];
     GameChest* event_chest[10];

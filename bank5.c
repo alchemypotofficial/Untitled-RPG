@@ -7,9 +7,13 @@
 #include "Game_Sprite.h"
 
 extern UBYTE PlayerCharacter;
+
 extern INT8 i, j, k, l, m, n;
+
 extern UBYTE u_i, u_j;
+
 extern UBYTE u16_i;
+
 extern UINT16 party_gold;
 
 extern GameNPC* npc_list[7];
@@ -24,7 +28,7 @@ extern GameCharacter* Find_Free_Character();
 extern void Call_Move_Char(UBYTE bank, GameCharacter* character, UINT8 tile_x, UINT8 tile_y, UINT8 pixel_offset);
 extern void Call_Load_Char_Sprite(UBYTE bank, GameCharacter* character, GameSprite* sprite);
 extern void Call_Build_Char(UBYTE bank, GameCharacter* character);
-extern void Call_Set_Sprite_Packages(UBYTE bank, GameCharacter* character, GameSpritePackage* sprites_up, GameSpritePackage* sprites_down, GameSpritePackage* sprites_left, GameSpritePackage* sprites_right);
+extern void Call_Set_Sprites(UBYTE bank, GameCharacter* character, const GameCharSprite* sprites);
 extern void Call_Orient_Char(UBYTE bank, GameCharacter* character);
 
 const INT8 Jump_Parabola[] =
@@ -55,14 +59,14 @@ void Add_NPC(const char* name, GameNPC* npc, UBYTE pos_x, UBYTE pos_y, UBYTE fac
 
         Set_Name(temp_char, name);
 
-        Call_Set_Sprite_Packages(bank5, temp_char, npc->sprites_up, npc->sprites_down, npc->sprites_left, npc->sprites_right);
+        Call_Set_Sprites(bank5, temp_char, npc->sprites);
 
         switch(facing)
         {
-            case up: Call_Load_Char_Sprite(bank5, temp_char, npc->sprites_up->sprites[0]); break;
-            case down: Call_Load_Char_Sprite(bank5, temp_char, npc->sprites_down->sprites[0]); break;
-            case left: Call_Load_Char_Sprite(bank5, temp_char, npc->sprites_left->sprites[0]); break;
-            case right: Call_Load_Char_Sprite(bank5, temp_char, npc->sprites_right->sprites[0]); break;
+            case up: Call_Load_Char_Sprite(bank5, temp_char, npc->sprites->actor_up->sprites[0]); break;
+            case down: Call_Load_Char_Sprite(bank5, temp_char, npc->sprites->actor_down->sprites[0]); break;
+            case left: Call_Load_Char_Sprite(bank5, temp_char, npc->sprites->actor_left->sprites[0]); break;
+            case right: Call_Load_Char_Sprite(bank5, temp_char, npc->sprites->actor_right->sprites[0]); break;
         }
 
         Call_Orient_Char(bank5, temp_char);
@@ -87,7 +91,7 @@ void Clear_Char(GameCharacter* character)
         character->active = false;
         character->visible = false;
 
-        Call_Set_Sprite_Packages(bank5, character, NULL, NULL, NULL, NULL);
+        Call_Set_Sprites(bank5, character, NULL);
         Call_Load_Char_Sprite(bank5, character, &sprite_clear);
     }
 }
@@ -127,9 +131,4 @@ void Jump_Character(GameCharacter* character)
             scroll_sprite(character->sprite_id[0] + 3, 0, Jump_Parabola[u_i]);
         }
     }
-}
-
-void NPC_Handler(UINT16 action_id)
-{
-
 }

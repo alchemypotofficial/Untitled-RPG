@@ -12,6 +12,13 @@ typedef struct GameTroop
     UBYTE escapable;
 } GameTroop;
 
+typedef struct GameBattle
+{
+    const GameTroop* troop;
+    UBYTE percentage;
+
+} GameBattle;
+
 extern const GameTroop troop_bee1;
 extern const GameTroop troop_wolf1;
 extern const GameTroop troop_bee2;

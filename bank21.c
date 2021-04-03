@@ -7,3 +7,4 @@
 #include "Game_NPC.h"
 #include "Tiles/Tiles_Sashi.c"
 #include "Tiles/Tiles_Man_1.c"
+#include "Tiles/Tiles_Ship.c"

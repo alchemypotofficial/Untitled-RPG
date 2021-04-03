@@ -40,7 +40,11 @@ UBYTE current_bank = 2, held_bank = 0;
 
 UBYTE CurrentMapBank = 0, Tileset = 0, Collision = 0;
 
+UBYTE rand_percent, percent_max;
+
 const GameMap* current_map; //Current GameMap.
+
+const GameTroop* current_troop; //Current GameTroop.
 
 UBYTE confirm_x = 0, confirm_y = 0;
 
@@ -88,6 +92,8 @@ UINT16 party_gold = 500;
 
 UINT16 clock_time_second = 0, clock_time_minute = 0, clock_time_hour = 0;
 
+UBYTE tile_collision = 0;
+
 UBYTE step_counter = 6, encounter_rate = 50, encounter_value = 0;
 
 INT8 i = 0, j = 0, k = 0, l = 0, m = 0, n = 0, r = 0, x = 0, y = 0;
@@ -122,6 +128,8 @@ const GameEquip* equipment_accessory[30];
 
 unsigned char flag_switch[255];
 
+UBYTE temp_UBYTE = 0;
+
 GameCharacter* temp_char;
 
 const GameEquip* temp_equip;
@@ -133,6 +141,8 @@ const GameChest* tempChest;
 GameActor* party[4] = {0, 0, 0, 0};
 
 unsigned char enemy[3] = {0, 0, 0};
+
+UBYTE ship_pos_x = 117, ship_pos_y = 221;
 
 unsigned char name_hiro[7] =
 {
@@ -198,6 +208,8 @@ extern GameActor saved_actor_hiro;
 
 /*  Game Flags:  */
 UBYTE game_scene = 0;
+
+UBYTE InShipFlag = false;
 
 UBYTE ADownFlag = false;
 
@@ -328,7 +340,8 @@ extern void Load_Menu_Status();
 extern void Load_Menu_Skills();
 
 /*  Bank 16  */
-extern void Load_Combat_Main();
+extern void Load_Random_Combat();
+extern void Load_Combat(const GameTroop* troop);
 extern void Check_Step_Counter();
 extern void Draw_Troop(unsigned char* tiles, unsigned char* data);
 extern void Load_Battle_Message_Box();
@@ -680,6 +693,18 @@ void Save_Variables(void) //* Saves all "save" variables.
     saved_game_start = true;
 }
 
+UBYTE Check_Collision(UBYTE collision)
+{
+    if((collision == 0 && InShipFlag == false) || (collision == 2 && InShipFlag == true))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 UBYTE Compare_String(char* string_1, char* string_2)
 {
     if(strlen(string_1) == strlen(string_2))
@@ -748,7 +773,7 @@ GameCharacter* Find_Free_Character()
     }
 }
 
-void Load_Char_Sprite(GameCharacter* character, GameSprite* sprite)
+void Load_Char_Sprite(GameCharacter* character, const GameSprite* sprite)
 {
     set_sprite_data(character->sprite_index, 4, sprite->tiles);
 }
@@ -782,12 +807,9 @@ void Set_Char_Tile(GameCharacter* character, UBYTE tile, GameSprite* sprite)
     set_sprite_data(character->sprite_index + tile, 1, sprite->tiles);
 }
 
-void Set_Sprite_Packages(GameCharacter* character, GameSpritePackage* sprites_up, GameSpritePackage* sprites_down, GameSpritePackage* sprites_left, GameSpritePackage* sprites_right)
+void Set_Sprites(GameCharacter* character, const GameCharSprite* sprites)
 {
-    character->sprites_up = sprites_up;
-    character->sprites_down = sprites_down;
-    character->sprites_left = sprites_left;
-    character->sprites_right = sprites_right;
+    character->sprites = sprites;
 }
 
 /*--------------------------------------------*/
@@ -1342,7 +1364,7 @@ void Call_Load_Player_Actor(UBYTE bank)
     switch_bank(bank);
 }
 
-void Call_Load_Char_Sprite(UBYTE bank, GameCharacter* character, GameSprite* sprite) //* Sets character to sprite specified.
+void Call_Load_Char_Sprite(UBYTE bank, GameCharacter* character, const GameSprite* sprite) //* Sets character to sprite specified.
 {
     switch_bank(sprite->bank);
 
@@ -1351,11 +1373,11 @@ void Call_Load_Char_Sprite(UBYTE bank, GameCharacter* character, GameSprite* spr
     switch_bank(bank);
 }
 
-void Call_Set_Sprite_Packages(UBYTE bank, GameCharacter* character, GameSpritePackage* sprites_up, GameSpritePackage* sprites_down, GameSpritePackage* sprites_left, GameSpritePackage* sprites_right)
+void Call_Set_Sprites(UBYTE bank, GameCharacter* character, const GameCharSprite* sprites)
 {
-    switch_bank(sprites_up->sprites[0]->bank);
+    switch_bank(sprites->actor_up->sprites[0]->bank);
 
-    Set_Sprite_Packages(character, sprites_up, sprites_down, sprites_left, sprites_right);
+    Set_Sprites(character, sprites);
 
     switch_bank(bank);
 }
@@ -1604,7 +1626,7 @@ void Call_Remove_NPC(UBYTE bank, const char* name)
 
     switch_bank(bank5);
 
-    Remove_NPC(name);
+    Remove_NPC(temp_string);
 
     switch_bank(bank);
 }
@@ -1708,11 +1730,20 @@ void Call_Play_Use(UBYTE bank)
     switch_bank(bank);
 }
 
-void Call_Load_Combat_Main(UBYTE bank)
+void Call_Load_Random_Combat(UBYTE bank) //Initiates a random battle.
 {
     switch_bank(bank16);
     
-    Load_Combat_Main();
+    Load_Random_Combat();
+
+    switch_bank(bank);
+}
+
+void Call_Load_Combat(UBYTE bank, const GameTroop* troop) //Initates a specific battle.
+{
+    switch_bank(bank16);
+    
+    Load_Combat(troop);
 
     switch_bank(bank);
 }

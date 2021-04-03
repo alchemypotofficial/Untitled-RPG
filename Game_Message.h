@@ -7,6 +7,7 @@ typedef struct GameMessage
     UBYTE bank;
     unsigned char* message;
     UBYTE length;
+    UBYTE speedable;
     
 } GameMessage;
 

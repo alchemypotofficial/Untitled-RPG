@@ -1,5 +1,6 @@
 #include <gb/gb.h>
 #include "Game_Definitions.h"
+#include "Game_Sprite.h"
 
 extern const unsigned char Clear_Tiles;
 
@@ -62,6 +63,18 @@ extern const unsigned char Tiles_Man_1BLK8;
 extern const unsigned char Tiles_Man_1BLK9;
 extern const unsigned char Tiles_Man_1BLK10;
 
+extern const unsigned char Tiles_ShipBLK0;
+extern const unsigned char Tiles_ShipBLK1;
+extern const unsigned char Tiles_ShipBLK2;
+extern const unsigned char Tiles_ShipBLK3;
+extern const unsigned char Tiles_ShipBLK4;
+extern const unsigned char Tiles_ShipBLK5;
+extern const unsigned char Tiles_ShipBLK6;
+extern const unsigned char Tiles_ShipBLK7;
+extern const unsigned char Tiles_ShipBLK8;
+extern const unsigned char Tiles_ShipBLK9;
+extern const unsigned char Tiles_ShipBLK10;
+
 /*  Game Sprites:  */
 const GameSprite sprite_clear = {&Clear_Tiles, bank4};
 
@@ -100,6 +113,11 @@ const GameSprite sprite_man_1_down_2 = {&Tiles_Man_1BLK2, bank21};
 const GameSprite sprite_man_1_left_0 = {&Tiles_Man_1BLK3, bank21};
 const GameSprite sprite_man_1_right_0 = {&Tiles_Man_1BLK6, bank21};
 
+const GameSprite sprite_ship_up_0 = {&Tiles_ShipBLK9, bank21};
+const GameSprite sprite_ship_down_0 = {&Tiles_ShipBLK0, bank21};
+const GameSprite sprite_ship_left_0 = {&Tiles_ShipBLK3, bank21};
+const GameSprite sprite_ship_right_0 = {&Tiles_ShipBLK6, bank21};
+
 /*  Game Sprite Packages:  */
 const GameSpritePackage sprite_hiro_up = {{&sprite_hiro_up_0, &sprite_clear, &sprite_clear, &sprite_clear}};
 const GameSpritePackage sprite_hiro_down = {{&sprite_hiro_down_0, &sprite_hiro_down_1, &sprite_hiro_down_2, &sprite_clear}};
@@ -126,11 +144,17 @@ const GameSpritePackage sprite_man_1_down = {{&sprite_man_1_down_0, &sprite_man_
 const GameSpritePackage sprite_man_1_left = {{&sprite_man_1_left_0, &sprite_clear, &sprite_clear, &sprite_clear}};
 const GameSpritePackage sprite_man_1_right = {{&sprite_man_1_right_0, &sprite_clear, &sprite_clear, &sprite_clear}};
 
+const GameSpritePackage sprite_ship_up = {{&sprite_ship_up_0, &sprite_clear}};
+const GameSpritePackage sprite_ship_down = {{&sprite_ship_down_0, &sprite_clear}};
+const GameSpritePackage sprite_ship_left = {{&sprite_ship_left_0, &sprite_clear}};
+const GameSpritePackage sprite_ship_right = {{&sprite_ship_right_0, &sprite_clear}};
+
 /*  Game Actor Sprite Packages:  */
 const GameCharSprite sprite_hiro = {&sprite_hiro_up, &sprite_hiro_down, &sprite_hiro_left, &sprite_hiro_right};
 const GameCharSprite sprite_bud = {&sprite_bud_up, &sprite_bud_down, &sprite_bud_left, &sprite_bud_right};
 const GameCharSprite sprite_soran = {&sprite_soran_up, &sprite_soran_down, &sprite_soran_left, &sprite_soran_right};
 
 const GameCharSprite sprite_sashi = {&sprite_sashi_up, &sprite_sashi_down, &sprite_sashi_left, &sprite_sashi_right};
-
 const GameCharSprite sprite_man_1 = {&sprite_man_1_up, &sprite_man_1_down, &sprite_man_1_left, &sprite_man_1_right};
+
+const GameCharSprite sprite_ship = {&sprite_ship_up, &sprite_ship_down, &sprite_ship_left, &sprite_ship_right};

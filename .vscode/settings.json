@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "gb.h": "c"
+        "gb.h": "c",
+        "game_functions.h": "c",
+        "game_definitions.h": "c"
     }
 }

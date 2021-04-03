@@ -97,18 +97,18 @@ void Draw_Tile18(UINT16 tile_x, UINT16 tile_y, UBYTE tile_num)
 {
     switch (Tileset)
     {
-    case 1:
-        set_bkg_tiles(tile_x, tile_y, 2, 2, Tileset_1_Map[tile_num]);
-        break;
-    case 2:
-        set_bkg_tiles(tile_x, tile_y, 2, 2, Tileset_2_Map[tile_num]);
-        break;
-    case 3:
-        set_bkg_tiles(tile_x, tile_y, 2, 2, Tileset_3_Map[tile_num]);
-        break;
-    default:
-        set_bkg_tiles(tile_x, tile_y, 2, 2, Tileset_1_Map[tile_num]);
-        break;
+        case 1:
+            set_bkg_tiles(tile_x, tile_y, 2, 2, Tileset_1_Map[tile_num]);
+            break;
+        case 2:
+            set_bkg_tiles(tile_x, tile_y, 2, 2, Tileset_2_Map[tile_num]);
+            break;
+        case 3:
+            set_bkg_tiles(tile_x, tile_y, 2, 2, Tileset_3_Map[tile_num]);
+            break;
+        default:
+            set_bkg_tiles(tile_x, tile_y, 2, 2, Tileset_1_Map[tile_num]);
+            break;
     }
 }
 
@@ -146,36 +146,36 @@ void Draw_Map_Bank18(const GameMap *map) //* Draws map tiles.
     i = 0;
     j = 0;
 
-    while (1)
+    while(1)
     {
-        f = Map_YggdridLUT[u_y + j];
+        f = Lookup_Map_Yggdrid[u_y + j];
         base_byte = map->data[f + u_i];
         count_byte = map->data[f + u_i + 1];
 
-        if (count_byte > u_x)
+        if(count_byte > u_x)
         {
             count_byte -= u_x;
             u_x = 0;
 
-            while (1)
+            while(1)
             {
                 Draw_Tile18(i * 2, j * 2, base_byte);
 
                 i++;
                 count_byte--;
 
-                if (count_byte == 0)
+                if(count_byte == 0)
                 {
                     u_i += 2;
                     break;
                 }
-                else if (i == 10)
+                else if(i == 10)
                 {
                     break;
                 }
             }
         }
-        else if (count_byte <= u_x)
+        else if(count_byte <= u_x)
         {
             u_x -= count_byte;
             count_byte = 0;
@@ -183,7 +183,7 @@ void Draw_Map_Bank18(const GameMap *map) //* Draws map tiles.
             u_i += 2;
         }
 
-        if (i == 10)
+        if(i == 10)
         {
             i = 0;
             j++;
@@ -191,7 +191,7 @@ void Draw_Map_Bank18(const GameMap *map) //* Draws map tiles.
             u_x = u_j;
         }
 
-        if (j == 9)
+        if(j == 9)
         {
             break;
         }
@@ -205,7 +205,7 @@ void Draw_Line_Bank18(const GameMap *map, UBYTE direction) //* Draws verticle/ho
     j = 0;
     u_k = 0;
 
-    if (direction == right && char_player.pos_x <= map_size_x - 5)
+    if(direction == right && char_player.pos_x <= map_size_x - 5)
     {
         load_pos_x = camera_x + 20;
         if (load_pos_x >= 32)
@@ -240,7 +240,7 @@ void Draw_Line_Bank18(const GameMap *map, UBYTE direction) //* Draws verticle/ho
         {
             while (1)
             {
-                f = Map_YggdridLUT[u_y + j];
+                f = Lookup_Map_Yggdrid[u_y + j];
                 base_byte = map->data[f + u_i];
                 count_byte = map->data[f + u_i + 1];
 
@@ -284,7 +284,7 @@ void Draw_Line_Bank18(const GameMap *map, UBYTE direction) //* Draws verticle/ho
         {
             while (1)
             {
-                f = Map_YggdridLUT[u_y + j];
+                f = Lookup_Map_Yggdrid[u_y + j];
                 base_byte = map->data[f + u_i];
                 count_byte = map->data[f + u_i + 1];
 
@@ -312,7 +312,7 @@ void Draw_Line_Bank18(const GameMap *map, UBYTE direction) //* Draws verticle/ho
         }
     }
 
-    else if (direction == left && char_player.pos_x >= 5)
+    else if(direction == left && char_player.pos_x >= 5)
     {
         if (camera_x == 0)
         {
@@ -350,7 +350,7 @@ void Draw_Line_Bank18(const GameMap *map, UBYTE direction) //* Draws verticle/ho
         {
             while (1)
             {
-                f = Map_YggdridLUT[u_y + j];
+                f = Lookup_Map_Yggdrid[u_y + j];
                 base_byte = map->data[f + u_i];
                 count_byte = map->data[f + u_i + 1];
 
@@ -394,7 +394,7 @@ void Draw_Line_Bank18(const GameMap *map, UBYTE direction) //* Draws verticle/ho
         {
             while (1)
             {
-                f = Map_YggdridLUT[u_y + j];
+                f = Lookup_Map_Yggdrid[u_y + j];
                 base_byte = map->data[f + u_i];
                 count_byte = map->data[f + u_i + 1];
 
@@ -422,7 +422,7 @@ void Draw_Line_Bank18(const GameMap *map, UBYTE direction) //* Draws verticle/ho
         }
     }
 
-    else if (direction == down && char_player.pos_y <= map_size_y - 4)
+    else if(direction == down && char_player.pos_y <= map_size_y - 4)
     {
         load_pos_x = camera_x;
         if (load_pos_x >= 32)
@@ -455,7 +455,7 @@ void Draw_Line_Bank18(const GameMap *map, UBYTE direction) //* Draws verticle/ho
         {
             while (1)
             {
-                f = Map_YggdridLUT[u_y];
+                f = Lookup_Map_Yggdrid[u_y];
                 base_byte = map->data[f + u_i];
                 count_byte = map->data[f + u_i + 1];
 
@@ -481,7 +481,7 @@ void Draw_Line_Bank18(const GameMap *map, UBYTE direction) //* Draws verticle/ho
                                 {
                                     u_k = 1;
 
-                                    f = Map_YggdridLUT[u_y];
+                                    f = Lookup_Map_Yggdrid[u_y];
                                     base_byte = map->data[f + u_i];
                                     count_byte = map->data[f + u_i + 1];
 
@@ -541,7 +541,7 @@ void Draw_Line_Bank18(const GameMap *map, UBYTE direction) //* Draws verticle/ho
         {
             while (1)
             {
-                f = Map_YggdridLUT[u_y];
+                f = Lookup_Map_Yggdrid[u_y];
                 base_byte = map->data[f + u_i];
                 count_byte = map->data[f + u_i + 1];
 
@@ -584,15 +584,15 @@ void Draw_Line_Bank18(const GameMap *map, UBYTE direction) //* Draws verticle/ho
         }
     }
 
-    else if (direction == up && char_player.pos_y >= 5)
+    else if(direction == up && char_player.pos_y >= 5)
     {
         load_pos_x = camera_x;
-        if (load_pos_x >= 32)
+        if(load_pos_x >= 32)
         {
             load_pos_x = load_pos_x - 32;
         }
 
-        if (camera_y == 0)
+        if(camera_y == 0)
         {
             load_pos_y = 30;
         }
@@ -601,11 +601,11 @@ void Draw_Line_Bank18(const GameMap *map, UBYTE direction) //* Draws verticle/ho
             load_pos_y = camera_y - 2;
         }
 
-        if (char_player.pos_x <= 5)
+        if(char_player.pos_x <= 5)
         {
             u_x = 0;
         }
-        else if (char_player.pos_x >= map_size_x - 5)
+        else if(char_player.pos_x >= map_size_x - 5)
         {
             u_x = map_size_x - 10;
         }
@@ -616,22 +616,22 @@ void Draw_Line_Bank18(const GameMap *map, UBYTE direction) //* Draws verticle/ho
 
         u_y = char_player.pos_y - 6;
 
-        if (camera_x + 20 > 32)
+        if(camera_x + 20 > 32)
         {
-            while (1)
+            while(1)
             {
-                f = Map_YggdridLUT[u_y];
+                f = Lookup_Map_Yggdrid[u_y];
                 base_byte = map->data[f + u_i];
                 count_byte = map->data[f + u_i + 1];
 
-                if (count_byte > u_x)
+                if(count_byte > u_x)
                 {
                     count_byte -= u_x;
                     u_x = 0;
 
-                    if (u_k == 0)
+                    if(u_k == 0)
                     {
-                        while (1)
+                        while(1)
                         {
                             Draw_Tile18(load_pos_x + i, load_pos_y, base_byte);
 
@@ -646,7 +646,7 @@ void Draw_Line_Bank18(const GameMap *map, UBYTE direction) //* Draws verticle/ho
                                 {
                                     u_k = 1;
 
-                                    f = Map_YggdridLUT[u_y];
+                                    f = Lookup_Map_Yggdrid[u_y];
                                     base_byte = map->data[f + u_i];
                                     count_byte = map->data[f + u_i + 1];
 
@@ -706,7 +706,7 @@ void Draw_Line_Bank18(const GameMap *map, UBYTE direction) //* Draws verticle/ho
         {
             while (1)
             {
-                f = Map_YggdridLUT[u_y];
+                f = Lookup_Map_Yggdrid[u_y];
                 base_byte = map->data[f + u_i];
                 count_byte = map->data[f + u_i + 1];
 
@@ -757,17 +757,17 @@ UBYTE Check_Tile_Collision_Bank18(const GameMap *map, GameCharacter *character, 
     u_x = character->pos_x + move_x;
     u_y = character->pos_y + move_y;
 
-    while (1)
+    while(1)
     {
-        f = Map_YggdridLUT[u_y];
+        f = Lookup_Map_Yggdrid[u_y];
         base_byte = map->data[f + u_i];
         count_byte = map->data[f + u_i + 1];
 
-        if (count_byte > u_x)
+        if(count_byte > u_x)
         {
-            return tilemap_3[base_byte] == impassable;
+            return tilemap_3[base_byte];
         }
-        else if (count_byte <= u_x)
+        else if(count_byte <= u_x)
         {
             u_x -= count_byte;
             count_byte = 0;

@@ -30,6 +30,8 @@ extern INT8 i, j, k, l, m, n;
 
 extern UINT16 f, g, h;
 
+extern UBYTE ship_pos_x, ship_pos_y;
+
 extern void set_bkg_map(UINT8 tile_x, UINT8 tile_y, UINT8 width, UINT8 height, unsigned char *map_1, unsigned char *map_0);
 extern void set_win_map(UINT8 tile_x, UINT8 tile_y, UINT8 width, UINT8 height, unsigned char *map_1, unsigned char *map_0);
 extern void set_bkg_tileset(UBYTE first_tile, UBYTE num_tile, unsigned char *tileset);
@@ -87,7 +89,7 @@ void Load_Tileset(UBYTE tileset)
     }
     else if(tileset == 3)
     {
-        set_bkg_tileset(0, 78, Tileset_3);
+        set_bkg_tileset(0, 115, Tileset_3);
     }
 }
 
@@ -137,6 +139,8 @@ void Load_Map(UINT8 map_id) //* Loads map data into "map" based on the ID given.
 
         Load_Tileset(3);
         set_bkg_palette(0, 4, Palette_BKG);
+
+        Call_Add_NPC(bank3, "npc_ship", &npc_ship, ship_pos_x, ship_pos_y, right);
     }
 }
 

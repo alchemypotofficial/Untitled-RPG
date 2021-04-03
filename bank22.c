@@ -1,0 +1,9 @@
+#include <gb/gb.h>
+#include "Game_Definitions.h"
+#include "Game_Functions.h"
+#include "Game_Actor.h"
+#include "Game_NPC.h"
+#include "Game_Event.h"
+#include "Game_Map.h"
+#include "Game_Character.h"
+#include "Game_Message.h"

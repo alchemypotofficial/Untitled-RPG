@@ -1,5 +1,6 @@
 #include <gb/gb.h>
 #include "Game_Definitions.h"
+#include "Game_Class.h"
 
 const unsigned char name_knight[3] = {0x45, 0x48, 0x4E};
 const unsigned char name_traveler[3] = {0x4E, 0x50, 0x4C};

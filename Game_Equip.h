@@ -20,7 +20,6 @@ typedef struct GameEquip
     UBYTE phys_def;
     UBYTE magic_def;
     const GameSkill* skill;
-    UBYTE skill_id;
     UINT16 price;
 
 } GameEquip;

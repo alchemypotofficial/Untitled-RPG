@@ -1,5 +1,6 @@
 #include <gb/gb.h>
 #include "Game_Definitions.h"
+#include "Game_Troop.h"
 
 extern const unsigned char Map_Troop_Bee1PLN0;
 extern const unsigned char Map_Troop_Bee1PLN1;

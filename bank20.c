@@ -10,6 +10,8 @@
 
 extern UBYTE Joy;
 
+extern const GameMap* current_map;
+
 extern UBYTE CurrentMenu, CurrentSelection, CurrentItemSlot, CurrentItemSelection, CurrentShop, CurrentShopSelection;
 
 extern UBYTE slot_1, slot_2, item_1, item_2, slot_1_filled, slot_2_filled, amount_1, amount_2;
@@ -22,6 +24,8 @@ extern UBYTE Tileset;
 
 extern UBYTE PlayerControlFlag;
 
+extern UBYTE InShipFlag;
+
 extern UINT16 party_gold;
 
 extern UBYTE parsed_number;
@@ -33,6 +37,8 @@ extern INT8 i, j, k, l, m, n;
 extern UBYTE u_x, u_y;
 
 extern GameActor *party[4];
+
+extern GameCharacter* temp_char;
 
 extern unsigned char name_hiro;
 extern UBYTE name_hiro_length;
@@ -114,12 +120,84 @@ void Scene_Opening()
     PlayerControlFlag = true;
 }
 
+void Scene_Ship()
+{
+    temp_char = Get_Char_NPC("npc_ship");
+
+    switch(char_player.facing)
+    {
+        case up: Call_Walk_Distance(bank20, &char_player, 0, -1); break;
+        case down: Call_Walk_Distance(bank20, &char_player, 0, 1); break;
+        case left: Call_Walk_Distance(bank20, &char_player, -1, 0); break;
+        case right: Call_Walk_Distance(bank20, &char_player, 1, 0); break;
+    }
+
+    while(true)
+    {
+        performant_delay(1);
+        
+        Call_Walk_Chars(bank20);
+        
+        if(check_walk_counter(&char_player) == false)
+        {
+            break;
+        }
+    }
+
+    Call_Set_Sprites(bank20, &char_player, &sprite_ship);
+
+    switch(temp_char->facing)
+    {
+        case up: Call_Load_Char_Sprite(bank20, &char_player, &sprite_ship_up_0); break;
+        case down: Call_Load_Char_Sprite(bank20, &char_player, &sprite_ship_down_0); break;
+        case left: Call_Load_Char_Sprite(bank20, &char_player, &sprite_ship_left_0); break;
+        case right: Call_Load_Char_Sprite(bank20, &char_player, &sprite_ship_right_0); break;
+    }
+
+    char_player.facing = temp_char->facing;
+
+    InShipFlag = true;
+
+    Call_Remove_NPC(bank20, "npc_ship");
+}
+
+void Scene_Ship_Depart()
+{
+    Call_Add_NPC(bank20, "npc_ship", &npc_ship, char_player.pos_x, char_player.pos_y, char_player.facing);
+
+    Call_Load_Player_Actor(bank20);
+    
+    switch(char_player.facing)
+    {
+        case up: Call_Load_Char_Sprite(bank20, &char_player, char_player.sprites->actor_up->sprites[0]); break;
+        case down: Call_Load_Char_Sprite(bank20, &char_player, char_player.sprites->actor_down->sprites[0]); break;
+        case left: Call_Load_Char_Sprite(bank20, &char_player, char_player.sprites->actor_left->sprites[0]); break;
+        case right: Call_Load_Char_Sprite(bank20, &char_player, char_player.sprites->actor_right->sprites[0]); break;
+    }
+
+    switch(char_player.facing)
+    {
+        case up: Call_Walk_Distance(bank20, &char_player, 0, -1); break;
+        case down: Call_Walk_Distance(bank20, &char_player, 0, 1); break;
+        case left: Call_Walk_Distance(bank20, &char_player, -1, 0); break;
+        case right: Call_Walk_Distance(bank20, &char_player, 1, 0); break;
+    }
+
+    InShipFlag = false;
+}
+
 void Scene_Handler(UBYTE scene_id)
 {
     switch (scene_id)
     {
         case 0:
             Scene_Opening();
+            break;
+        case 1:
+            Scene_Ship();
+            break;
+        case 2:
+            Scene_Ship_Depart();
             break;
         default:
             break;

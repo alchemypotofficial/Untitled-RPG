@@ -20,11 +20,7 @@ typedef struct GameCharacter
     UBYTE visible;
     UBYTE anim_tick;
     UBYTE char_npc_id;
-    const GameCharSprite* sprites; // Deprecated
-    GameSpritePackage *sprites_up;
-    GameSpritePackage *sprites_down;
-    GameSpritePackage *sprites_left;
-    GameSpritePackage *sprites_right;
+    const GameCharSprite* sprites;
 
 } GameCharacter;
 

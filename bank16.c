@@ -1,6 +1,7 @@
 #include <gb/gb.h>
 #include <rand.h>
 #include "Game_Definitions.h"
+#include "Game_Functions.h"
 #include "Game_Map.h"
 #include "Game_Character.h"
 #include "Game_Actor.h"
@@ -25,7 +26,11 @@ extern UBYTE Joy, Seed;
 
 extern const GameMap* current_map;
 
+extern const GameTroop* current_troop;
+
 extern UBYTE clock_tick;
+
+extern UBYTE rand_percent, percent_max;
 
 extern UBYTE CurrentMenu, CurrentSelection, CurrentItemSlot, CurrentItemSelection, CurrentEquipSelection, CurrentSkillSelection[4], skill_y[4];
 
@@ -39,7 +44,7 @@ extern UBYTE Tileset;
 
 extern UINT16 party_gold;
 
-extern UBYTE CurrentCombat, CurrentTroop, combat_main_y, combat_selection_y, CurrentTurn, turn_number, total_actors, selected_enemy, enemy_selection[4], action_selection[4], target_selection[7], action_order[7], enemy_x, actor_action[4], enemy_action[3];
+extern UBYTE CurrentCombat, combat_main_y, combat_selection_y, CurrentTurn, turn_number, total_actors, selected_enemy, enemy_selection[4], action_selection[4], target_selection[7], action_order[7], enemy_x, actor_action[4], enemy_action[3];
 
 extern const GameSkill* skill_selection[7];
 
@@ -145,6 +150,7 @@ const unsigned char Combat_Background[1] = {0x01};
 const unsigned char Combat_Zeros[4] = {0x31, 0x31, 0x31, 0x31};
 
 void Close_Combat();
+void Load_Random_Combat();
 void Load_Combat_Main();
 void Update_Combat_Main_Joypad();
 void Update_Combat_Fight_Joypad();
@@ -200,7 +206,7 @@ void Check_Step_Counter()
 
         if(encounter_value <= encounter_rate)
         {
-            Load_Combat_Main();
+            Load_Random_Combat();
         }
     }
 }
@@ -434,7 +440,7 @@ void Load_Enemy_Dummy() //* Loads all three enemy dummies based "enemy[]".
 {
     for(i = 0; i < 3; i++)
     {
-        enemy[i] = Get_Troop(current_map->troops[CurrentTroop])->enemy_slot[i];
+        enemy[i] = current_troop->enemy_slot[i];
     }
 
     if(enemy[0] != 0)
@@ -516,9 +522,33 @@ void Load_Actor_Info()
 
 void Load_Random_Troop() //* Loads a random troop id, based on map troops, into "CurrentTroop".
 {
-    initrand(Seed);
+    rand_percent = rand() % 100;
 
-    CurrentTroop = rand() % 5;
+    for(int i = 0; i < 6; i++)
+    {
+        if(i == 0 && current_map->battles[0].troop != NULL)
+        {
+            if(rand_percent < current_map->battles[0].percentage)
+            {
+                current_troop = current_map->battles[0].troop;
+                return;
+            }
+            
+            percent_max = current_map->battles[0].percentage;
+        }
+        else if(current_map->battles[i].troop != NULL)
+        {
+            percent_max += current_map->battles[i].percentage;
+
+            if(rand_percent < percent_max)
+            {
+                current_troop = current_map->battles[i].troop;
+                return;
+            }
+        }
+    }
+
+    current_troop = &troop_bee1;
 }
 
 void Move_Pointer(UBYTE pos_x, UBYTE pos_y, UBYTE offset_x, UBYTE offset_y) //* Moves pointer and expands to fit offset.
@@ -757,9 +787,7 @@ void Draw_Combat_Main()
     set_bkg_tiles(0, 12, 20, 6, Map_Combat_Selection_MainPLN0);
     set_bkg_tiles(8, 12, 12, 6, Map_Combat_Actor_BoxPLN0);
 
-    Load_Random_Troop();
-
-    Call_Draw_Troop(bank16, Get_Troop(current_map->troops[CurrentTroop])->tiles, Get_Troop(current_map->troops[CurrentTroop])->data);
+    Call_Draw_Troop(bank16, current_troop->tiles, current_troop->data);
 
     Load_Enemy_Dummy();
 
@@ -892,6 +920,20 @@ void Check_Enemies_Killed()
     }
 }
 
+void Load_Random_Combat()
+{
+    Load_Random_Troop();
+
+    Load_Combat_Main();
+}
+
+void Load_Combat(const GameTroop* troop)
+{
+    current_troop = troop;
+
+    Load_Combat_Main();
+}
+
 void Execute_Combat()
 {
     Load_Enemy_Skill();
@@ -955,7 +997,7 @@ void Flee_Battle()
 {
     initrand(clock_tick);
 
-    if(Get_Troop(CurrentTroop)->escapable == true)
+    if(current_troop->escapable == true)
     {
         x = rand() % 3;
 

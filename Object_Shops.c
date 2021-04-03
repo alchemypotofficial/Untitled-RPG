@@ -1,5 +1,6 @@
 #include <gb/gb.h>
 #include "Game_Definitions.h"
+#include "Game_Shop.h"
 
 extern unsigned char Message_Shop_PlumItemPLN0;
 

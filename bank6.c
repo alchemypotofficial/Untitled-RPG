@@ -205,22 +205,22 @@ void reset_char_sprites()
         switch(char_npc_1.facing)
         {
             case up:
-                Call_Load_Char_Sprite(bank6, &char_npc_1, char_npc_1.sprites_up->sprites[0]);
+                Call_Load_Char_Sprite(bank6, &char_npc_1, char_npc_1.sprites->actor_up->sprites[0]);
                 break;
             case down:
-                Call_Load_Char_Sprite(bank6, &char_npc_1, char_npc_1.sprites_down->sprites[0]);
+                Call_Load_Char_Sprite(bank6, &char_npc_1, char_npc_1.sprites->actor_down->sprites[0]);
                 break;
             case left:
-                Call_Load_Char_Sprite(bank6, &char_npc_1, char_npc_1.sprites_left->sprites[0]);
+                Call_Load_Char_Sprite(bank6, &char_npc_1, char_npc_1.sprites->actor_left->sprites[0]);
                 break;
             case right:
-                Call_Load_Char_Sprite(bank6, &char_npc_1, char_npc_1.sprites_right->sprites[0]);
+                Call_Load_Char_Sprite(bank6, &char_npc_1, char_npc_1.sprites->actor_right->sprites[0]);
                 break;
             case idle:
-                Call_Load_Char_Sprite(bank6, &char_npc_1, char_npc_1.sprites_down->sprites[0]);
+                Call_Load_Char_Sprite(bank6, &char_npc_1, char_npc_1.sprites->actor_down->sprites[0]);
                 break;
             default:
-                Call_Load_Char_Sprite(bank6, &char_npc_1, char_npc_1.sprites_down->sprites[0]);
+                Call_Load_Char_Sprite(bank6, &char_npc_1, char_npc_1.sprites->actor_down->sprites[0]);
                 break;
         }
     }
@@ -229,22 +229,22 @@ void reset_char_sprites()
         switch(char_npc_2.facing)
         {
             case up:
-                Call_Load_Char_Sprite(bank6, &char_npc_2, char_npc_2.sprites_up->sprites[0]);
+                Call_Load_Char_Sprite(bank6, &char_npc_2, char_npc_2.sprites->actor_up->sprites[0]);
                 break;
             case down:
-                Call_Load_Char_Sprite(bank6, &char_npc_2, char_npc_2.sprites_down->sprites[0]);
+                Call_Load_Char_Sprite(bank6, &char_npc_2, char_npc_2.sprites->actor_down->sprites[0]);
                 break;
             case left:
-                Call_Load_Char_Sprite(bank6, &char_npc_2, char_npc_2.sprites_left->sprites[0]);
+                Call_Load_Char_Sprite(bank6, &char_npc_2, char_npc_2.sprites->actor_left->sprites[0]);
                 break;
             case right:
-                Call_Load_Char_Sprite(bank6, &char_npc_2, char_npc_2.sprites_right->sprites[0]);
+                Call_Load_Char_Sprite(bank6, &char_npc_2, char_npc_2.sprites->actor_right->sprites[0]);
                 break;
             case idle:
-                Call_Load_Char_Sprite(bank6, &char_npc_2, char_npc_2.sprites_down->sprites[0]);
+                Call_Load_Char_Sprite(bank6, &char_npc_2, char_npc_2.sprites->actor_down->sprites[0]);
                 break;
             default:
-                Call_Load_Char_Sprite(bank6, &char_npc_2, char_npc_2.sprites_down->sprites[0]);
+                Call_Load_Char_Sprite(bank6, &char_npc_2, char_npc_2.sprites->actor_down->sprites[0]);
                 break;
         }
     }
